@@ -235,15 +235,15 @@ const uniswap = () => {
             />
           </div>
 
-          <div className="bg-darkBlue pb-[8px] mb-[10px]">
+          <div className="bg-darkBlue  mb-[10px]">
             <div
-              className="flex justify-between  py-[5px] mb-[10px] cursor-pointer px-[20px]"
+              className="flex justify-between items-center py-[8px] cursor-pointer px-[20px]"
               onClick={() => {
                 setExpand(!expand);
               }}
             >
               <div className="flex items-center">
-                <InfoOutlinedIcon className="text-lightbluetext text-[14px] mr-[5px]" />
+                <InfoOutlinedIcon className="text-lightbluetext text-[15px] mr-[5px]" />
                 <div>
                   <text className="text-[14px]">1 USDT = 1.0045(USDC) </text>
                   <span className="text-lightbluetext text-[14px]">
