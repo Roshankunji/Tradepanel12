@@ -235,7 +235,7 @@ const uniswap = () => {
             />
           </div>
 
-          <div className="bg-darkBlue  mb-[10px]">
+          <div className="bg-darkBlue mb-[10px]">
             <div
               className="flex justify-between items-center py-[8px] cursor-pointer px-[20px]"
               onClick={() => {
