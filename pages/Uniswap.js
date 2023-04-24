@@ -31,12 +31,12 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 404,
+  width: 420,
   bgcolor: "#131A2A",
   borderRadius: "18px",
   boxShadow: 24,
   color: "white",
-  p: 4,
+  // p: 4,
 };
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
@@ -93,6 +93,9 @@ const Uniswap = () => {
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
+  const [swapAmount, setSwapAmount] = useState(0);
+  const [swapSecondAmount, setSwapSecondAmount] = useState(0);
+  const [tokenData, setTokenData] = useState("");
 
   const handleChange = () => {
     setChecked(!checked);
@@ -133,6 +136,7 @@ const Uniswap = () => {
     );
   }, []);
 
+  console.log("token data", tokenData);
   return (
     <>
       <Modal
@@ -142,8 +146,15 @@ const Uniswap = () => {
         aria-describedby="modal-modal-description"
         className="backdrop-blur-sm px-[71px]"
       >
-        <Box sx={style}>
-          <UniswapModalContent />
+        <Box sx={style} className="border-[1px] border-borderColor1">
+          <UniswapModalContent
+            tokenData1={(e) => {
+              setTokenData(e);
+            }}
+            closeModal={() => {
+              handleClose();
+            }}
+          />
         </Box>
       </Modal>
       <div className="ml-auto w-[100px]">
@@ -236,20 +247,37 @@ const Uniswap = () => {
           <div className="flex flex-col w-[100%]  ">
             <div className="flex justify-between py-[20px] mx-[20px] px-[20px] mb-[5px] bg-darkBlue rounded-[10px]">
               <div>
-                <div className="text-[36px]">5</div>
+                {/* <div className="text-[36px]">5</div> */}
+                <input
+                  type="number"
+                  className="text-[36px] bg-darkBlue w-[40%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                  value={swapAmount}
+                  onChange={(e) => {
+                    setSwapAmount(e.target.value);
+                  }}
+                ></input>
                 <div className="text-lightbluetext text-[14px]">$45.00</div>
               </div>
-              <div>
+              <div className="w-[100%]">
                 <div
-                  className="mb-[15px] flex justify-center items-center py-[5px] rounded-[20px] text-white bg-lightBlue cursor-pointer"
+                  className="mb-[15px]  box-border flex justify-center items-center py-[5px] rounded-[20px] text-white bg-lightBlue cursor-pointer"
                   onClick={handleOpen}
                 >
-                  <Image
-                    src={setting}
-                    alt="coin"
-                    className="w-[18px] h-[18px] mr-[8px]"
-                  ></Image>
-                  <text className="text-[18px]">USDT</text>
+                  {tokenData && tokenData.image ? (
+                    <Image
+                      src={`data:image/png;base64,${tokenData?.image}`}
+                      height={25}
+                      width={25}
+                      alt="Token"
+                      className=" mr-[8px] rounded-[20px]"
+                    ></Image>
+                  ) : (
+                    ""
+                  )}
+
+                  <text className="text-[18px]">
+                    {tokenData.shortName ? tokenData.shortName : "USDT"}
+                  </text>
                   <KeyboardArrowDownIcon />
                 </div>
                 <div className="text-center">
@@ -264,20 +292,39 @@ const Uniswap = () => {
 
           <div className="flex justify-between py-[20px] mb-[10px] mx-[20px] px-[20px] bg-darkBlue rounded-[10px] cursor-pointer">
             <div>
-              <div className="text-[36px]">5</div>
+              {/* <div className="text-[36px]">5</div> */}
+              <input
+                type="number"
+                className="text-[36px] bg-darkBlue w-[40%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                value={swapSecondAmount}
+                onChange={(e) => {
+                  setSwapSecondAmount(e.target.value);
+                }}
+              ></input>
               <div className="text-lightbluetext text-[14px]">$45.00</div>
             </div>
-            <div>
+            <div className="w-[100%]">
               <div
                 className="mb-[15px] flex justify-center items-center bg-primary py-[5px] px-[8px] rounded-[20px] text-white"
                 onClick={handleOpen}
               >
-                <Image
-                  src={setting}
-                  alt="coin"
-                  className="w-[18px] h-[18px] mr-[8px]"
-                ></Image>
-                <text className="text-[18px]">Select Token</text>
+                {tokenData && tokenData.image ? (
+                  <Image
+                    src={`data:image/png;base64,${tokenData?.image}`}
+                    height={25}
+                    width={25}
+                    alt="Token"
+                    className="mr-[8px] rounded-[20px]"
+                  ></Image>
+                ) : (
+                  ""
+                )}
+
+                <text className="text-[18px]">
+                  {tokenData && tokenData.shortName
+                    ? tokenData.shortName
+                    : "Select Token"}
+                </text>
                 <KeyboardArrowDownIcon />
               </div>
               <div className="text-center">

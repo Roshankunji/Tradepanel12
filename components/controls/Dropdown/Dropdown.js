@@ -57,7 +57,7 @@ const Dropdown = ({ className }) => {
             style={{
               color: "white",
               // background: "gray",
-              backgroundColor: "#161617",
+              backgroundColor: "#0C1020",
               height: "40px",
               borderRadius: "8px",
             }}
@@ -92,22 +92,18 @@ const Dropdown = ({ className }) => {
                 value={name}
                 style={getStyles(name, personName, theme)}
                 onClick={(e) => {
-                  console.log("true", name);
                   if (name == personName) {
                     setSelected(true);
-                    console.log("true", e);
                   } else {
                     setSelected(false);
-                    console.log("false");
                   }
-                  console.log("e", e.target.innerText);
                 }}
               >
                 <div
                   className={
                     selected === true
                       ? "bg-primary text-white pt-[12px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
-                      : "bg-[#161617] text-white pt-[12px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
+                      : "bg-darkBlue text-white pt-[12px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
                   }
                 >
                   {name}
