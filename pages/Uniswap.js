@@ -23,6 +23,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import WarningIcon from "@mui/icons-material/Warning";
 import ErrorWarning from "../components/Molecules/ErrorMessge/ErrorWarning";
 import Error from "../components/Molecules/ErrorMessge/Error";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -36,7 +38,7 @@ const style = {
   borderRadius: "18px",
   boxShadow: 24,
   color: "white",
-  p: 4,
+  padding: 3,
 };
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
@@ -87,18 +89,48 @@ const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
   const [totalTokenAmount, setTotalTokenAmount] = useState();
   const [walletAddress, setWalletAddress] = useState("0x5175...526A");
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState();
   const [checked, setChecked] = useState(false);
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
+  const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  let [counter, setCounter] = useState(0);
 
   const handleChange = () => {
     setChecked(!checked);
   };
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  useEffect(() => {
+    setTotalTokenAmount(
+      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
+    );
+  }, []);
+
+  useEffect(() => {
+    if (openConfirmModal) {
+      setTimeout(() => {
+        setCounter(counter++);
+        setTimeout(() => {
+          setCounter(counter++);
+          setTimeout(() => {
+            setCounter(counter++);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }
+  }, [openConfirmModal]);
+
+  const handleOpenConfirmModal = () => {
+    setOpenConfirmModal(true);
+  };
+  const handleCloseConfirmModal = () => {
+    setOpenConfirmModal(false);
+    setCounter(0);
+  };
 
   let tokens = [
     {
@@ -127,12 +159,6 @@ const Uniswap = () => {
     },
   ];
 
-  useEffect(() => {
-    setTotalTokenAmount(
-      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
-    );
-  }, []);
-
   return (
     <>
       <Modal
@@ -144,6 +170,90 @@ const Uniswap = () => {
       >
         <Box sx={style}>
           <UniswapModalContent />
+        </Box>
+      </Modal>
+      <Modal
+        open={openConfirmModal}
+        onClose={handleCloseConfirmModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        className="backdrop-blur-sm px-[71px]"
+        sx={{ height: "100%" }}
+      >
+        <Box sx={style}>
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center bg-gray-700 px-2 rounded-full">
+              <Avatar
+                sx={{ width: 30, height: 30 }}
+                src={"/Images/Arbitrum.svg"}
+                alt="arbitrum"
+                className="mr-0"
+              />{" "}
+              <div className="mr-1">Arbitrum</div>
+            </div>
+            <CloseIcon
+              className="cursor-pointer text-gray-300"
+              onClick={handleCloseConfirmModal}
+            />
+          </div>
+          <div className="text-center">
+            {counter === 0 && (
+              <div>
+                <CircularProgress size="78px" className="p-[5px]" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Confirm Transaction in wallet
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[20px]">
+                  Swapping 10.7507 USDT for 10.7527 USDC
+                </div>
+              </div>
+            )}
+            {counter === 1 && (
+              <div>
+                <CircularProgress size="78px" className="p-[5px]" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Transaction Submitted
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[20px]">
+                  Swap exactly 10.7507 USDT for 10.7527 USDC
+                </div>
+                <div className="font-normal text-[14px] text-blue-500 mb-[20px] cursor-pointer">
+                  View on Explorer
+                </div>
+              </div>
+            )}
+            {counter === 2 && (
+              <div>
+                <CheckCircleOutlineIcon className="text-[90px] text-green-500 mb-2" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Success
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[10px]">
+                  Swapping exactly 10.7507 USDT for 10.7527 USDC
+                </div>
+                <div className="font-normal text-[14px] text-blue-500 mb-[15px] cursor-pointer">
+                  View on Explorer
+                </div>
+                <div className="font-normal text-[14px] text-gray-500 mb-[10px]">
+                  Transaction completed in{" "}
+                  <span className="text-gray-200">3.511 seconds</span>
+                </div>
+              </div>
+            )}
+            {/* {setTimeout(() => {
+              if (showContentOne) {
+                setShowContentOne(false);
+              } else {
+                setShowContentOne(true);
+              }
+            }, 3000)} */}
+            <Button
+              className="bg-primary w-[100%]"
+              onClick={handleCloseConfirmModal}
+            >
+              Close
+            </Button>
+          </div>
         </Box>
       </Modal>
       <div className="ml-auto w-[100px]">
@@ -449,7 +559,10 @@ const Uniswap = () => {
             <Button className="bg-primary w-[100%] mb-[20px]">Swap</Button>
           </div>
           <div className="mx-[20px]">
-            <Button className="bg-primary w-[100%] mb-[20px]">
+            <Button
+              className="bg-primary w-[100%] mb-[20px]"
+              onClick={handleOpenConfirmModal}
+            >
               Confirm Swap
             </Button>
           </div>
