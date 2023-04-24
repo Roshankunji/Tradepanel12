@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
-const search = ({ className }) => {
+const Search = ({ className }) => {
   const [search, setSearch] = useState("");
   return (
     <>
@@ -21,4 +21,4 @@ const search = ({ className }) => {
   );
 };
 
-export default search;
+export default Search;

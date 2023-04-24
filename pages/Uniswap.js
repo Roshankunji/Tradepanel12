@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import setting from "../public/Images/setting.png";
 import paper from "../public/Images/paper.png";
 import Button from "../components/atoms/Button/Button";
+import SouthIcon from "@mui/icons-material/South";
+import DrawerC from "../components/controls/SideDrawer/SideDrawer";
+import Avatar from "@mui/material/Avatar";
+import SouthEastIcon from "@mui/icons-material/SouthEast";
+import NorthEastIcon from "@mui/icons-material/NorthEast";
+import TokenInfo from "../components/Molecules/Uniswap/TokenInfo";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
@@ -77,7 +83,10 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-const uniswap = () => {
+const Uniswap = () => {
+  const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
+  const [totalTokenAmount, setTotalTokenAmount] = useState();
+  const [walletAddress, setWalletAddress] = useState("0x5175...526A");
   const [open, setOpen] = React.useState(false);
   const [percentage, setPercentage] = useState();
   const [checked, setChecked] = useState(false);
@@ -90,6 +99,40 @@ const uniswap = () => {
   };
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  let tokens = [
+    {
+      tokenName: "Tether USD",
+      tokenAmount: 10.75,
+      dollarValue: 10.75,
+      tokenSymbol: "USDT",
+      percentChange: 0.05,
+      profitLoss: "loss",
+    },
+    {
+      tokenName: "USD Coin",
+      tokenAmount: 10.35,
+      dollarValue: 10.36,
+      tokenSymbol: "USDC",
+      percentChange: 0.07,
+      profitLoss: "profit",
+    },
+    {
+      tokenName: "Ethereum",
+      tokenAmount: 0.003,
+      dollarValue: 4.86,
+      tokenSymbol: "ETH",
+      percentChange: 1.33,
+      profitLoss: "loss",
+    },
+  ];
+
+  useEffect(() => {
+    setTotalTokenAmount(
+      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
+    );
+  }, []);
+
   return (
     <>
       <Modal
@@ -103,6 +146,75 @@ const uniswap = () => {
           <UniswapModalContent />
         </Box>
       </Modal>
+      <div className="ml-auto w-[100px]">
+        <DrawerC
+          anchor="right"
+          wallet={
+            <div className="flex py-[7px] px-[12px]">
+              <Avatar
+                sx={{ width: 25, height: 25 }}
+                src={""}
+                alt="wallet"
+                className="mr-2"
+              />
+              <div className="text-[16px] font-medium text-white">
+                {walletAddress}
+              </div>
+            </div>
+          }
+          content={
+            <div className="px-[20px] py-[16px]">
+              <div>
+                <div className="text-white text-[36px] font-medium">
+                  ${totalTokenAmount}
+                </div>
+                <div className="flex items-center text-gray-400 text-[15px] font-medium">
+                  {totalProfitLoss === "loss" ? (
+                    <SouthEastIcon className="text-red-400 text-[16px] mr-[1px]" />
+                  ) : (
+                    <NorthEastIcon className="text-green-400 text-[16px] mr-[1px]" />
+                  )}
+                  <div className="">$0.06</div>
+                  <div className="ml-1">(0.24%)</div>
+                </div>
+              </div>
+              <div className="text-white text-[15px] font-bold mt-5 mb-3">
+                Tokens
+              </div>
+              {tokens.map(function (e) {
+                return (
+                  <TokenInfo
+                    key={""}
+                    tokenName={e.tokenName}
+                    tokenAmount={e.tokenAmount}
+                    dollarValue={e.dollarValue}
+                    tokenSymbol={e.tokenSymbol}
+                    percentChange={e.percentChange}
+                    profitLoss={e.profitLoss}
+                  />
+                );
+              })}
+            </div>
+          }
+          button={
+            <div className="flex justify-end cursor-pointer pt-3">
+              <div className="flex py-[7px] px-[12px] border border-gray-600 rounded-full">
+                <Avatar
+                  sx={{ width: 25, height: 25 }}
+                  src={""}
+                  alt="wallet"
+                  className="mr-2"
+                />
+                <div className="text-[16px] font-medium">{walletAddress}</div>
+              </div>
+            </div>
+          }
+        />
+      </div>
+
+      {/* <SideDrawer openPanel={openPanel} btn="Open">
+        <div className="w-[30%]">Hello</div>
+      </SideDrawer> */}
       <div className="flex justify-center items-center bg-backgroundColor text-white py-[50px]">
         {" "}
         <div className="w-[500px] bg-darkBlueBlack1 border-[1px] border-borderColor1 rounded-[10px]">
@@ -350,4 +462,4 @@ const uniswap = () => {
   );
 };
 
-export default uniswap;
+export default Uniswap;
