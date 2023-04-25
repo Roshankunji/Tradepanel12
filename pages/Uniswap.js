@@ -122,6 +122,26 @@ const Uniswap = () => {
     setCounter(0);
   };
 
+  useEffect(() => {
+    setTotalTokenAmount(
+      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
+    );
+  }, []);
+
+  useEffect(() => {
+    if (openConfirmModal) {
+      setTimeout(() => {
+        setCounter(counter++);
+        setTimeout(() => {
+          setCounter(counter++);
+          setTimeout(() => {
+            setCounter(counter++);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }
+  }, [openConfirmModal]);
+
   let tokens = [
     {
       tokenName: "Tether USD",
@@ -189,6 +209,90 @@ const Uniswap = () => {
         sx={{ height: "100%" }}
       >
         <Box sx={style1}>
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center bg-gray-700 px-2 rounded-full">
+              <Avatar
+                sx={{ width: 30, height: 30 }}
+                src={"/Images/Arbitrum.svg"}
+                alt="arbitrum"
+                className="mr-0"
+              />{" "}
+              <div className="mr-1">Arbitrum</div>
+            </div>
+            <CloseIcon
+              className="cursor-pointer text-gray-300"
+              onClick={handleCloseConfirmModal}
+            />
+          </div>
+          <div className="text-center">
+            {counter === 0 && (
+              <div>
+                <CircularProgress size="78px" className="p-[5px]" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Confirm Transaction in wallet
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[20px]">
+                  Swapping 10.7507 USDT for 10.7527 USDC
+                </div>
+              </div>
+            )}
+            {counter === 1 && (
+              <div>
+                <CircularProgress size="78px" className="p-[5px]" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Transaction Submitted
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[20px]">
+                  Swap exactly 10.7507 USDT for 10.7527 USDC
+                </div>
+                <div className="font-normal text-[14px] text-blue-500 mb-[20px] cursor-pointer">
+                  View on Explorer
+                </div>
+              </div>
+            )}
+            {counter === 2 && (
+              <div>
+                <CheckCircleOutlineIcon className="text-[90px] text-green-500 mb-2" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Success
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[10px]">
+                  Swapping exactly 10.7507 USDT for 10.7527 USDC
+                </div>
+                <div className="font-normal text-[14px] text-blue-500 mb-[15px] cursor-pointer">
+                  View on Explorer
+                </div>
+                <div className="font-normal text-[14px] text-gray-500 mb-[10px]">
+                  Transaction completed in{" "}
+                  <span className="text-gray-200">3.511 seconds</span>
+                </div>
+              </div>
+            )}
+            {/* {setTimeout(() => {
+              if (showContentOne) {
+                setShowContentOne(false);
+              } else {
+                setShowContentOne(true);
+              }
+            }, 3000)} */}
+            <Button
+              className="bg-primary w-[100%]"
+              onClick={handleCloseConfirmModal}
+            >
+              Close
+            </Button>
+          </div>
+        </Box>
+      </Modal>
+      <Modal
+        open={openConfirmModal}
+        onClose={handleCloseConfirmModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        className="backdrop-blur-sm px-[71px]"
+        sx={{ height: "100%" }}
+      >
+        <Box sx={style}>
           <div className="flex justify-between items-center mb-3">
             <div className="flex items-center bg-gray-700 px-2 rounded-full">
               <Avatar
