@@ -53,17 +53,17 @@ body {
 }
 
 /* scrollnbar */
-::-webkit-scrollbar {
+.scroll::-webkit-scrollbar {
   width: 2px;
 }
 /* Track */
-::-webkit-scrollbar-track {
+.scroll::-webkit-scrollbar-track {
   box-shadow: inset 0 0 5px #0c1020;
   border-radius: 10px;
 }
 
 /* Handle */
-::-webkit-scrollbar-thumb {
+.scroll::-webkit-scrollbar-thumb {
   background: grey;
   border-radius: 10px;
 }

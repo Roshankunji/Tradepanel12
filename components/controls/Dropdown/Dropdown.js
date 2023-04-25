@@ -103,7 +103,7 @@ const Dropdown = ({ className }) => {
                   className={
                     selected === true
                       ? "bg-primary text-white pt-[12px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
-                      : "bg-darkBlue text-white pt-[12px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
+                      : "bg-darkBlue text-white pt-[12px] rounded-[2px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
                   }
                 >
                   {name}
