@@ -57,7 +57,8 @@ const style1 = {
 
 const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
-  const [totalTokenAmount, setTotalTokenAmount] = useState();
+  const [totalTraderTokenAmount, setTotalTraderTokenAmount] = useState();
+  const [totalUserTokenAmount, setTotalUserTokenAmount] = useState();
   const [walletAddress, setWalletAddress] = useState("0x5175...526A");
   const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState();
@@ -73,6 +74,7 @@ const Uniswap = () => {
   const [first, setFirst] = useState(false);
   const [second, setSecond] = useState(false);
   let [counter, setCounter] = useState(0);
+  const [toggle, setToggle] = useState("Trader wallet");
 
   const handleChange = () => {
     setChecked(!checked);
@@ -95,8 +97,17 @@ const Uniswap = () => {
   };
 
   useEffect(() => {
-    setTotalTokenAmount(
-      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
+    setTotalTraderTokenAmount(
+      traderTokens
+        .map((item) => item.dollarValue)
+        .reduce((prev, next) => prev + next)
+        .toFixed(2)
+    );
+    setTotalUserTokenAmount(
+      userTokens
+        .map((item) => item.dollarValue)
+        .reduce((prev, next) => prev + next)
+        .toFixed(2)
     );
   }, []);
 
@@ -122,27 +133,11 @@ const Uniswap = () => {
     setCounter(0);
   };
 
-  useEffect(() => {
-    setTotalTokenAmount(
-      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
-    );
-  }, []);
+  const toggleHandler = (type) => {
+    setToggle(type);
+  };
 
-  useEffect(() => {
-    if (openConfirmModal) {
-      setTimeout(() => {
-        setCounter(counter++);
-        setTimeout(() => {
-          setCounter(counter++);
-          setTimeout(() => {
-            setCounter(counter++);
-          }, 1000);
-        }, 1000);
-      }, 1000);
-    }
-  }, [openConfirmModal]);
-
-  let tokens = [
+  let traderTokens = [
     {
       tokenName: "Tether USD",
       tokenAmount: 10.75,
@@ -169,11 +164,32 @@ const Uniswap = () => {
     },
   ];
 
-  useEffect(() => {
-    setTotalTokenAmount(
-      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
-    );
-  }, [tokens]);
+  let userTokens = [
+    {
+      tokenName: "Tether USD",
+      tokenAmount: 100.75,
+      dollarValue: 100.75,
+      tokenSymbol: "USDT",
+      percentChange: 1.05,
+      profitLoss: "loss",
+    },
+    {
+      tokenName: "USD Coin",
+      tokenAmount: 100.35,
+      dollarValue: 100.36,
+      tokenSymbol: "USDC",
+      percentChange: 1.07,
+      profitLoss: "profit",
+    },
+    {
+      tokenName: "Ethereum",
+      tokenAmount: 1.003,
+      dollarValue: 40.86,
+      tokenSymbol: "ETH",
+      percentChange: 10.33,
+      profitLoss: "loss",
+    },
+  ];
 
   return (
     <>
@@ -268,97 +284,6 @@ const Uniswap = () => {
                 </div>
               </div>
             )}
-            {/* {setTimeout(() => {
-              if (showContentOne) {
-                setShowContentOne(false);
-              } else {
-                setShowContentOne(true);
-              }
-            }, 3000)} */}
-            <Button
-              className="bg-primary w-[100%]"
-              onClick={handleCloseConfirmModal}
-            >
-              Close
-            </Button>
-          </div>
-        </Box>
-      </Modal>
-      <Modal
-        open={openConfirmModal}
-        onClose={handleCloseConfirmModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        className="backdrop-blur-sm px-[71px]"
-        sx={{ height: "100%" }}
-      >
-        <Box sx={style}>
-          <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center bg-gray-700 px-2 rounded-full">
-              <Avatar
-                sx={{ width: 30, height: 30 }}
-                src={"/Images/Arbitrum.svg"}
-                alt="arbitrum"
-                className="mr-0"
-              />{" "}
-              <div className="mr-1">Arbitrum</div>
-            </div>
-            <CloseIcon
-              className="cursor-pointer text-gray-300"
-              onClick={handleCloseConfirmModal}
-            />
-          </div>
-          <div className="text-center">
-            {counter === 0 && (
-              <div>
-                <CircularProgress size="78px" className="p-[5px]" />
-                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
-                  Confirm Transaction in wallet
-                </div>
-                <div className="font-normal text-[14px] text-gray-200 mb-[20px]">
-                  Swapping 10.7507 USDT for 10.7527 USDC
-                </div>
-              </div>
-            )}
-            {counter === 1 && (
-              <div>
-                <CircularProgress size="78px" className="p-[5px]" />
-                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
-                  Transaction Submitted
-                </div>
-                <div className="font-normal text-[14px] text-gray-200 mb-[20px]">
-                  Swap exactly 10.7507 USDT for 10.7527 USDC
-                </div>
-                <div className="font-normal text-[14px] text-blue-500 mb-[20px] cursor-pointer">
-                  View on Explorer
-                </div>
-              </div>
-            )}
-            {counter === 2 && (
-              <div>
-                <CheckCircleOutlineIcon className="text-[90px] text-green-500 mb-2" />
-                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
-                  Success
-                </div>
-                <div className="font-normal text-[14px] text-gray-200 mb-[10px]">
-                  Swapping exactly 10.7507 USDT for 10.7527 USDC
-                </div>
-                <div className="font-normal text-[14px] text-blue-500 mb-[15px] cursor-pointer">
-                  View on Explorer
-                </div>
-                <div className="font-normal text-[14px] text-gray-500 mb-[10px]">
-                  Transaction completed in{" "}
-                  <span className="text-gray-200">3.511 seconds</span>
-                </div>
-              </div>
-            )}
-            {/* {setTimeout(() => {
-              if (showContentOne) {
-                setShowContentOne(false);
-              } else {
-                setShowContentOne(true);
-              }
-            }, 3000)} */}
             <Button
               className="bg-primary w-[100%]"
               onClick={handleCloseConfirmModal}
@@ -386,36 +311,106 @@ const Uniswap = () => {
           }
           content={
             <div className="px-[20px] py-[16px]">
-              <div>
-                <div className="text-white text-[36px] font-medium">
-                  ${totalTokenAmount}
-                </div>
-                <div className="flex items-center text-gray-400 text-[15px] font-medium">
-                  {totalProfitLoss === "loss" ? (
-                    <SouthEastIcon className="text-red-400 text-[16px] mr-[1px]" />
-                  ) : (
-                    <NorthEastIcon className="text-green-400 text-[16px] mr-[1px]" />
-                  )}
-                  <div className="">$0.06</div>
-                  <div className="ml-1">(0.24%)</div>
+              <div className="w-full mb-3">
+                <div className="flex">
+                  <div
+                    onClick={() => toggleHandler("Trader wallet")}
+                    className="w-[50%]"
+                  >
+                    <div
+                      className={
+                        toggle === "Trader wallet"
+                          ? "text-center bg-primary h-full p-2 border-1 border-gray-800 text-white text-[16px] font-medium cursor-pointer"
+                          : "text-center bg-gray-700 p-2 text-gray-400 border-1 font-medium cursor-pointer"
+                      }
+                    >
+                      Trader wallet
+                    </div>
+                  </div>
+                  <div
+                    onClick={() => toggleHandler("User wallet")}
+                    className="w-[50%]"
+                  >
+                    <div
+                      className={
+                        toggle === "User wallet"
+                          ? "text-center bg-primary h-full p-2 border-1 border-gray-800 text-white text-[16px] font-medium cursor-pointer"
+                          : "text-center bg-gray-700 p-2 text-gray-400 border-1 font-medium cursor-pointer"
+                      }
+                    >
+                      User wallet
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="text-white text-[15px] font-bold mt-5 mb-3">
-                Tokens
-              </div>
-              {tokens.map(function (e) {
-                return (
-                  <TokenInfo
-                    key={""}
-                    tokenName={e.tokenName}
-                    tokenAmount={e.tokenAmount}
-                    dollarValue={e.dollarValue}
-                    tokenSymbol={e.tokenSymbol}
-                    percentChange={e.percentChange}
-                    profitLoss={e.profitLoss}
-                  />
-                );
-              })}
+              {toggle === "Trader wallet" && (
+                <div>
+                  <div>
+                    <div className="text-white text-[36px] font-medium">
+                      ${totalTraderTokenAmount}
+                    </div>
+                    <div className="flex items-center text-gray-400 text-[15px] font-medium">
+                      {totalProfitLoss === "loss" ? (
+                        <SouthEastIcon className="text-red-400 text-[16px] mr-[1px]" />
+                      ) : (
+                        <NorthEastIcon className="text-green-400 text-[16px] mr-[1px]" />
+                      )}
+                      <div className="">$0.06</div>
+                      <div className="ml-1">(0.24%)</div>
+                    </div>
+                  </div>
+                  <div className="text-white text-[15px] font-bold mt-5 mb-3">
+                    Tokens
+                  </div>
+                  {traderTokens.map(function (e) {
+                    return (
+                      <TokenInfo
+                        key={""}
+                        tokenName={e.tokenName}
+                        tokenAmount={e.tokenAmount}
+                        dollarValue={e.dollarValue}
+                        tokenSymbol={e.tokenSymbol}
+                        percentChange={e.percentChange}
+                        profitLoss={e.profitLoss}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+              {toggle === "User wallet" && (
+                <div>
+                  <div>
+                    <div className="text-white text-[36px] font-medium">
+                      ${totalUserTokenAmount}
+                    </div>
+                    <div className="flex items-center text-gray-400 text-[15px] font-medium">
+                      {totalProfitLoss === "loss" ? (
+                        <SouthEastIcon className="text-red-400 text-[16px] mr-[1px]" />
+                      ) : (
+                        <NorthEastIcon className="text-green-400 text-[16px] mr-[1px]" />
+                      )}
+                      <div className="">$0.06</div>
+                      <div className="ml-1">(0.24%)</div>
+                    </div>
+                  </div>
+                  <div className="text-white text-[15px] font-bold mt-5 mb-3">
+                    Tokens
+                  </div>
+                  {userTokens.map(function (e) {
+                    return (
+                      <TokenInfo
+                        key={""}
+                        tokenName={e.tokenName}
+                        tokenAmount={e.tokenAmount}
+                        dollarValue={e.dollarValue}
+                        tokenSymbol={e.tokenSymbol}
+                        percentChange={e.percentChange}
+                        profitLoss={e.profitLoss}
+                      />
+                    );
+                  })}
+                </div>
+              )}
             </div>
           }
           button={
