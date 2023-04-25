@@ -14,7 +14,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import UniswapModalContent from "../components/controls/Modal/UniswapModalContent";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import Switch from "@mui/material/Switch";
+import Switch1 from "../components/atoms/Switch/Switch1";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import KeyboardArrowUpOutlinedIcon from "@mui/icons-material/KeyboardArrowUpOutlined";
@@ -25,6 +25,7 @@ import ErrorWarning from "../components/Molecules/ErrorMessge/ErrorWarning";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
+import tokenDataFromJson from "../components/controls/Dropdown/TokenData.json";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -33,57 +34,26 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 404,
+  width: 390,
+  bgcolor: "#131A2A",
+  borderRadius: "18px",
+  boxShadow: 24,
+  color: "white",
+  // p: 4,
+  pt: 1,
+};
+const style1 = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 390,
   bgcolor: "#131A2A",
   borderRadius: "18px",
   boxShadow: 24,
   color: "white",
   padding: 3,
 };
-
-const AntSwitch = styled(Switch)(({ theme }) => ({
-  width: 48,
-  height: 24,
-  padding: 0,
-  display: "flex",
-  "&:active": {
-    "& .MuiSwitch-thumb": {
-      width: 22,
-    },
-    "& .MuiSwitch-switchBase.Mui-checked": {
-      transform: "translateX(0px)",
-    },
-  },
-  "& .MuiSwitch-switchBase": {
-    padding: 2,
-    "&.Mui-checked": {
-      transform: "translateX(22px)",
-      color: "#fff",
-      "& + .MuiSwitch-track": {
-        opacity: 1,
-        backgroundColor: theme.palette.mode === "dark" ? "#177ddc" : "#1890ff",
-      },
-    },
-  },
-  "& .MuiSwitch-thumb": {
-    boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    transition: theme.transitions.create(["width"], {
-      duration: 200,
-    }),
-  },
-  "& .MuiSwitch-track": {
-    borderRadius: 28 / 2,
-    opacity: 1,
-    backgroundColor:
-      theme.palette.mode === "dark"
-        ? "rgba(255,255,255,.35)"
-        : "rgba(0,0,0,.25)",
-    boxSizing: "border-box",
-  },
-}));
 
 const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
@@ -95,14 +65,34 @@ const Uniswap = () => {
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
+  const [swapAmount, setSwapAmount] = useState(0);
+  const [swapSecondAmount, setSwapSecondAmount] = useState(0);
+  const [tokenData, setTokenData] = useState("");
+  const [tokenDataNext, setTokenDataNext] = useState("");
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
+  const [first, setFirst] = useState(false);
+  const [second, setSecond] = useState(false);
   let [counter, setCounter] = useState(0);
 
   const handleChange = () => {
     setChecked(!checked);
   };
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => {
+    setFirst(true);
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setFirst(false);
+    setOpen(false);
+  };
+  const handleOpen1 = () => {
+    setSecond(true);
+    setOpen(true);
+  };
+  const handleClose1 = () => {
+    setSecond(false);
+    setOpen(false);
+  };
 
   useEffect(() => {
     setTotalTokenAmount(
@@ -132,6 +122,26 @@ const Uniswap = () => {
     setCounter(0);
   };
 
+  useEffect(() => {
+    setTotalTokenAmount(
+      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
+    );
+  }, []);
+
+  useEffect(() => {
+    if (openConfirmModal) {
+      setTimeout(() => {
+        setCounter(counter++);
+        setTimeout(() => {
+          setCounter(counter++);
+          setTimeout(() => {
+            setCounter(counter++);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }
+  }, [openConfirmModal]);
+
   let tokens = [
     {
       tokenName: "Tether USD",
@@ -159,17 +169,119 @@ const Uniswap = () => {
     },
   ];
 
+  useEffect(() => {
+    setTotalTokenAmount(
+      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
+    );
+  }, [tokens]);
+
   return (
     <>
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={first === true ? handleClose : handleClose1}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
         className="backdrop-blur-sm px-[71px]"
       >
-        <Box sx={style}>
-          <UniswapModalContent />
+        <Box sx={style} className="border-[1px] border-borderColor1">
+          <UniswapModalContent
+            tokenData1={(e) => {
+              setTokenData(e);
+            }}
+            first={first}
+            second={second}
+            tokenData2={(e) => {
+              setTokenDataNext(e);
+            }}
+            closeModal={() => {
+              handleClose();
+            }}
+          />
+        </Box>
+      </Modal>
+      <Modal
+        open={openConfirmModal}
+        onClose={handleCloseConfirmModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        className="backdrop-blur-sm px-[71px]"
+        sx={{ height: "100%" }}
+      >
+        <Box sx={style1}>
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center bg-gray-700 px-2 rounded-full">
+              <Avatar
+                sx={{ width: 30, height: 30 }}
+                src={"/Images/Arbitrum.svg"}
+                alt="arbitrum"
+                className="mr-0"
+              />{" "}
+              <div className="mr-1">Arbitrum</div>
+            </div>
+            <CloseIcon
+              className="cursor-pointer text-gray-300"
+              onClick={handleCloseConfirmModal}
+            />
+          </div>
+          <div className="text-center">
+            {counter === 0 && (
+              <div>
+                <CircularProgress size="78px" className="p-[5px]" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Confirm Transaction in wallet
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[20px]">
+                  Swapping 10.7507 USDT for 10.7527 USDC
+                </div>
+              </div>
+            )}
+            {counter === 1 && (
+              <div>
+                <CircularProgress size="78px" className="p-[5px]" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Transaction Submitted
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[20px]">
+                  Swap exactly 10.7507 USDT for 10.7527 USDC
+                </div>
+                <div className="font-normal text-[14px] text-blue-500 mb-[20px] cursor-pointer">
+                  View on Explorer
+                </div>
+              </div>
+            )}
+            {counter === 2 && (
+              <div>
+                <CheckCircleOutlineIcon className="text-[90px] text-green-500 mb-2" />
+                <div className="font-medium text-gray-200 mb-[5px] text-[17px]">
+                  Success
+                </div>
+                <div className="font-normal text-[14px] text-gray-200 mb-[10px]">
+                  Swapping exactly 10.7507 USDT for 10.7527 USDC
+                </div>
+                <div className="font-normal text-[14px] text-blue-500 mb-[15px] cursor-pointer">
+                  View on Explorer
+                </div>
+                <div className="font-normal text-[14px] text-gray-500 mb-[10px]">
+                  Transaction completed in{" "}
+                  <span className="text-gray-200">3.511 seconds</span>
+                </div>
+              </div>
+            )}
+            {/* {setTimeout(() => {
+              if (showContentOne) {
+                setShowContentOne(false);
+              } else {
+                setShowContentOne(true);
+              }
+            }, 3000)} */}
+            <Button
+              className="bg-primary w-[100%]"
+              onClick={handleCloseConfirmModal}
+            >
+              Close
+            </Button>
+          </div>
         </Box>
       </Modal>
       <Modal
@@ -345,21 +457,43 @@ const Uniswap = () => {
           </div>
           <div className="flex flex-col w-[100%]  ">
             <div className="flex justify-between py-[20px] mx-[20px] px-[20px] mb-[5px] bg-darkBlue rounded-[10px]">
-              <div>
-                <div className="text-[36px]">5</div>
-                <div className="text-lightbluetext text-[14px]">$45.00</div>
+              <div className="w-[60%] mr-[10px]">
+                <input
+                  type="number"
+                  className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                  value={swapAmount}
+                  onChange={(e) => {
+                    setSwapAmount(e.target.value);
+                  }}
+                ></input>
+                <div className="text-lightbluetext text-[14px] ">$45.00</div>
               </div>
-              <div>
+              <div className="w-[40%]">
                 <div
-                  className="mb-[15px] flex justify-center items-center py-[5px] rounded-[20px] text-white bg-lightBlue cursor-pointer"
+                  className="mb-[15px]  box-border flex justify-center items-center py-[5px] rounded-[20px] text-white bg-lightBlue cursor-pointer"
                   onClick={handleOpen}
                 >
-                  <Image
-                    src={setting}
-                    alt="coin"
-                    className="w-[18px] h-[18px] mr-[8px]"
-                  ></Image>
-                  <text className="text-[18px]">USDT</text>
+                  {tokenData && tokenData.image ? (
+                    <Image
+                      src={`data:image/png;base64,${tokenData?.image}`}
+                      height={25}
+                      width={25}
+                      alt="Token"
+                      className="mr-[8px] rounded-[20px]"
+                    ></Image>
+                  ) : (
+                    <Image
+                      src={`data:image/png;base64,${tokenDataFromJson[0].image}`}
+                      height={25}
+                      width={25}
+                      alt="Token"
+                      className="mr-[8px] rounded-[20px]"
+                    ></Image>
+                  )}
+
+                  <text className="text-[18px]">
+                    {tokenData.shortName ? tokenData.shortName : "USDT"}
+                  </text>
                   <KeyboardArrowDownIcon />
                 </div>
                 <div className="text-center">
@@ -373,21 +507,39 @@ const Uniswap = () => {
           </div>
 
           <div className="flex justify-between py-[20px] mb-[10px] mx-[20px] px-[20px] bg-darkBlue rounded-[10px] cursor-pointer">
-            <div>
-              <div className="text-[36px]">5</div>
+            <div className="w-[60%] mr-[10px]">
+              <input
+                type="number"
+                className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                value={swapSecondAmount}
+                onChange={(e) => {
+                  setSwapSecondAmount(e.target.value);
+                }}
+              ></input>
               <div className="text-lightbluetext text-[14px]">$45.00</div>
             </div>
-            <div>
+            <div className="w-[40%]">
               <div
                 className="mb-[15px] flex justify-center items-center bg-primary py-[5px] px-[8px] rounded-[20px] text-white"
-                onClick={handleOpen}
+                onClick={handleOpen1}
               >
-                <Image
-                  src={setting}
-                  alt="coin"
-                  className="w-[18px] h-[18px] mr-[8px]"
-                ></Image>
-                <text className="text-[18px]">Select Token</text>
+                {tokenDataNext && tokenDataNext.image ? (
+                  <Image
+                    src={`data:image/png;base64,${tokenDataNext.image}`}
+                    height={25}
+                    width={25}
+                    alt="Token"
+                    className="mr-[8px] rounded-[20px]"
+                  ></Image>
+                ) : (
+                  ""
+                )}
+
+                <text className="text-[18px]">
+                  {tokenDataNext && tokenDataNext.shortName
+                    ? tokenDataNext.shortName
+                    : "Select Token"}
+                </text>
                 <KeyboardArrowDownIcon />
               </div>
               <div className="text-center">
@@ -450,11 +602,7 @@ const Uniswap = () => {
               <HelpOutlineIcon className="text-[18px]" />
             </div>
             {/* <Switch {...label} checked={checked} onChange={handleChange} /> */}
-            <AntSwitch
-              inputProps={{ "aria-label": "ant design" }}
-              checked={checked}
-              onChange={handleChange}
-            />
+            <Switch1 checked={checked} change={handleChange} />
           </div>
 
           <div className="bg-darkBlue mb-[10px]">
