@@ -87,7 +87,8 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
 
 const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
-  const [totalTokenAmount, setTotalTokenAmount] = useState();
+  const [totalTraderTokenAmount, setTotalTraderTokenAmount] = useState();
+  const [totalUserTokenAmount, setTotalUserTokenAmount] = useState();
   const [walletAddress, setWalletAddress] = useState("0x5175...526A");
   const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState();
@@ -97,6 +98,7 @@ const Uniswap = () => {
   const [approve, setApprove] = useState(false);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   let [counter, setCounter] = useState(0);
+  const [toggle, setToggle] = useState("Trader wallet");
 
   const handleChange = () => {
     setChecked(!checked);
@@ -105,8 +107,17 @@ const Uniswap = () => {
   const handleClose = () => setOpen(false);
 
   useEffect(() => {
-    setTotalTokenAmount(
-      tokens.map((item) => item.dollarValue).reduce((prev, next) => prev + next)
+    setTotalTraderTokenAmount(
+      traderTokens
+        .map((item) => item.dollarValue)
+        .reduce((prev, next) => prev + next)
+        .toFixed(2)
+    );
+    setTotalUserTokenAmount(
+      userTokens
+        .map((item) => item.dollarValue)
+        .reduce((prev, next) => prev + next)
+        .toFixed(2)
     );
   }, []);
 
@@ -132,7 +143,11 @@ const Uniswap = () => {
     setCounter(0);
   };
 
-  let tokens = [
+  const toggleHandler = (type) => {
+    setToggle(type);
+  };
+
+  let traderTokens = [
     {
       tokenName: "Tether USD",
       tokenAmount: 10.75,
@@ -155,6 +170,33 @@ const Uniswap = () => {
       dollarValue: 4.86,
       tokenSymbol: "ETH",
       percentChange: 1.33,
+      profitLoss: "loss",
+    },
+  ];
+
+  let userTokens = [
+    {
+      tokenName: "Tether USD",
+      tokenAmount: 100.75,
+      dollarValue: 100.75,
+      tokenSymbol: "USDT",
+      percentChange: 1.05,
+      profitLoss: "loss",
+    },
+    {
+      tokenName: "USD Coin",
+      tokenAmount: 100.35,
+      dollarValue: 100.36,
+      tokenSymbol: "USDC",
+      percentChange: 1.07,
+      profitLoss: "profit",
+    },
+    {
+      tokenName: "Ethereum",
+      tokenAmount: 1.003,
+      dollarValue: 40.86,
+      tokenSymbol: "ETH",
+      percentChange: 10.33,
       profitLoss: "loss",
     },
   ];
@@ -240,13 +282,6 @@ const Uniswap = () => {
                 </div>
               </div>
             )}
-            {/* {setTimeout(() => {
-              if (showContentOne) {
-                setShowContentOne(false);
-              } else {
-                setShowContentOne(true);
-              }
-            }, 3000)} */}
             <Button
               className="bg-primary w-[100%]"
               onClick={handleCloseConfirmModal}
@@ -274,36 +309,106 @@ const Uniswap = () => {
           }
           content={
             <div className="px-[20px] py-[16px]">
-              <div>
-                <div className="text-white text-[36px] font-medium">
-                  ${totalTokenAmount}
-                </div>
-                <div className="flex items-center text-gray-400 text-[15px] font-medium">
-                  {totalProfitLoss === "loss" ? (
-                    <SouthEastIcon className="text-red-400 text-[16px] mr-[1px]" />
-                  ) : (
-                    <NorthEastIcon className="text-green-400 text-[16px] mr-[1px]" />
-                  )}
-                  <div className="">$0.06</div>
-                  <div className="ml-1">(0.24%)</div>
+              <div className="w-full mb-3">
+                <div className="flex">
+                  <div
+                    onClick={() => toggleHandler("Trader wallet")}
+                    className="w-[50%]"
+                  >
+                    <div
+                      className={
+                        toggle === "Trader wallet"
+                          ? "text-center bg-primary h-full p-2 border-1 border-gray-800 text-white text-[16px] font-medium cursor-pointer"
+                          : "text-center bg-gray-700 p-2 text-gray-400 border-1 font-medium cursor-pointer"
+                      }
+                    >
+                      Trader wallet
+                    </div>
+                  </div>
+                  <div
+                    onClick={() => toggleHandler("User wallet")}
+                    className="w-[50%]"
+                  >
+                    <div
+                      className={
+                        toggle === "User wallet"
+                          ? "text-center bg-primary h-full p-2 border-1 border-gray-800 text-white text-[16px] font-medium cursor-pointer"
+                          : "text-center bg-gray-700 p-2 text-gray-400 border-1 font-medium cursor-pointer"
+                      }
+                    >
+                      User wallet
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="text-white text-[15px] font-bold mt-5 mb-3">
-                Tokens
-              </div>
-              {tokens.map(function (e) {
-                return (
-                  <TokenInfo
-                    key={""}
-                    tokenName={e.tokenName}
-                    tokenAmount={e.tokenAmount}
-                    dollarValue={e.dollarValue}
-                    tokenSymbol={e.tokenSymbol}
-                    percentChange={e.percentChange}
-                    profitLoss={e.profitLoss}
-                  />
-                );
-              })}
+              {toggle === "Trader wallet" && (
+                <div>
+                  <div>
+                    <div className="text-white text-[36px] font-medium">
+                      ${totalTraderTokenAmount}
+                    </div>
+                    <div className="flex items-center text-gray-400 text-[15px] font-medium">
+                      {totalProfitLoss === "loss" ? (
+                        <SouthEastIcon className="text-red-400 text-[16px] mr-[1px]" />
+                      ) : (
+                        <NorthEastIcon className="text-green-400 text-[16px] mr-[1px]" />
+                      )}
+                      <div className="">$0.06</div>
+                      <div className="ml-1">(0.24%)</div>
+                    </div>
+                  </div>
+                  <div className="text-white text-[15px] font-bold mt-5 mb-3">
+                    Tokens
+                  </div>
+                  {traderTokens.map(function (e) {
+                    return (
+                      <TokenInfo
+                        key={""}
+                        tokenName={e.tokenName}
+                        tokenAmount={e.tokenAmount}
+                        dollarValue={e.dollarValue}
+                        tokenSymbol={e.tokenSymbol}
+                        percentChange={e.percentChange}
+                        profitLoss={e.profitLoss}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+              {toggle === "User wallet" && (
+                <div>
+                  <div>
+                    <div className="text-white text-[36px] font-medium">
+                      ${totalUserTokenAmount}
+                    </div>
+                    <div className="flex items-center text-gray-400 text-[15px] font-medium">
+                      {totalProfitLoss === "loss" ? (
+                        <SouthEastIcon className="text-red-400 text-[16px] mr-[1px]" />
+                      ) : (
+                        <NorthEastIcon className="text-green-400 text-[16px] mr-[1px]" />
+                      )}
+                      <div className="">$0.06</div>
+                      <div className="ml-1">(0.24%)</div>
+                    </div>
+                  </div>
+                  <div className="text-white text-[15px] font-bold mt-5 mb-3">
+                    Tokens
+                  </div>
+                  {userTokens.map(function (e) {
+                    return (
+                      <TokenInfo
+                        key={""}
+                        tokenName={e.tokenName}
+                        tokenAmount={e.tokenAmount}
+                        dollarValue={e.dollarValue}
+                        tokenSymbol={e.tokenSymbol}
+                        percentChange={e.percentChange}
+                        profitLoss={e.profitLoss}
+                      />
+                    );
+                  })}
+                </div>
+              )}
             </div>
           }
           button={
