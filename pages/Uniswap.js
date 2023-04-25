@@ -66,8 +66,8 @@ const Uniswap = () => {
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
-  const [swapAmount, setSwapAmount] = useState(0);
-  const [swapSecondAmount, setSwapSecondAmount] = useState(0);
+  const [swapAmount, setSwapAmount] = useState();
+  const [swapSecondAmount, setSwapSecondAmount] = useState();
   const [tokenData, setTokenData] = useState("");
   const [tokenDataNext, setTokenDataNext] = useState("");
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
@@ -457,6 +457,7 @@ const Uniswap = () => {
                   type="number"
                   className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
                   value={swapAmount}
+                  placeholder="0"
                   onChange={(e) => {
                     setSwapAmount(e.target.value);
                   }}
@@ -507,6 +508,7 @@ const Uniswap = () => {
                 type="number"
                 className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
                 value={swapSecondAmount}
+                placeholder="0"
                 onChange={(e) => {
                   setSwapSecondAmount(e.target.value);
                 }}
