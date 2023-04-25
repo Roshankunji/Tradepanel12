@@ -27,7 +27,7 @@ const Nav = () => {
       setGmsFont(false);
       setUniswapFont(false);
     }
-  }, [router && router.pathname]);
+  }, [router && router.pathname, name]);
   return (
     <>
       <div className="bg-backgroundColor text-white py-[20px] px-10 w-[100%] flex justify-between">
