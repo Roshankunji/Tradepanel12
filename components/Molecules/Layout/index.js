@@ -10,21 +10,6 @@ export default function Layout({ children }) {
   switch (router.pathname) {
     case "/login":
       return <BasicLayout>{children}</BasicLayout>;
-    case "/verify":
-      return <BasicLayout>{children}</BasicLayout>;
-    case "/register":
-      return <BasicLayout>{children}</BasicLayout>;
-    case "/forgotPassword":
-      return <BasicLayout>{children}</BasicLayout>;
-    case "/otp":
-      return <BasicLayout>{children}</BasicLayout>;
-    case "/referral":
-      return <BasicLayout>{children}</BasicLayout>;
-    case "/waitingList":
-      return <BasicLayout>{children}</BasicLayout>;
-    case "/getearlyaccess":
-      return <BasicLayout>{children}</BasicLayout>;
-
     case "/Dashboard":
       return <HomepageLayout>{children}</HomepageLayout>;
     case "/GMX":
