@@ -157,7 +157,7 @@ const Gmx = () => {
     <>
       <div className="flex justify-end ">
         <div className="w-[100%] flex  my-[10px] ">
-          <div className="w-[68%]">
+          <div className="w-[68%] mr-9">
             <div className="w-full mb-3">
               <div className="flex">
                 <div
