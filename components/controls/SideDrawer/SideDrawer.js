@@ -58,7 +58,7 @@ export default function TransientDrawer(props) {
         onKeyDown={toggleDrawer(anchor, false)}
       >
         <div>{props.wallet}</div>
-        <CloseIcon className="text-gray-400" />
+        <CloseIcon className="text-gray-400 cursor-pointer" />
       </div>
       <div>{props.content}</div>
     </div>
