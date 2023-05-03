@@ -352,9 +352,10 @@ const Gmx = () => {
                       <text className="underline decoration-dashed">$0.05</text>
                     </div>
                   </div>
-                  <Button className="bg-primary w-[100%] rounded-[2px]">
-                    Aprove USDC
-                  </Button>
+                  {/* <Button className="bg-primary w-[100%] rounded-[2px]">
+                    Approve USDC
+                  </Button> */}
+                  <LongBtcModal />
                 </div>
               ) : (
                 // limit
@@ -624,7 +625,7 @@ const Gmx = () => {
             </div>
             <div className="bg-darkBlueBlack1 px-[10px] py-[10px]">
               <div>Long BTC</div>
-              <hr className="border-initialNavTextColor border-[1px] my-[8px]"></hr>
+              <hr className="border-lightBlue border-[1px] my-[8px]"></hr>
               <div className="flex items-center justify-between my-[5px]">
                 <text className="text-[14px]">Entry Price</text>
                 <text className="underline decoration-dashed text-[14px]">
