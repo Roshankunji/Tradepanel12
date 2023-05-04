@@ -36,18 +36,21 @@ function Table(props) {
     useTable({ columns, data });
   return (
     <>
-      <table {...getTableProps()} className="w-[100%]">
+      <table
+        {...getTableProps()}
+        className="w-[100%] border border-[1px] border-gray-700 bg-[#16182e]"
+      >
         <thead>
           {headerGroups.map((headerGroup, i) => (
             <tr
               {...headerGroup.getHeaderGroupProps()}
-              className=" h-[50px] border-[1px] border-gray-300 w-[100%]"
+              className=" h-[50px] w-[100%]"
               key={i}
             >
               {headerGroup.headers.map((column, i) => (
                 <th
                   {...column.getHeaderProps()}
-                  className=" h-[50px] border-[1px] border-gray-300 px-[10px]"
+                  className=" h-[50px] text-left text-gray-300 font-normal text-[14px] px-3"
                   key={i}
                 >
                   {column.render("Header")}
@@ -63,14 +66,14 @@ function Table(props) {
               return (
                 <tr
                   {...row.getRowProps()}
-                  className="h-[50px] border-[1px] border-gray-300 "
+                  className="h-[50px] hover:bg-[#232743]"
                   key={i}
                 >
                   {row.cells.map((cell, i) => {
                     return (
                       <td
                         {...cell.getCellProps()}
-                        className=" h-[50px] border-[1px] border-gray-300  text-center"
+                        className=" h-[50px] text-gray-100 text-[14px] px-3 py-1"
                         key={i}
                       >
                         {cell.render("Cell")}
@@ -82,7 +85,7 @@ function Table(props) {
             })}
           </tbody>
         ) : !loading ? (
-          <tbody className="w-[100%] relative border-gray-300 border-[1px] h-[250px]">
+          <tbody className="w-[100%] relative h-[250px]">
             <div className="absolute top-[50%] left-[40%] bg-white py-[10px] px-[18px] text-[18px] font-semibold">
               Data Not Found
             </div>
