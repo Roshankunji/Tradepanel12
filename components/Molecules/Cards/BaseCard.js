@@ -7,7 +7,7 @@ const BaseCard = ({ name, className }) => {
       <div
         className={`card w-[100%] sm:w-[45%] md:w-[30%] h-[100%] font-sora ${className}`}
       >
-        <div className="-[100%] h-[100%] text-white ">
+        <div className="w-[100%] h-[100%] text-white ">
           <div className="text-white  flex justify-center py-[10px] text-[18px]">
             {name}
           </div>

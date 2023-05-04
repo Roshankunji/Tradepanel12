@@ -13,7 +13,7 @@ export default function Dashboard() {
       />
       <BaseCard
         name="Trader Wallet"
-        className="w-[100%] sm:w-[45%] md:w-[30%]"
+        className="w-[100%] sm:w-[45%] md:w-[30%] "
       />
       <BaseCard
         name="Funds Rollover"

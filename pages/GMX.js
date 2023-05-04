@@ -16,6 +16,9 @@ const Gmx = () => {
   const [marketLimitTab, setMarketLimitTab] = useState("Market");
   const [marketPay, setMarketPay] = useState(null);
   const [marketLong, setMarketLong] = useState(null);
+  const [limitPay, setLimitPay] = useState(null);
+  const [limitLong, setLimitLong] = useState(null);
+  const [marketShort, setMarketShort] = useState(null);
   const [price, setPrice] = useState(null);
   const [data, setData] = useState([]);
   const [tokenData1, setTokenData1] = useState([]);
@@ -25,6 +28,15 @@ const Gmx = () => {
   const [numberOfPositions, setNumberOfPositions] = useState(2);
   const [limit, setLimit] = useState(10);
   const [tradeDataTab, setTradeDataTab] = useState("Positions");
+  const [showLeverageInput, setShowLeverageInput] = useState(false);
+  const [hideMaxButton, setHideMaxButton] = useState(false);
+  const [hideMaxButton1, setHideMaxButton1] = useState(false);
+  const [hideMaxButton2, setHideMaxButton2] = useState(false);
+  const [hideMaxButton3, setHideMaxButton3] = useState(false);
+  const [hideMaxButton4, setHideMaxButton4] = useState(false);
+  const [hideMaxButton5, setHideMaxButton5] = useState(false);
+  const [hideMaxButton6, setHideMaxButton6] = useState(false);
+  const [hideMaxButton7, setHideMaxButton7] = useState(false);
 
   const search = (e) => {
     setSearchData(e);
@@ -34,6 +46,17 @@ const Gmx = () => {
     setData(tokenData);
   }, []);
 
+  useEffect(() => {
+    if (toggle === "Short" || toggle === "Long") {
+      setMarketPay(null);
+      setMarketLong(null);
+      setLimitPay(null);
+      setHideMaxButton(false);
+      setHideMaxButton1(false);
+      setHideMaxButton2(false);
+      setHideMaxButton3(false);
+    }
+  }, [toggle]);
   useEffect(() => {
     const dataOfToken = data.filter((e) => {
       const uppercase = e?.name?.toUpperCase();
@@ -209,14 +232,14 @@ const Gmx = () => {
             )}
           </div>
           <div className="w-[32%] flex-col">
-            <div className="bg-darkBlueBlack1 px-[10px] py-[10px] mb-[10px]">
+            <div className="card1 px-[10px] py-[10px] mb-[10px]">
               <div className="flex">
                 <div onClick={() => toggleHandler("Long")} className="w-[50%]">
                   <div
                     className={
                       toggle === "Long"
                         ? "text-center bg-primary h-full p-2 border-1 border-gray-800 text-white text-[16px] font-medium cursor-pointer rounded-l-[2px]"
-                        : "text-center bg-gray-700 p-2 text-gray-400 border-1 font-medium cursor-pointer rounded-l-[2px]"
+                        : "text-center bg-gray-800 p-2 text-gray-400 border-1 font-medium cursor-pointer rounded-l-[2px]"
                     }
                   >
                     <TrendingUpIcon className="mr-[5px]" />
@@ -228,7 +251,7 @@ const Gmx = () => {
                     className={
                       toggle === "Short"
                         ? "text-center bg-primary h-full p-2 border-1 border-gray-800 text-white text-[16px] font-medium cursor-pointer rounded-r-[2px]"
-                        : "text-center bg-gray-700 p-2 text-gray-400 border-1 font-medium cursor-pointer rounded-r-[2px]"
+                        : "text-center bg-gray-800 p-2 text-gray-400 border-1 font-medium cursor-pointer rounded-r-[2px]"
                     }
                   >
                     <TrendingDownIcon className="mr-[5px]" /> Short
@@ -240,8 +263,8 @@ const Gmx = () => {
                 <div
                   className={
                     marketLimitTab === "Market"
-                      ? "mr-5 cursor-pointer text-initialNavTextColor"
-                      : "mr-5 cursor-pointer text-white"
+                      ? "mr-5 cursor-pointer text-white"
+                      : "mr-5 cursor-pointer text-gray-400"
                   }
                   onClick={() => {
                     setMarketLimitTab("Market");
@@ -252,8 +275,8 @@ const Gmx = () => {
                 <div
                   className={
                     marketLimitTab === "Limit"
-                      ? "cursor-pointer text-initialNavTextColor"
-                      : "cursor-pointer text-white"
+                      ? "cursor-pointer text-white"
+                      : "cursor-pointer text-gray-400"
                   }
                   onClick={() => {
                     setMarketLimitTab("Limit");
@@ -273,16 +296,26 @@ const Gmx = () => {
                       <input
                         type="number"
                         className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                        value={marketLong}
+                        value={marketPay ? marketPay : ""}
                         placeholder="0"
                         onChange={(e) => {
                           setMarketPay(e.target.value);
                         }}
                       ></input>
-                      <div className="flex justify-between w-[50%]  items-center">
-                        <Button className="bg-primary py-[3px] px-[8px] text-[11px] rounded-[3px] mr-[5px]">
-                          Max
-                        </Button>
+                      <div className="flex justify-end w-[50%]  items-center">
+                        {hideMaxButton === false ? (
+                          <Button
+                            className="bg-primary py-[4px] px-[9px] text-[10px] rounded-[3px] mr-[25px]"
+                            onClick={() => {
+                              setMarketPay(13.8788);
+                              setHideMaxButton(true);
+                            }}
+                          >
+                            Max
+                          </Button>
+                        ) : (
+                          ""
+                        )}
 
                         <DrawerC
                           anchor="right"
@@ -366,23 +399,39 @@ const Gmx = () => {
 
                   <div className="bg-darkBlue py-[10px] px-[10px] rounded-[2px]">
                     <div className="my-[10px] flex justify-between">
-                      <text>Long: 10.00 USDC</text>
+                      <text>
+                        {toggle === "Long" ? "Long" : "Short"}: 10.00 USDC
+                      </text>
                       <text>Leaverage: 1.10x</text>
                     </div>
                     <div className="flex items-center justify-between w-[100%]">
                       <input
                         type="number"
                         className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                        value={marketPay}
+                        value={marketLong ? marketLong : ""}
                         placeholder="0"
                         onChange={(e) => {
-                          setMarketLong(e.target.value);
+                          if (toggle === "Long") {
+                            setMarketLong(e.target.value);
+                          } else {
+                            setMarketShort(e.target.value);
+                          }
                         }}
                       ></input>
-                      <div className="flex justify-between w-[50%]  items-center">
-                        <Button className="bg-primary py-[3px] px-[8px] text-[11px] rounded-[3px] mr-[5px]">
-                          Max
-                        </Button>
+                      <div className="flex justify-end w-[50%] items-center ">
+                        {hideMaxButton1 === false ? (
+                          <Button
+                            className="bg-primary py-[4px] px-[9px] text-[10px] rounded-[3px] mr-[25px]"
+                            onClick={() => {
+                              setMarketLong(1.1);
+                              setHideMaxButton1(true);
+                            }}
+                          >
+                            Max
+                          </Button>
+                        ) : (
+                          ""
+                        )}
 
                         <DrawerC
                           anchor="right"
@@ -465,22 +514,109 @@ const Gmx = () => {
                   </div>
                   <div className="my-[10px] flex justify-between items-center">
                     <div>Leverage Slider</div>
-                    <CheckBox />
+                    <CheckBox
+                      show={(e) => {
+                        setShowLeverageInput(e);
+                      }}
+                    />
                   </div>
-                  <input
-                    type="number"
-                    className="w-[100%] outline-none rounded-[3px] font-sora bg-darkBlueBlack text-white py-[5px] px-[10px] border-[1px] border-lightBlue"
-                    placeholder="1.1"
-                    controls={false}
-                    value={leaverage}
-                    onChange={(e) => {
-                      setLeaverage(e.target.value);
-                    }}
-                  ></input>
+                  {showLeverageInput === true ? (
+                    <input
+                      type="number"
+                      className="w-[100%] outline-none rounded-[3px] font-sora bg-backgroundColor text-white py-[5px] px-[10px] border-[1px] border-lightBlue"
+                      placeholder="1.1"
+                      controls={false}
+                      value={leaverage}
+                      onChange={(e) => {
+                        setLeaverage(e.target.value);
+                      }}
+                    ></input>
+                  ) : (
+                    ""
+                  )}
                   <div>
                     <div className="flex items-center justify-between my-[5px]">
                       <text className="text-[14px]">Collateral In</text>
-                      <text className="text-[14px]">USD</text>
+                      {toggle === "Long" ? (
+                        <text className="text-[14px]">USD</text>
+                      ) : (
+                        <DrawerC
+                          anchor="right"
+                          wallet={
+                            <div className="flex py-[7px] px-[12px] text-white">
+                              Pay
+                            </div>
+                          }
+                          content={
+                            <div>
+                              <Search
+                                className="mx-4 text-white"
+                                searchToken={(e) => {
+                                  search(e);
+                                }}
+                              />
+                              <hr className="border-[1px] border-lightBlue mb-[20px]"></hr>
+                              <div className="overflow-y-auto h-[100%] mb-[10px] scroll">
+                                {data.map((e) => {
+                                  return (
+                                    <div
+                                      className="flex justify-between items-center cursor-pointer hover:bg-backgroundColor border-[1px] border-lightBlue mx-[20px] mb-[10px] rounded-[3px]"
+                                      key={data.id}
+                                      onClick={() => {
+                                        setTokenData1(e);
+                                        document
+                                          .getElementById("closeTransient")
+                                          .click();
+                                      }}
+                                    >
+                                      <div className="flex w-[100%] px-4 py-1 ">
+                                        <div className="flex items-center">
+                                          <Image
+                                            src={`data:image/png;base64,${e.image}`}
+                                            alt="Token Image"
+                                            width={35}
+                                            height={35}
+                                            className="rounded-[20px] mr-[10px]"
+                                          />
+                                        </div>
+                                        <div className="flex flex-col">
+                                          <text className="font-semibold text-[18px] text-white">
+                                            {e.name}
+                                          </text>
+                                          <text className="font-extralight text-[13px] text-white">
+                                            {e.shortName}
+                                          </text>
+                                        </div>
+                                      </div>
+                                      <div className="flex-col">
+                                        <div className="mr-[12px] text-[14px] text-white">
+                                          0.002571
+                                        </div>
+                                        <div className="text-white text-[14px]">
+                                          $4.49
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          }
+                          button={
+                            <div
+                              className="box-border flex justify-center items-center py-[5px] rounded-[20px] text-white cursor-pointer"
+                              // onClick={handleOpen}
+                            >
+                              <text className="text-[14px] mr-[2px]">
+                                {tokenData1 && tokenData1.shortName
+                                  ? tokenData1.shortName
+                                  : "USDC"}
+                              </text>
+                              <KeyboardArrowDownIcon className="text-[18px]" />
+                            </div>
+                          }
+                        />
+                      )}
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
                       <text className="text-[14px]">Leaverage</text>
@@ -499,9 +635,10 @@ const Gmx = () => {
                       <text className="underline decoration-dashed">$0.05</text>
                     </div>
                   </div>
-                  <Button className="bg-primary w-[100%] rounded-[2px]">
-                    Aprove USDC
-                  </Button>
+                  {/* <Button className="bg-primary w-[100%] rounded-[2px]">
+                    Approve USDC
+                  </Button> */}
+                  <LongBtcModal />
                 </div>
               ) : (
                 // limit
@@ -516,16 +653,26 @@ const Gmx = () => {
                       <input
                         type="number"
                         className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                        value={marketLong}
+                        value={limitPay ? limitPay : ""}
                         placeholder="0"
                         onChange={(e) => {
-                          setMarketPay(e.target.value);
+                          setLimitPay(e.target.value);
                         }}
                       ></input>
-                      <div className="flex justify-between w-[50%]  items-center">
-                        <Button className="bg-primary py-[3px] px-[8px] text-[11px] rounded-[3px] mr-[5px]">
-                          Max
-                        </Button>
+                      <div className="flex justify-end w-[50%]  items-center">
+                        {hideMaxButton2 === false ? (
+                          <Button
+                            className="bg-primary py-[4px] px-[9px] text-[10px] rounded-[3px] mr-[25px]"
+                            onClick={() => {
+                              setLimitPay(13.8788);
+                              setHideMaxButton2(true);
+                            }}
+                          >
+                            Max
+                          </Button>
+                        ) : (
+                          ""
+                        )}
 
                         <DrawerC
                           anchor="right"
@@ -609,23 +756,39 @@ const Gmx = () => {
 
                   <div className="bg-darkBlue py-[10px] px-[10px] rounded-[2px] mb-[10px]">
                     <div className="my-[10px] flex justify-between">
-                      <text>Long: 10.00 USDC</text>
+                      <text>
+                        {toggle === "Long" ? "Long" : "Short"}: 10.00 USDC
+                      </text>
                       <text>Leaverage: 1.10x</text>
                     </div>
                     <div className="flex items-center justify-between w-[100%]">
                       <input
                         type="number"
                         className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                        value={marketPay}
+                        value={limitLong ? limitLong : ""}
                         placeholder="0"
                         onChange={(e) => {
-                          setMarketLong(e.target.value);
+                          if (toggle === "Long") {
+                            setLimitLong(e.target.value);
+                          } else {
+                            setMarketShort(e.target.value);
+                          }
                         }}
                       ></input>
-                      <div className="flex justify-between w-[50%]  items-center">
-                        <Button className="bg-primary py-[3px] px-[8px] text-[11px] rounded-[3px] mr-[5px]">
-                          Max
-                        </Button>
+                      <div className="flex justify-end w-[50%]  items-center">
+                        {hideMaxButton3 === false ? (
+                          <Button
+                            className="bg-primary py-[4px] px-[9px] text-[10px] rounded-[3px] mr-[25px]"
+                            onClick={() => {
+                              setLimitLong(1.1);
+                              setHideMaxButton3(true);
+                            }}
+                          >
+                            Max
+                          </Button>
+                        ) : (
+                          ""
+                        )}
 
                         <DrawerC
                           anchor="right"
@@ -637,7 +800,7 @@ const Gmx = () => {
                           content={
                             <div>
                               <Search
-                                className="mx-4 text-white"
+                                className="mx-4 text-white rounded-[3px]"
                                 searchToken={(e) => {
                                   search(e);
                                 }}
@@ -727,22 +890,109 @@ const Gmx = () => {
                   </div>
                   <div className="my-[10px] flex justify-between items-center">
                     <div>Leverage Slider</div>
-                    <CheckBox />
+                    <CheckBox
+                      show={(e) => {
+                        setShowLeverageInput(e);
+                      }}
+                    />
                   </div>
-                  <input
-                    type="number"
-                    className="w-[100%] outline-none rounded-[3px] font-sora bg-darkBlueBlack text-white py-[5px] px-[10px] border-[1px] border-lightBlue"
-                    placeholder="1.1"
-                    controls={false}
-                    value={leaverage}
-                    onChange={(e) => {
-                      setLeaverage(e.target.value);
-                    }}
-                  ></input>
+                  {showLeverageInput === true ? (
+                    <input
+                      type="number"
+                      className="w-[100%] outline-none rounded-[3px] font-sora bg-backgroundColor text-white py-[5px] px-[10px] border-[1px] border-lightBlue"
+                      placeholder="1.1"
+                      controls={false}
+                      value={leaverage}
+                      onChange={(e) => {
+                        setLeaverage(e.target.value);
+                      }}
+                    ></input>
+                  ) : (
+                    ""
+                  )}
                   <div>
                     <div className="flex items-center justify-between my-[5px]">
                       <text className="text-[14px]">Collateral In</text>
-                      <text className="text-[14px]">USD</text>
+                      {toggle === "Long" ? (
+                        <text className="text-[14px]">USD</text>
+                      ) : (
+                        <DrawerC
+                          anchor="right"
+                          wallet={
+                            <div className="flex py-[7px] px-[12px] text-white">
+                              Pay
+                            </div>
+                          }
+                          content={
+                            <div>
+                              <Search
+                                className="mx-4 text-white"
+                                searchToken={(e) => {
+                                  search(e);
+                                }}
+                              />
+                              <hr className="border-[1px] border-lightBlue mb-[20px]"></hr>
+                              <div className="overflow-y-auto h-[100%] mb-[10px] scroll">
+                                {data.map((e) => {
+                                  return (
+                                    <div
+                                      className="flex justify-between items-center cursor-pointer hover:bg-backgroundColor border-[1px] border-lightBlue mx-[20px] mb-[10px] rounded-[3px]"
+                                      key={data.id}
+                                      onClick={() => {
+                                        setTokenData2(e);
+                                        document
+                                          .getElementById("closeTransient")
+                                          .click();
+                                      }}
+                                    >
+                                      <div className="flex w-[100%] px-4 py-1 ">
+                                        <div className="flex items-center">
+                                          <Image
+                                            src={`data:image/png;base64,${e.image}`}
+                                            alt="Token Image"
+                                            width={35}
+                                            height={35}
+                                            className="rounded-[20px] mr-[10px]"
+                                          />
+                                        </div>
+                                        <div className="flex flex-col">
+                                          <text className="font-semibold text-[18px] text-white">
+                                            {e.name}
+                                          </text>
+                                          <text className="font-extralight text-[13px] text-white">
+                                            {e.shortName}
+                                          </text>
+                                        </div>
+                                      </div>
+                                      <div className="flex-col">
+                                        <div className="mr-[12px] text-[14px] text-white">
+                                          0.002571
+                                        </div>
+                                        <div className="text-white text-[14px]">
+                                          $4.49
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          }
+                          button={
+                            <div
+                              className="box-border flex justify-center items-center py-[5px] rounded-[20px] text-white cursor-pointer"
+                              // onClick={handleOpen}
+                            >
+                              <text className="text-[14px] mr-[2px]">
+                                {tokenData2 && tokenData2.shortName
+                                  ? tokenData2.shortName
+                                  : "USDC"}
+                              </text>
+                              <KeyboardArrowDownIcon className="text-[18px]" />
+                            </div>
+                          }
+                        />
+                      )}
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
                       <text className="text-[14px]">Leaverage</text>
@@ -769,9 +1019,9 @@ const Gmx = () => {
                 </div>
               )}
             </div>
-            <div className="bg-darkBlueBlack1 px-[10px] py-[10px]">
+            <div className="card1 px-[10px] py-[10px]">
               <div>Long BTC</div>
-              <hr className="border-initialNavTextColor border-[1px] my-[8px]"></hr>
+              <hr className="border-lightBlue border-[1px] my-[8px]"></hr>
               <div className="flex items-center justify-between my-[5px]">
                 <text className="text-[14px]">Entry Price</text>
                 <text className="underline decoration-dashed text-[14px]">
