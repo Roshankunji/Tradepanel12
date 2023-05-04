@@ -26,8 +26,7 @@ const ClosePositionModal = (props) => {
     setOpen(false);
     props.close(false);
   };
-  console.log("PROPS OPEN----->>>>", props.open);
-  console.log("STATE OPEN----->>>>", open);
+
   useEffect(() => {
     setOpen(props.open);
   }, [props.open]);
