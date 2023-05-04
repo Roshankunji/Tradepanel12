@@ -4,6 +4,7 @@ import Modal from "@mui/material/Modal";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Button from "../../atoms/Button/Button";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import CheckBox from "../../atoms/Checkbox/Checkbox";
 
 const style = {
   position: "absolute",
@@ -51,49 +52,50 @@ const LongBtcModal = () => {
             </div>
             <hr className="border-[1px] border-lightBlue"></hr>
             <div className="text-center px-[15px] py-[15px]">
-              <div className="w-[100%] flex justify-center mb-[5px]">
+              <div className="w-[100%] flex justify-center mb-[5px] text-[20px]">
                 Pay 10.0000 USDC ($10.00)
               </div>
 
               <ArrowDownwardIcon className="mb-[5px]" />
 
-              <div className="text-[13px] mb-[20px]">
+              <div className="text-[13px] mb-[20px] items-center text-[20px]">
                 Long 0.0007 BTC ($19.87)
               </div>
 
-              <div className="flex justify-between">
-                <div>Leverage</div>
-                <div>2.00x</div>
+              <div className="flex justify-between items-center">
+                <div className="text-[15px]">Leverage</div>
+                <div className="text-[15px]">2.00x</div>
               </div>
-              <div className="flex justify-between">
-                <div>Allow upto 1% of slippage</div>
-                <div>2.00x</div>
+              <div className="flex justify-between items-center">
+                <div className="text-[15px]">Allow upto 1% of slippage</div>
+
+                <CheckBox />
               </div>
-              <div className="flex justify-between">
-                <div>Allowed Slippage</div>
-                <div>0.30%</div>
-              </div>
-              <hr className="border-[1px] border-lightBlue my-[10px]"></hr>
-              <div className="flex justify-between">
-                <div>Collateral Spread</div>
-                <div>0.00%</div>
-              </div>
-              <div className="flex justify-between">
-                <div>Entry Price</div>
-                <div>$28,456,454</div>
-              </div>
-              <div className="flex justify-between">
-                <div>Liq. Price</div>
-                <div>$28,456,454</div>
+              <div className="flex justify-between items-center">
+                <div className="text-[15px]">Allowed Slippage</div>
+                <div className="text-[15px]">0.30%</div>
               </div>
               <hr className="border-[1px] border-lightBlue my-[10px]"></hr>
-              <div className="flex justify-between">
-                <div>Collateral (Btc)</div>
-                <div>$9.94</div>
+              <div className="flex justify-between items-center">
+                <div className="text-[15px]">Collateral Spread</div>
+                <div className="text-[15px]">0.00%</div>
               </div>
-              <div className="flex justify-between">
-                <div>Fees</div>
-                <div>$0.43</div>
+              <div className="flex justify-between items-center">
+                <div className="text-[15px]">Entry Price</div>
+                <div className="text-[15px]">$28,456,454</div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="text-[15px]">Liq. Price</div>
+                <div className="text-[15px]">$28,456,454</div>
+              </div>
+              <hr className="border-[1px] border-lightBlue my-[10px]"></hr>
+              <div className="flex justify-between items-center">
+                <div className="text-[15px]">Collateral (Btc)</div>
+                <div className="text-[15px]">$9.94</div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="text-[15px]">Fees</div>
+                <div className="text-[15px]">$0.43</div>
               </div>
               <Button className="bg-primary w-[100%] rounded-[3px] mt-[15px]">
                 Long

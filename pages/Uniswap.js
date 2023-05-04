@@ -226,7 +226,7 @@ const Uniswap = () => {
       >
         <Box sx={style1}>
           <div className="flex justify-between items-center mb-3">
-            <div className="flex items-center bg-gray-700 px-2 rounded-full">
+            <div className="flex items-center bg-gray-800 px-2 rounded-full">
               <Avatar
                 sx={{ width: 30, height: 30 }}
                 src={"/Images/Arbitrum.svg"}
@@ -321,7 +321,7 @@ const Uniswap = () => {
                       className={
                         toggle === "Trader wallet"
                           ? "text-center bg-primary h-full p-2 border-1 border-gray-800 text-white text-[16px] font-medium cursor-pointer"
-                          : "text-center bg-gray-700 p-2 text-gray-400 border-1 font-medium cursor-pointer"
+                          : "text-center bg-gray-800 p-2 text-gray-400 border-1 font-medium cursor-pointer"
                       }
                     >
                       Trader wallet
@@ -335,7 +335,7 @@ const Uniswap = () => {
                       className={
                         toggle === "User wallet"
                           ? "text-center bg-primary h-full p-2 border-1 border-gray-800 text-white text-[16px] font-medium cursor-pointer"
-                          : "text-center bg-gray-700 p-2 text-gray-400 border-1 font-medium cursor-pointer"
+                          : "text-center bg-gray-800 p-2 text-gray-400 border-1 font-medium cursor-pointer"
                       }
                     >
                       User wallet
