@@ -9,7 +9,9 @@ import Search from "../components/controls/Input/Search";
 import tokenData from "../components/controls/Dropdown/TokenData.json";
 import Image from "next/image";
 import LongBtcModal from "../components/controls/Modal/LongBtcModal";
+import ClosePositionModal from "../components/controls/Modal/ClosePositionModal";
 import Table from "../components/Molecules/Table/index";
+import TradeHistory from "../components/Molecules/Gmx/TradeHistory";
 
 const Gmx = () => {
   const [toggle, setToggle] = useState("Long");
@@ -25,6 +27,7 @@ const Gmx = () => {
   const [numberOfPositions, setNumberOfPositions] = useState(2);
   const [limit, setLimit] = useState(10);
   const [tradeDataTab, setTradeDataTab] = useState("Positions");
+  const [showClosePositionModal, setShowClosePositionModal] = useState(false);
 
   const search = (e) => {
     setSearchData(e);
@@ -70,27 +73,46 @@ const Gmx = () => {
       coin: "BTC",
       longShortRange: "1.10x",
       longShort: "Long",
-      netValue: 9.92,
+      netValue: "$9.92",
       profitLoss: "-$0.02",
       profitLossPercent: "-0.21%",
-      size: 10.94,
-      collateral: 9.93,
-      entryPrice: 28061.13,
-      marketPrice: 28062.3,
-      liqPrice: 15426.5,
+      size: "$10.94",
+      collateral: "$9.93",
+      entryPrice: "$28061.13",
+      marketPrice: "$28062.3",
+      liqPrice: "$15426.5",
     },
     {
       coin: "BTC",
       longShortRange: "2.09x",
       longShort: "Short",
-      netValue: 9.96,
+      netValue: "$9.96",
       profitLoss: "-$0.03",
       profitLossPercent: "-0.37%",
-      size: 20.95,
-      collateral: 9.97,
-      entryPrice: 28068.83,
-      marketPrice: 28062.3,
-      liqPrice: 34709.83,
+      size: "$20.95",
+      collateral: "$9.97",
+      entryPrice: "$28068.83",
+      marketPrice: "$28062.3",
+      liqPrice: "$34709.83",
+    },
+  ];
+
+  let tradeData = [
+    {
+      date: "06 Apr 2023, 12:01 PM",
+      details: "Update order: Decrease BTC Long -5.00 USD, Price: > 28,051.00",
+    },
+    {
+      date: "06 Apr 2023, 12:30 PM",
+      details: "Create order: Decrease BTC Short -5.00 USD, Price: > 31,987.00",
+    },
+    {
+      date: "06 Apr 2023, 01:43 PM",
+      details: "Request Decrease BTC Long +14.00 USD, Price: > 89,444.00",
+    },
+    {
+      date: "06 Apr 2023, 02:55 PM",
+      details: "Update order: Decrease BTC Short -5.00 USD, Price: > 28,051.00",
     },
   ];
 
@@ -99,15 +121,17 @@ const Gmx = () => {
       Header: "Position",
       accessor: (d) => (
         <div className="flex flex-col">
-          {d.coin}
+          <div className="text-[14px]">{d.coin}</div>
           <div className="flex">
-            {d.longShortRange}{" "}
+            <div className="text-[14px]">{d.longShortRange} </div>
             <span
               className={
-                d.longShort === "Long" ? "text-green-600" : "text-red-500"
+                d.longShort === "Long"
+                  ? "text-green-500 text-[14px]"
+                  : "text-red-500 text-[14px]"
               }
             >
-              {d.longShort}
+              &nbsp;{d.longShort}
             </span>
           </div>
         </div>
@@ -115,7 +139,33 @@ const Gmx = () => {
     },
     {
       Header: "Net Value",
-      accessor: "netValue",
+      accessor: (d) => (
+        <div className="flex flex-col">
+          <div className="text-[14px]">{d.netValue}</div>
+          <div className="flex">
+            <div
+              className={
+                d.profitLoss.startsWith("-")
+                  ? "text-red-500 text-[13px]"
+                  : "text-green-500 text-[13px]"
+              }
+            >
+              {d.profitLoss}{" "}
+            </div>
+            <span
+              className={
+                d.profitLossPercent.startsWith("-")
+                  ? "text-red-500 text-[13px]"
+                  : "text-green-500 text-[13px]"
+              }
+            >
+              &nbsp;{"("}
+              {d.profitLossPercent}
+              {")"}
+            </span>
+          </div>
+        </div>
+      ),
     },
     {
       Header: "Size",
@@ -141,20 +191,28 @@ const Gmx = () => {
       Header: "",
       accessor: "close",
       Cell: (e) => {
-        return <div className="">Close</div>;
-      },
-    },
-    {
-      Header: "",
-      accessor: "menu",
-      Cell: (e) => {
-        return <div className="">Three dots</div>;
+        return (
+          <div
+            className="cursor-pointer hover:text-white"
+            onClick={() => setShowClosePositionModal(true)}
+          >
+            Close
+          </div>
+        );
       },
     },
   ];
 
   return (
     <>
+      {
+        <ClosePositionModal
+          open={showClosePositionModal}
+          close={(e) => {
+            setShowClosePositionModal(e);
+          }}
+        />
+      }
       <div className="flex justify-end ">
         <div className="w-[100%] flex  my-[10px] ">
           <div className="w-[68%] mr-9">
@@ -207,6 +265,12 @@ const Gmx = () => {
                 hidePagination={true}
               />
             )}
+            {tradeDataTab === "Trades" &&
+              tradeData.map(function (e) {
+                return (
+                  <TradeHistory key={""} date={e.date} details={e.details} />
+                );
+              })}
           </div>
           <div className="w-[32%] flex-col">
             <div className="bg-darkBlueBlack1 px-[10px] py-[10px] mb-[10px]">
