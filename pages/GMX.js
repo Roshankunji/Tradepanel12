@@ -122,6 +122,7 @@ const Gmx = () => {
     if (searchData === "") {
       setData(tokenData);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchData]);
 
   const handleCloseConfirmCancelModal = () => {
