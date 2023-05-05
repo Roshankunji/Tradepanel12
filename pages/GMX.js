@@ -15,6 +15,7 @@ import TradeHistory from "../components/Molecules/Gmx/TradeHistory";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Error from "../components/Molecules/ErrorMessge/Error";
+import Dropdown from "../components/controls/Dropdown/Dropdown";
 
 const Gmx = () => {
   const [toggle, setToggle] = useState("Long");
@@ -213,6 +214,8 @@ const Gmx = () => {
     },
   ];
 
+  const names = ["BTC/USD", "ETH/USD", "LINK/USD", "UNI/USD"];
+
   let positionColumns = [
     {
       Header: "Position",
@@ -381,6 +384,9 @@ const Gmx = () => {
       <div className="flex justify-end ">
         <div className="w-[100%] flex  my-[10px] ">
           <div className="w-[68%] mr-9">
+            <div className="my-[10px] font-semibold flex items-center">
+              <Dropdown names={names} width={160} background="#16182e" />
+            </div>
             <div className="w-full mb-3">
               <div className="flex">
                 <div

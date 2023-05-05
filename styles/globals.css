@@ -40,12 +40,9 @@ body {
   color: #34435e !important;
 }
 .MuiList-root {
-  /* padding: 0 !important; */
-  padding-left: 3px !important;
-  padding-right: 3px !important;
-  padding-top: 3px !important;
-  padding-bottom: 3px !important;
-  background-color: #161617 !important;
+  padding: 0 !important;
+
+  background-color: #0c1020 !important;
 }
 
 .css-kk1bwy-MuiButtonBase-root-MuiMenuItem-root {

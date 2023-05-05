@@ -48,7 +48,7 @@ const BaseCard = ({ name, className }) => {
                   $34,44,44,4788
                 </text>
               </div>
-              {name === "User Valut" ? (
+              {name === "User Vault" ? (
                 <div>
                   <div className="flex flex-col py-[6px] ">
                     <text className="text-[12px] font-sora">Total Shares</text>

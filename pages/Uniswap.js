@@ -63,6 +63,7 @@ const Uniswap = () => {
   const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState();
   const [checked, setChecked] = useState(false);
+  const [checked1, setChecked1] = useState(false);
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
@@ -78,6 +79,9 @@ const Uniswap = () => {
 
   const handleChange = () => {
     setChecked(!checked);
+  };
+  const handleChange1 = () => {
+    setChecked1(!checked1);
   };
   const handleOpen = () => {
     setFirst(true);
@@ -600,8 +604,15 @@ const Uniswap = () => {
               <text className="mr-[10px] text-[15px]">Auto Router Api</text>
               <HelpOutlineIcon className="text-[18px]" />
             </div>
-            {/* <Switch {...label} checked={checked} onChange={handleChange} /> */}
             <Switch1 checked={checked} change={handleChange} />
+          </div>
+
+          <div className="flex justify-between items-center px-[20px] mb-[10px]">
+            <div className="flex items-center">
+              <text className="mr-[10px] text-[15px]">Exper Mode</text>
+              <HelpOutlineIcon className="text-[18px]" />
+            </div>
+            <Switch1 checked={checked1} change={handleChange1} />
           </div>
 
           <div className="bg-darkBlue mb-[10px]">
