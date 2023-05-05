@@ -5,7 +5,7 @@ const BaseCard = ({ name, className }) => {
   return (
     <>
       <div
-        className={`card w-[100%] sm:w-[45%] md:w-[30%] h-[100%] font-sora ${className}`}
+        className={`bg-[#16182e] rounded-[10px] w-[100%] sm:w-[45%] md:w-[30%] h-[100%] font-sora ${className}`}
       >
         <div className="w-[100%] h-[100%] text-white ">
           <div className="text-white  flex justify-center py-[10px] text-[18px]">

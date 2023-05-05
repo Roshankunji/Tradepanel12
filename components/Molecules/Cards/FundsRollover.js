@@ -21,7 +21,7 @@ const FundsRollover = () => {
     <>
       <div className="font-sora">
         <div
-          className="bg-darkBlueBlack1 mb-[20px] py-[15px] px-[25px] rounded-[20px] cursor-pointer"
+          className="bg-backgroundColor mb-[20px] py-[15px] px-[25px] rounded-[20px] cursor-pointer"
           onClick={() => {
             setDepositeShow(!depositShow);
           }}
@@ -73,7 +73,7 @@ const FundsRollover = () => {
           )}
         </div>
         <div
-          className="bg-darkBlueBlack1  mb-[20px] py-[15px] px-[25px] rounded-[20px] cursor-pointer"
+          className="bg-backgroundColor mb-[20px] py-[15px] px-[25px] rounded-[20px] cursor-pointer"
           onClick={() => {
             setWithdrawShow(!withdrawShow);
           }}
