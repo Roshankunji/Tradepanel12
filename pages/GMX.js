@@ -14,6 +14,7 @@ import Table from "../components/Molecules/Table/index";
 import TradeHistory from "../components/Molecules/Gmx/TradeHistory";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
+import Error from "../components/Molecules/ErrorMessge/Error";
 
 const Gmx = () => {
   const [toggle, setToggle] = useState("Long");
@@ -29,16 +30,19 @@ const Gmx = () => {
   const [tokenData2, setTokenData2] = useState([]);
   const [searchData, setSearchData] = useState("");
   const [leaverage, setLeaverage] = useState(1.1);
+  const [leaverage1, setLeaverage1] = useState(1.1);
+  const [leverageError, setLeverageError] = useState(false);
+  const [leverageError1, setLeverageError1] = useState(false);
   // const [numberOfPositions, setNumberOfPositions] = useState(2);
   const [limit, setLimit] = useState(10);
   const [tradeDataTab, setTradeDataTab] = useState("Positions");
   const [showClosePositionModal, setShowClosePositionModal] = useState(false);
   const [openConfirmCancelModal, setOpenConfirmCancelModal] = useState(false);
-  const [showLeverageInput, setShowLeverageInput] = useState(false);
   const [hideMaxButton, setHideMaxButton] = useState(false);
   const [hideMaxButton1, setHideMaxButton1] = useState(false);
   const [hideMaxButton2, setHideMaxButton2] = useState(false);
   const [hideMaxButton3, setHideMaxButton3] = useState(false);
+  const [disable, setDisable] = useState(false);
 
   const style = {
     position: "absolute",
@@ -66,12 +70,36 @@ const Gmx = () => {
       setMarketPay(null);
       setMarketLong(null);
       setLimitPay(null);
+      setLimitLong(null);
       setHideMaxButton(false);
       setHideMaxButton1(false);
       setHideMaxButton2(false);
       setHideMaxButton3(false);
+      setLeaverage(null);
+      setLeverageError(false);
+      setLeaverage1(null);
+      setLeverageError1(false);
+      setLeaverage(1.1);
+      setLeaverage1(1.1);
+
+      if (marketLimitTab === "Market") {
+        setLeaverage1(1.1);
+        setLeverageError1(false);
+        setLimitPay(null);
+        setLimitLong(null);
+        setHideMaxButton2(false);
+        setHideMaxButton3(false);
+      } else {
+        setMarketPay(null);
+        setMarketLong(null);
+        setHideMaxButton(false);
+        setHideMaxButton1(false);
+        setLeaverage(1.1);
+        setLeverageError(false);
+      }
     }
-  }, [toggle]);
+  }, [toggle, marketLimitTab]);
+
   useEffect(() => {
     const dataOfToken = data.filter((e) => {
       const uppercase = e?.name?.toUpperCase();
@@ -422,7 +450,7 @@ const Gmx = () => {
               })}
           </div>
           <div className="w-[32%] flex-col">
-            <div className="card1 px-[10px] py-[10px] mb-[10px]">
+            <div className="bg-[#16182e] px-[10px] py-[10px] mb-[10px]">
               <div className="flex">
                 <div onClick={() => toggleHandler("Long")} className="w-[50%]">
                   <div
@@ -477,7 +505,7 @@ const Gmx = () => {
               </div>
               {marketLimitTab === "Market" ? (
                 <div>
-                  <div className="bg-darkBlue py-[10px] px-[10px] rounded-[2px] mb-[10px]">
+                  <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px] mb-[10px]">
                     <div className="my-[10px] flex justify-between">
                       <text>Pay: 10.00 USDC</text>
                       <text>Balance: 13.8788</text>
@@ -485,7 +513,7 @@ const Gmx = () => {
                     <div className="flex items-center justify-between w-[100%] ">
                       <input
                         type="number"
-                        className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                        className="text-[25px] py-[5px] bg-backgroundColor w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
                         value={marketPay ? marketPay : ""}
                         placeholder="0"
                         onChange={(e) => {
@@ -494,15 +522,15 @@ const Gmx = () => {
                       ></input>
                       <div className="flex justify-end w-[50%]  items-center">
                         {hideMaxButton === false ? (
-                          <Button
-                            className="bg-primary py-[4px] px-[9px] text-[10px] rounded-[3px] mr-[25px]"
+                          <button
+                            className="bg-primary py-[4px] px-[9px] text-[12px] rounded-[3px] mr-[25px]"
                             onClick={() => {
                               setMarketPay(13.8788);
                               setHideMaxButton(true);
                             }}
                           >
-                            Max
-                          </Button>
+                            MAX
+                          </button>
                         ) : (
                           ""
                         )}
@@ -587,7 +615,7 @@ const Gmx = () => {
                     </div>
                   </div>
 
-                  <div className="bg-darkBlue py-[10px] px-[10px] rounded-[2px]">
+                  <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px]">
                     <div className="my-[10px] flex justify-between">
                       <text>
                         {toggle === "Long" ? "Long" : "Short"}: 10.00 USDC
@@ -597,7 +625,7 @@ const Gmx = () => {
                     <div className="flex items-center justify-between w-[100%]">
                       <input
                         type="number"
-                        className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                        className="text-[25px] py-[5px] bg-backgroundColor w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
                         value={marketLong ? marketLong : ""}
                         placeholder="0"
                         onChange={(e) => {
@@ -610,15 +638,15 @@ const Gmx = () => {
                       ></input>
                       <div className="flex justify-end w-[50%] items-center ">
                         {hideMaxButton1 === false ? (
-                          <Button
-                            className="bg-primary py-[4px] px-[9px] text-[10px] rounded-[3px] mr-[25px]"
+                          <button
+                            className="bg-primary py-[4px] px-[9px] text-[12px] rounded-[3px] mr-[25px]"
                             onClick={() => {
                               setMarketLong(1.1);
                               setHideMaxButton1(true);
                             }}
                           >
-                            Max
-                          </Button>
+                            MAX
+                          </button>
                         ) : (
                           ""
                         )}
@@ -686,10 +714,7 @@ const Gmx = () => {
                             </div>
                           }
                           button={
-                            <div
-                              className="box-border flex justify-center w-[80%] items-center py-[5px] rounded-[20px] text-white cursor-pointer"
-                              // onClick={handleOpen}
-                            >
+                            <div className="box-border flex justify-center w-[80%] items-center py-[5px] rounded-[20px] text-white cursor-pointer">
                               <text className="text-[18px]">
                                 {tokenData2 && tokenData2.shortName
                                   ? tokenData2.shortName
@@ -704,13 +729,8 @@ const Gmx = () => {
                   </div>
                   <div className="my-[10px] flex justify-between items-center">
                     <div>Leverage Slider</div>
-                    <CheckBox
-                      show={(e) => {
-                        setShowLeverageInput(e);
-                      }}
-                    />
                   </div>
-                  {showLeverageInput === true ? (
+                  {
                     <input
                       type="number"
                       className="w-[100%] outline-none rounded-[3px] font-sora bg-backgroundColor text-white py-[5px] px-[10px] border-[1px] border-lightBlue"
@@ -718,9 +738,23 @@ const Gmx = () => {
                       controls={false}
                       value={leaverage}
                       onChange={(e) => {
-                        setLeaverage(e.target.value);
+                        if (e.target.value >= 1.1) {
+                          setLeverageError(false);
+                          if (e.target.value.match(/^(\d*\.{0,1}\d{0,1}$)/)) {
+                            setLeaverage(e.target.value);
+                          } else {
+                          }
+                        } else {
+                          setLeaverage(null);
+                          setLeverageError(true);
+                        }
                       }}
                     ></input>
+                  }
+                  {leverageError === true ? (
+                    <Error className="text-[14px]">
+                      Minimum Leverage is 1.1
+                    </Error>
                   ) : (
                     ""
                   )}
@@ -822,19 +856,30 @@ const Gmx = () => {
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
                       <text className="text-[14px]">Fees</text>
-                      <text className="underline decoration-dashed">$0.05</text>
+                      <text className="underline decoration-dashed text-[14px]">
+                        $0.05
+                      </text>
                     </div>
                   </div>
-                  {/* <Button className="bg-primary w-[100%] rounded-[2px]">
-                    Approve USDC
-                  </Button> */}
-                  <LongBtcModal />
+                  {
+                    <Button
+                      className="bg-primary w-[100%] rounded-[2px]"
+                      disabled={
+                        leverageError === true || leaverage == null
+                          ? true
+                          : false
+                      }
+                    >
+                      Approve USDC
+                    </Button>
+                  }
+                  {/* <LongBtcModal /> */}
                 </div>
               ) : (
                 // limit
 
                 <div>
-                  <div className="bg-darkBlue py-[10px] px-[10px] rounded-[2px] mb-[10px]">
+                  <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px] mb-[10px]">
                     <div className="my-[10px] flex justify-between">
                       <text>Pay: 10.00 USDC</text>
                       <text>Balance: 13.8788</text>
@@ -842,7 +887,7 @@ const Gmx = () => {
                     <div className="flex items-center justify-between w-[100%] ">
                       <input
                         type="number"
-                        className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                        className="text-[25px] py-[5px] bg-backgroundColor w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
                         value={limitPay ? limitPay : ""}
                         placeholder="0"
                         onChange={(e) => {
@@ -851,15 +896,15 @@ const Gmx = () => {
                       ></input>
                       <div className="flex justify-end w-[50%]  items-center">
                         {hideMaxButton2 === false ? (
-                          <Button
-                            className="bg-primary py-[4px] px-[9px] text-[10px] rounded-[3px] mr-[25px]"
+                          <button
+                            className="bg-primary py-[4px] px-[9px] text-[12px] rounded-[3px] mr-[25px]"
                             onClick={() => {
                               setLimitPay(13.8788);
                               setHideMaxButton2(true);
                             }}
                           >
-                            Max
-                          </Button>
+                            MAX
+                          </button>
                         ) : (
                           ""
                         )}
@@ -944,7 +989,7 @@ const Gmx = () => {
                     </div>
                   </div>
 
-                  <div className="bg-darkBlue py-[10px] px-[10px] rounded-[2px] mb-[10px]">
+                  <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px] mb-[10px]">
                     <div className="my-[10px] flex justify-between">
                       <text>
                         {toggle === "Long" ? "Long" : "Short"}: 10.00 USDC
@@ -954,7 +999,7 @@ const Gmx = () => {
                     <div className="flex items-center justify-between w-[100%]">
                       <input
                         type="number"
-                        className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                        className="text-[25px] py-[5px] bg-backgroundColor w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
                         value={limitLong ? limitLong : ""}
                         placeholder="0"
                         onChange={(e) => {
@@ -967,15 +1012,15 @@ const Gmx = () => {
                       ></input>
                       <div className="flex justify-end w-[50%]  items-center">
                         {hideMaxButton3 === false ? (
-                          <Button
-                            className="bg-primary py-[4px] px-[9px] text-[10px] rounded-[3px] mr-[25px]"
+                          <button
+                            className="bg-primary py-[4px] px-[9px] text-[12px] rounded-[3px] mr-[25px]"
                             onClick={() => {
                               setLimitLong(1.1);
                               setHideMaxButton3(true);
                             }}
                           >
-                            Max
-                          </Button>
+                            MAX
+                          </button>
                         ) : (
                           ""
                         )}
@@ -1059,7 +1104,7 @@ const Gmx = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="bg-darkBlue py-[10px] px-[10px] rounded-[2px]">
+                  <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px]">
                     <div className="my-[10px] flex justify-between">
                       <text>Price</text>
                       <text>Mark: 28,031.23</text>
@@ -1067,7 +1112,7 @@ const Gmx = () => {
                     <div className="flex items-center justify-between w-[100%]">
                       <input
                         type="number"
-                        className="text-[25px] py-[5px] bg-darkBlue w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
+                        className="text-[25px] py-[5px] bg-backgroundColor w-[50%] mr-[10px] px-[10px]  outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
                         value={marketPay}
                         placeholder="0"
                         onChange={(e) => {
@@ -1080,23 +1125,32 @@ const Gmx = () => {
                   </div>
                   <div className="my-[10px] flex justify-between items-center">
                     <div>Leverage Slider</div>
-                    <CheckBox
-                      show={(e) => {
-                        setShowLeverageInput(e);
-                      }}
-                    />
                   </div>
-                  {showLeverageInput === true ? (
+                  {
                     <input
                       type="number"
                       className="w-[100%] outline-none rounded-[3px] font-sora bg-backgroundColor text-white py-[5px] px-[10px] border-[1px] border-lightBlue"
                       placeholder="1.1"
                       controls={false}
-                      value={leaverage}
+                      value={leaverage1}
                       onChange={(e) => {
-                        setLeaverage(e.target.value);
+                        if (e.target.value >= 1.1) {
+                          setLeverageError1(false);
+                          if (e.target.value.match(/^(\d*\.{0,1}\d{0,1}$)/)) {
+                            setLeaverage1(e.target.value);
+                          } else {
+                          }
+                        } else {
+                          setLeaverage1(null);
+                          setLeverageError1(true);
+                        }
                       }}
                     ></input>
+                  }
+                  {leverageError1 === true ? (
+                    <Error className="text-[14px]">
+                      Minimum Leverage is 1.1
+                    </Error>
                   ) : (
                     ""
                   )}
@@ -1169,10 +1223,7 @@ const Gmx = () => {
                             </div>
                           }
                           button={
-                            <div
-                              className="box-border flex justify-center items-center py-[5px] rounded-[20px] text-white cursor-pointer"
-                              // onClick={handleOpen}
-                            >
+                            <div className="box-border flex justify-center items-center py-[5px] rounded-[20px] text-white cursor-pointer">
                               <text className="text-[14px] mr-[2px]">
                                 {tokenData2 && tokenData2.shortName
                                   ? tokenData2.shortName
@@ -1198,14 +1249,26 @@ const Gmx = () => {
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
                       <text className="text-[14px]">Fees</text>
-                      <text className="underline decoration-dashed">$0.05</text>
+                      <text className="underline decoration-dashed text-[14px]">
+                        $0.05
+                      </text>
                     </div>
                   </div>
-                  {/* <Button className="bg-primary w-[100%] rounded-[2px]">
-                    Approve USDC
-                  </Button> */}
 
-                  <LongBtcModal />
+                  {
+                    <Button
+                      className="bg-primary w-[100%] rounded-[2px]"
+                      disabled={
+                        leverageError1 === true || leaverage1 == null
+                          ? true
+                          : false
+                      }
+                    >
+                      Approve USDC
+                    </Button>
+                  }
+
+                  {/* <LongBtcModal /> */}
                 </div>
               )}
             </div>
