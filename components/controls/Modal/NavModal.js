@@ -6,7 +6,7 @@ import Modal from "@mui/material/Modal";
 import Image from "next/image";
 import kunjilogo from "../../../public/Images/kunjilogo.png";
 import browserWallet from "../../../public/Images/browserWallet.png";
-import walletConnect from "../../../public/Images/walletConnect.png";
+import walletConnect from "../../../public/Images/WalletConnect.png";
 import coinbase from "../../../public/Images/coinbase.png";
 import torus from "../../../public/Images/torus.png";
 import frame from "../../../public/Images/frame.png";

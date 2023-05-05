@@ -27,6 +27,7 @@ const Nav = () => {
       setGmsFont(false);
       setUniswapFont(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router && router.pathname, name]);
   return (
     <>
