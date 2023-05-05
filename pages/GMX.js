@@ -12,6 +12,8 @@ import LongBtcModal from "../components/controls/Modal/LongBtcModal";
 import ClosePositionModal from "../components/controls/Modal/ClosePositionModal";
 import Table from "../components/Molecules/Table/index";
 import TradeHistory from "../components/Molecules/Gmx/TradeHistory";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
 
 const Gmx = () => {
   const [toggle, setToggle] = useState("Long");
@@ -27,15 +29,29 @@ const Gmx = () => {
   const [tokenData2, setTokenData2] = useState([]);
   const [searchData, setSearchData] = useState("");
   const [leaverage, setLeaverage] = useState(1.1);
-  const [numberOfPositions, setNumberOfPositions] = useState(2);
+  // const [numberOfPositions, setNumberOfPositions] = useState(2);
   const [limit, setLimit] = useState(10);
   const [tradeDataTab, setTradeDataTab] = useState("Positions");
   const [showClosePositionModal, setShowClosePositionModal] = useState(false);
+  const [openConfirmCancelModal, setOpenConfirmCancelModal] = useState(false);
   const [showLeverageInput, setShowLeverageInput] = useState(false);
   const [hideMaxButton, setHideMaxButton] = useState(false);
   const [hideMaxButton1, setHideMaxButton1] = useState(false);
   const [hideMaxButton2, setHideMaxButton2] = useState(false);
   const [hideMaxButton3, setHideMaxButton3] = useState(false);
+
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 504,
+    bgcolor: "#161617",
+    borderRadius: "18px",
+    boxShadow: 24,
+    color: "white",
+    p: 4,
+  };
 
   const search = (e) => {
     setSearchData(e);
@@ -80,6 +96,10 @@ const Gmx = () => {
     }
   }, [searchData]);
 
+  const handleCloseConfirmCancelModal = () => {
+    setOpenConfirmCancelModal(false);
+  };
+
   const toggleHandler = (type) => {
     setToggle(type);
   };
@@ -116,6 +136,27 @@ const Gmx = () => {
     },
   ];
 
+  let ordersData = [
+    {
+      type: "Trigger",
+      order: "Decrease BTC Long by $5.00",
+      price: ">30,000.00",
+      marketPrice: "28,048.43",
+    },
+    {
+      type: "Market",
+      order: "Increase BTC Short by $23.45",
+      price: ">99,999.00",
+      marketPrice: "77,396.61",
+    },
+    {
+      type: "Trigger",
+      order: "Increase BTC Short by $69.01",
+      price: ">52,428.00",
+      marketPrice: "32,162.78",
+    },
+  ];
+
   let tradeData = [
     {
       date: "06 Apr 2023, 12:01 PM",
@@ -133,9 +174,17 @@ const Gmx = () => {
       date: "06 Apr 2023, 02:55 PM",
       details: "Update order: Decrease BTC Short -5.00 USD, Price: > 28,051.00",
     },
+    {
+      date: "06 Apr 2023, 01:43 PM",
+      details: "Request Decrease BTC Long +14.00 USD, Price: > 89,444.00",
+    },
+    {
+      date: "06 Apr 2023, 12:30 PM",
+      details: "Create order: Decrease BTC Short -5.00 USD, Price: > 31,987.00",
+    },
   ];
 
-  let columns = [
+  let positionColumns = [
     {
       Header: "Position",
       accessor: (d) => (
@@ -222,8 +271,76 @@ const Gmx = () => {
     },
   ];
 
+  let orderColumn = [
+    {
+      Header: "Type",
+      accessor: "type",
+    },
+    {
+      Header: "Order",
+      accessor: "order",
+    },
+    {
+      Header: "Price",
+      accessor: "price",
+    },
+    {
+      Header: "Market Price",
+      accessor: "marketPrice",
+    },
+    {
+      Header: "",
+      accessor: "close",
+      Cell: (e) => {
+        return (
+          <div
+            className="cursor-pointer hover:text-white"
+            onClick={() => setOpenConfirmCancelModal(true)}
+          >
+            Cancel
+          </div>
+        );
+      },
+    },
+  ];
+
   return (
     <>
+      <Modal
+        open={openConfirmCancelModal}
+        onClose={handleCloseConfirmCancelModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        className="backdrop-blur-sm px-[71px]"
+        keepMounted={true}
+      >
+        <Box sx={style}>
+          <div>
+            <div className="text-[18px] text-center">Confirm Cancel?</div>
+            <div className="text-[14px] text-center mb-[12px] font-thin text-lightGray">
+              Are you sure you want to proceed with this action?
+            </div>
+            <div className="flex justify-center">
+              <Button
+                className="mx-5 text-[18px] py-[10px] px-[53px] w-[134px] bg-primary"
+                onClick={() => {
+                  handleCloseConfirmCancelModal();
+                }}
+              >
+                Yes
+              </Button>
+              <Button
+                className="mx-5 text-[18px] py-[10px] px-[53px] w-[134px] bg-red-500"
+                onClick={() => {
+                  handleCloseConfirmCancelModal();
+                }}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        </Box>
+      </Modal>
       {
         <ClosePositionModal
           open={showClosePositionModal}
@@ -249,7 +366,9 @@ const Gmx = () => {
                     }
                   >
                     Positions{" "}
-                    {numberOfPositions > 0 ? `(${numberOfPositions})` : null}
+                    {transactionData && transactionData.length > 0
+                      ? `(${transactionData.length})`
+                      : null}
                   </div>
                 </div>
                 <div onClick={() => toggleTradeDataTab("Orders")} className="">
@@ -260,7 +379,10 @@ const Gmx = () => {
                         : "text-center p-2 text-gray-400 font-medium cursor-pointer hover:text-gray-300"
                     }
                   >
-                    Orders
+                    Orders{" "}
+                    {ordersData && ordersData.length > 0
+                      ? `(${ordersData.length})`
+                      : null}
                   </div>
                 </div>
                 <div onClick={() => toggleTradeDataTab("Trades")} className="">
@@ -279,7 +401,15 @@ const Gmx = () => {
             {tradeDataTab === "Positions" && (
               <Table
                 data={transactionData ? transactionData : []}
-                columns={columns}
+                columns={positionColumns}
+                defaultPageSize={limit}
+                hidePagination={true}
+              />
+            )}
+            {tradeDataTab === "Orders" && (
+              <Table
+                data={ordersData ? ordersData : []}
+                columns={orderColumn}
                 defaultPageSize={limit}
                 hidePagination={true}
               />
