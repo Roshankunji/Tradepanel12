@@ -109,6 +109,7 @@ const Uniswap = () => {
         .reduce((prev, next) => prev + next)
         .toFixed(2)
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -123,6 +124,7 @@ const Uniswap = () => {
         }, 1000);
       }, 1000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openConfirmModal]);
 
   const handleOpenConfirmModal = () => {
