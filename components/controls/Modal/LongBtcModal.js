@@ -69,11 +69,17 @@ const LongBtcModal = () => {
               <div className="flex justify-between items-center">
                 <div className="text-[15px]">Allow upto 1% of slippage</div>
 
-                <CheckBox />
+                <CheckBox
+                  show={(e) => {
+                    setClick(e);
+                  }}
+                />
               </div>
               <div className="flex justify-between items-center">
                 <div className="text-[15px]">Allowed Slippage</div>
-                <div className="text-[15px]">0.30%</div>
+                <div className="text-[15px] underline decoration-dashed">
+                  0.30%
+                </div>
               </div>
               <hr className="border-[1px] border-lightBlue my-[10px]"></hr>
               <div className="flex justify-between items-center">
@@ -91,11 +97,15 @@ const LongBtcModal = () => {
               <hr className="border-[1px] border-lightBlue my-[10px]"></hr>
               <div className="flex justify-between items-center">
                 <div className="text-[15px]">Collateral (Btc)</div>
-                <div className="text-[15px]">$9.94</div>
+                <div className="text-[15px] underline decoration-dashed">
+                  $9.94
+                </div>
               </div>
               <div className="flex justify-between items-center">
                 <div className="text-[15px]">Fees</div>
-                <div className="text-[15px]">$0.43</div>
+                <div className="text-[15px] underline decoration-dashed">
+                  $0.43
+                </div>
               </div>
               <Button className="bg-primary w-[100%] rounded-[3px] mt-[15px]">
                 Long
