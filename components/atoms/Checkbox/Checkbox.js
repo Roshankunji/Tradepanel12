@@ -15,7 +15,11 @@ const CheckBox = ({ show }) => {
         checked={checked}
         onChange={handleChange}
         inputProps={{ "aria-label": "controlled" }}
-        sx={{ color: "white", fontSize: "13px" }}
+        sx={{ "& .MuiSvgIcon-root": { fontSize: 18, color: "white" } }}
+        style={{
+          width: "5px",
+          height: "5px",
+        }}
       />
     </>
   );
