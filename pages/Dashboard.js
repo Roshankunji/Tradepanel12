@@ -8,7 +8,7 @@ export default function Dashboard() {
   return (
     <div className="flex flex-wrap min-h-screen bg-backgroundColor  py-10 justify-between ">
       <BaseCard
-        name="User Valut"
+        name="User Vault"
         className="w-[100%] sm:w-[45%] md:w-[30%] bg-gradient-custom-90.76deg"
       />
       <BaseCard

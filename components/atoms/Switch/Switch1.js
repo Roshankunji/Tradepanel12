@@ -3,7 +3,7 @@ import Switch from "@mui/material/Switch";
 import { styled } from "@mui/material/styles";
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
-  width: 48,
+  width: 46,
   height: 24,
   padding: 0,
   display: "flex",

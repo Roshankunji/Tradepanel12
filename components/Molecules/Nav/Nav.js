@@ -29,6 +29,12 @@ const Nav = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router && router.pathname, name]);
+
+  const names = [
+    "Arbitrage opportunities and Balanced Strategy",
+    "Top Cap Digital Assets Strategy",
+    "Alpha Blue Chip Focused Strategy",
+  ];
   return (
     <>
       <div className="bg-backgroundColor text-white py-[20px] px-10 w-[100%] flex justify-between">
@@ -84,7 +90,7 @@ const Nav = () => {
           </li>
         </ul>
         <div className="flex w-[60%] justify-end md:flex-nowrap flex-wrap">
-          <Dropdown1 />
+          <Dropdown1 names={names} background="#0C1020" width={390} />
           <NavModal />
         </div>
       </div>

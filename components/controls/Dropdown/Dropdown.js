@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import MenuItem from "@mui/material/MenuItem";
@@ -16,12 +16,6 @@ const MenuProps = {
   },
 };
 
-const names = [
-  "Arbitrage opportunities and Balanced Strategy",
-  "Top Cap Digital Assets Strategy",
-  "Alpha Blue Chip Focused Strategy",
-];
-
 function getStyles(name, personName, theme) {
   return {
     fontWeight:
@@ -31,10 +25,13 @@ function getStyles(name, personName, theme) {
   };
 }
 
-const Dropdown = ({ className }) => {
+const Dropdown = ({ className, names, background, width }) => {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState([]);
-  const [selected, setSelected] = useState(false);
+
+  useEffect(() => {
+    setPersonName(names[0]);
+  }, []);
 
   const handleChange = (event) => {
     const {
@@ -48,7 +45,7 @@ const Dropdown = ({ className }) => {
   return (
     <>
       <div className={`flex items-center mr-[30px]  ${className}`}>
-        <FormControl sx={{ m: 0, width: 390, mt: 0 }}>
+        <FormControl sx={{ m: 0, width: width, mt: 0 }}>
           <Select
             // multiple
             displayEmpty
@@ -57,7 +54,7 @@ const Dropdown = ({ className }) => {
             style={{
               color: "white",
               // background: "gray",
-              backgroundColor: "#0C1020",
+              backgroundColor: background,
               height: "40px",
               borderRadius: "8px",
             }}
@@ -91,19 +88,12 @@ const Dropdown = ({ className }) => {
                 key={name}
                 value={name}
                 style={getStyles(name, personName, theme)}
-                onClick={(e) => {
-                  if (name == personName) {
-                    setSelected(true);
-                  } else {
-                    setSelected(false);
-                  }
-                }}
               >
                 <div
                   className={
-                    selected === true
-                      ? "bg-primary text-white pt-[12px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
-                      : "bg-darkBlue text-white pt-[12px] rounded-[2px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
+                    name == personName
+                      ? "bg-primary rounded-[6px] my-[1px] text-white pt-[12px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
+                      : "bg-darkBlue text-white pt-[12px] my-[1px] rounded-[2px] px-[10px] pb-[12px] box-border w-[100%] hover:bg-primary hover:rounded-[6px]"
                   }
                 >
                   {name}
