@@ -45,7 +45,8 @@ const BaseCard = ({ name, className }) => {
               <div className="flex flex-col py-[6px] ">
                 <text className="text-[12px] font-sora">Returns</text>
                 <text className="text-[18px] font-semibold font-sora">
-                  $34,44,44,4788
+                  $34,44,44,4788{" "}
+                  <span className="text-green-500 font-normal">(+50.3%)</span>
                 </text>
               </div>
               {name === "User Vault" ? (

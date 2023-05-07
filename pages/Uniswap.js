@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import setting from "../public/Images/setting.png";
 import paper from "../public/Images/paper.png";
 import Button from "../components/atoms/Button/Button";
 import SouthIcon from "@mui/icons-material/South";
@@ -26,6 +25,7 @@ import Error from "../components/Molecules/ErrorMessge/Error";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import tokenDataFromJson from "../components/controls/Dropdown/TokenData.json";
+import ExperModeModal from "../components/controls/Modal/ExperModeModal";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -63,7 +63,6 @@ const Uniswap = () => {
   const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState();
   const [checked, setChecked] = useState(false);
-  const [checked1, setChecked1] = useState(false);
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
@@ -80,9 +79,7 @@ const Uniswap = () => {
   const handleChange = () => {
     setChecked(!checked);
   };
-  const handleChange1 = () => {
-    setChecked1(!checked1);
-  };
+
   const handleOpen = () => {
     setFirst(true);
     setOpen(true);
@@ -445,11 +442,6 @@ const Uniswap = () => {
             <div className="font-semiboold">Swap</div>
             <div className="flex">
               <Image
-                src={setting}
-                alt="setting"
-                className="w-[20px] h-[20px]"
-              />
-              <Image
                 src={paper}
                 alt="paper"
                 className="w-[20px] h-[20px] ml-[20px]"
@@ -612,7 +604,7 @@ const Uniswap = () => {
               <text className="mr-[10px] text-[15px]">Exper Mode</text>
               <HelpOutlineIcon className="text-[18px]" />
             </div>
-            <Switch1 checked={checked1} change={handleChange1} />
+            <ExperModeModal />
           </div>
 
           <div className="bg-darkBlue mb-[10px]">

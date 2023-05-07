@@ -33,10 +33,13 @@ const Gmx = () => {
   const [leaverage, setLeaverage] = useState(1.1);
   const [leaverage1, setLeaverage1] = useState(1.1);
   const [leverageError, setLeverageError] = useState(false);
+  const [leverageMaxError, setLeverageMaxError] = useState(false);
   const [leverageError1, setLeverageError1] = useState(false);
+  const [leverageMaxError1, setLeverageMaxError1] = useState(false);
   // const [numberOfPositions, setNumberOfPositions] = useState(2);
   const [limit, setLimit] = useState(10);
   const [tradeDataTab, setTradeDataTab] = useState("Positions");
+  const [tradeDataTab1, setTradeDataTab1] = useState("Positions");
   const [showClosePositionModal, setShowClosePositionModal] = useState(false);
   const [openConfirmCancelModal, setOpenConfirmCancelModal] = useState(false);
   const [hideMaxButton, setHideMaxButton] = useState(false);
@@ -80,8 +83,10 @@ const Gmx = () => {
       setLeverageError(false);
       setLeaverage1(null);
       setLeverageError1(false);
+      setLeverageMaxError(false);
       setLeaverage(1.1);
       setLeaverage1(1.1);
+      setLeverageMaxError1(false);
 
       if (marketLimitTab === "Market") {
         setLeaverage1(1.1);
@@ -90,6 +95,7 @@ const Gmx = () => {
         setLimitLong(null);
         setHideMaxButton2(false);
         setHideMaxButton3(false);
+        setLeverageMaxError1(false);
       } else {
         setMarketPay(null);
         setMarketLong(null);
@@ -97,6 +103,7 @@ const Gmx = () => {
         setHideMaxButton1(false);
         setLeaverage(1.1);
         setLeverageError(false);
+        setLeverageMaxError(false);
       }
     }
   }, [toggle, marketLimitTab]);
@@ -135,6 +142,9 @@ const Gmx = () => {
   };
   const toggleTradeDataTab = (type) => {
     setTradeDataTab(type);
+  };
+  const toggleTradeDataTab1 = (type) => {
+    setTradeDataTab1(type);
   };
 
   let transactionData = [
@@ -388,6 +398,9 @@ const Gmx = () => {
               <Dropdown names={names} width={160} background="#16182e" />
             </div>
             <div className="w-full mb-3">
+              <div className="my-[5px] font-semibold text-[#cc9900]">
+                Trader Wallet
+              </div>
               <div className="flex">
                 <div
                   onClick={() => toggleTradeDataTab("Positions")}
@@ -432,30 +445,103 @@ const Gmx = () => {
                   </div>
                 </div>
               </div>
+              {tradeDataTab === "Positions" && (
+                <Table
+                  data={transactionData ? transactionData : []}
+                  columns={positionColumns}
+                  defaultPageSize={limit}
+                  hidePagination={true}
+                />
+              )}
+              {tradeDataTab === "Orders" && (
+                <Table
+                  data={ordersData ? ordersData : []}
+                  columns={orderColumn}
+                  defaultPageSize={limit}
+                  hidePagination={true}
+                />
+              )}
+              {tradeDataTab === "Trades" &&
+                tradeData.map(function (e) {
+                  return (
+                    <TradeHistory key={""} date={e.date} details={e.details} />
+                  );
+                })}
             </div>
-            {tradeDataTab === "Positions" && (
-              <Table
-                data={transactionData ? transactionData : []}
-                columns={positionColumns}
-                defaultPageSize={limit}
-                hidePagination={true}
-              />
-            )}
-            {tradeDataTab === "Orders" && (
-              <Table
-                data={ordersData ? ordersData : []}
-                columns={orderColumn}
-                defaultPageSize={limit}
-                hidePagination={true}
-              />
-            )}
-            {tradeDataTab === "Trades" &&
-              tradeData.map(function (e) {
-                return (
-                  <TradeHistory key={""} date={e.date} details={e.details} />
-                );
-              })}
+
+            <div>
+              <div className="my-[5px] font-semibold text-[#cc9900]">
+                User Wallet
+              </div>
+              <div className="flex">
+                <div
+                  onClick={() => toggleTradeDataTab1("Positions")}
+                  className=""
+                >
+                  <div
+                    className={
+                      tradeDataTab1 === "Positions"
+                        ? "text-center h-full p-2 text-white text-[16px] font-medium cursor-pointer"
+                        : "text-center p-2 text-gray-400 font-medium cursor-pointer hover:text-gray-300"
+                    }
+                  >
+                    Positions{" "}
+                    {transactionData && transactionData.length > 0
+                      ? `(${transactionData.length})`
+                      : null}
+                  </div>
+                </div>
+                <div onClick={() => toggleTradeDataTab1("Orders")} className="">
+                  <div
+                    className={
+                      tradeDataTab1 === "Orders"
+                        ? "text-center h-full p-2 text-white text-[16px] font-medium cursor-pointer"
+                        : "text-center p-2 text-gray-400 font-medium cursor-pointer hover:text-gray-300"
+                    }
+                  >
+                    Orders{" "}
+                    {ordersData && ordersData.length > 0
+                      ? `(${ordersData.length})`
+                      : null}
+                  </div>
+                </div>
+                <div onClick={() => toggleTradeDataTab1("Trades")} className="">
+                  <div
+                    className={
+                      tradeDataTab1 === "Trades"
+                        ? "text-center h-full p-2 text-white text-[16px] font-medium cursor-pointer"
+                        : "text-center p-2 text-gray-400 font-medium cursor-pointer hover:text-gray-300"
+                    }
+                  >
+                    Trades
+                  </div>
+                </div>
+              </div>
+              {tradeDataTab1 === "Positions" && (
+                <Table
+                  data={transactionData ? transactionData : []}
+                  columns={positionColumns}
+                  defaultPageSize={limit}
+                  hidePagination={true}
+                />
+              )}
+              {tradeDataTab1 === "Orders" && (
+                <Table
+                  data={ordersData ? ordersData : []}
+                  columns={orderColumn}
+                  defaultPageSize={limit}
+                  hidePagination={true}
+                />
+              )}
+              {tradeDataTab1 === "Trades" &&
+                tradeData.map(function (e) {
+                  return (
+                    <TradeHistory key={""} date={e.date} details={e.details} />
+                  );
+                })}
+            </div>
           </div>
+
           <div className="w-[32%] flex-col">
             <div className="bg-[#16182e] px-[10px] py-[10px] mb-[10px]">
               <div className="flex">
@@ -745,12 +831,14 @@ const Gmx = () => {
                       controls={false}
                       value={leaverage}
                       onChange={(e) => {
-                        if (e.target.value >= 1.1) {
+                        if (e.target.value >= 1.1 && e.target.value <= 50) {
                           setLeverageError(false);
                           if (e.target.value.match(/^(\d*\.{0,1}\d{0,1}$)/)) {
                             setLeaverage(e.target.value);
                           } else {
                           }
+                        } else if (e.target.value > 50) {
+                          setLeverageMaxError(true);
                         } else {
                           setLeaverage(null);
                           setLeverageError(true);
@@ -760,7 +848,14 @@ const Gmx = () => {
                   }
                   {leverageError === true ? (
                     <Error className="text-[14px]">
-                      Minimum Leverage is 1.1
+                      Minimum Leverage is 1.1.
+                    </Error>
+                  ) : (
+                    ""
+                  )}
+                  {leverageMaxError === true ? (
+                    <Error className="text-[14px]">
+                      Maximum Leverage is 50.
                     </Error>
                   ) : (
                     ""
@@ -872,7 +967,9 @@ const Gmx = () => {
                     <Button
                       className="bg-primary w-[100%] rounded-[2px]"
                       disabled={
-                        leverageError === true || leaverage == null
+                        leverageError === true ||
+                        leaverage == null ||
+                        leverageMaxError === true
                           ? true
                           : false
                       }
@@ -1141,12 +1238,14 @@ const Gmx = () => {
                       controls={false}
                       value={leaverage1}
                       onChange={(e) => {
-                        if (e.target.value >= 1.1) {
+                        if (e.target.value >= 1.1 && e.target.value <= 50) {
                           setLeverageError1(false);
                           if (e.target.value.match(/^(\d*\.{0,1}\d{0,1}$)/)) {
                             setLeaverage1(e.target.value);
                           } else {
                           }
+                        } else if (e.target.value > 50) {
+                          setLeverageMaxError1(true);
                         } else {
                           setLeaverage1(null);
                           setLeverageError1(true);
@@ -1156,7 +1255,14 @@ const Gmx = () => {
                   }
                   {leverageError1 === true ? (
                     <Error className="text-[14px]">
-                      Minimum Leverage is 1.1
+                      Minimum Leverage is 1.1.
+                    </Error>
+                  ) : (
+                    ""
+                  )}
+                  {leverageMaxError1 === true ? (
+                    <Error className="text-[14px]">
+                      Maximum Leverage is 50.
                     </Error>
                   ) : (
                     ""
@@ -1266,7 +1372,9 @@ const Gmx = () => {
                     <Button
                       className="bg-primary w-[100%] rounded-[2px]"
                       disabled={
-                        leverageError1 === true || leaverage1 == null
+                        leverageError1 === true ||
+                        leaverage1 == null ||
+                        leverageMaxError1 === true
                           ? true
                           : false
                       }
