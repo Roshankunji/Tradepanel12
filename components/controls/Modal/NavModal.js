@@ -11,6 +11,8 @@ import coinbase from "../../../public/Images/coinbase.png";
 import torus from "../../../public/Images/torus.png";
 import frame from "../../../public/Images/frame.png";
 import CancelIcon from "@mui/icons-material/Cancel";
+import abi from "../../../pages/abi.json";
+// import { ethers } from "ethers";
 
 const style = {
   position: "absolute",
@@ -34,11 +36,66 @@ const NavModal = () => {
   const [click4, setClick4] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [address, setAddress] = useState("");
+  const ARBITRUM_CHAIN_ID = "0xa4b1";
+
+  async function connectToArbitrum() {
+    if (window.ethereum) {
+      try {
+        const chainId = await ethereum.request({ method: "eth_chainId" });
+
+        const isArbitrumAvailable = await ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: ARBITRUM_CHAIN_ID,
+              chainName: "Arbitrum",
+              nativeCurrency: {
+                name: "Ether",
+                symbol: "ETH",
+                decimals: 18,
+              },
+              rpcUrls: [
+                "https://rpc.tenderly.co/fork/63e43ae4-c660-4f58-a0e1-325d54f24923",
+              ],
+              blockExplorerUrls: ["https://arbiscan.io/"],
+            },
+          ],
+        });
+
+        if (chainId == ARBITRUM_CHAIN_ID || isArbitrumAvailable) {
+          const accounts = await ethereum.request({ method: "eth_accounts" });
+          if (accounts.length > 0) {
+            const address = accounts[0];
+            console.log(`Connected to wallet with address ${address}`);
+            setAddress(address);
+            return address;
+          } else {
+            console.log("No accounts found");
+          }
+          console.log("Connected to Arbitrum network");
+          // const addr = "0x824bef9c581f03ffd699b9bfdb9c714ac25f51b1";
+          // const provider = new ethers.BrowserProvider(window.ethereum);
+          // const contract = new ethers.Contract(addr, abi, provider);
+          // const name = await contract.getBalances();
+          // console.log("name is", name);
+          // setName(name);
+        } else {
+          console.log("Arbitrum network is not available");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      console.log("Ethereum not available");
+    }
+  }
+
   return (
     <>
       <div>
         <Button onClick={handleOpen} className="bg-primary">
-          Connect Wallet
+          {address ? `${address.slice(0, 12)}.......` : " Connect Wallet"}
         </Button>
         <Modal
           open={open}
@@ -75,11 +132,13 @@ const NavModal = () => {
                     : "flex justify-between items-center py-[15px] px-[10px] cursor-pointer hover:bg-hoverBgColor hover:rounded-[6px] mb-[3px]"
                 }
                 onClick={() => {
+                  connectToArbitrum();
                   setClick(!click);
                   setClick1(false);
                   setClick2(false);
                   setClick3(false);
                   setClick4(false);
+                  handleClose();
                 }}
               >
                 <text className="text-[15px]">Browser Wallet</text>
@@ -102,6 +161,7 @@ const NavModal = () => {
                   setClick2(false);
                   setClick3(false);
                   setClick4(false);
+                  handleClose();
                 }}
               >
                 <text className="text-[15px]">Wallet Connect</text>
@@ -123,6 +183,7 @@ const NavModal = () => {
                   setClick2(!click2);
                   setClick3(false);
                   setClick4(false);
+                  handleClose();
                 }}
               >
                 <text className="text-[15px]">Coinbase Wallet</text>
@@ -144,6 +205,7 @@ const NavModal = () => {
                   setClick2(false);
                   setClick3(!click3);
                   setClick4(false);
+                  handleClose();
                 }}
               >
                 <text className="text-[15px]">Torus</text>
@@ -165,6 +227,7 @@ const NavModal = () => {
                   setClick2(false);
                   setClick3(false);
                   setClick4(!click4);
+                  handleClose();
                 }}
               >
                 <text className="text-[15px]">Frame</text>
