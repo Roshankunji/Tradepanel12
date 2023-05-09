@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../atoms/Button/Button";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -39,6 +39,26 @@ const NavModal = () => {
   const [address, setAddress] = useState("");
   const ARBITRUM_CHAIN_ID = "0xa4b1";
 
+  useEffect(() => {
+    (async () => {
+      const chainId = await ethereum.request({ method: "eth_chainId" });
+      if (chainId == ARBITRUM_CHAIN_ID || isArbitrumAvailable) {
+        const accounts = await ethereum.request({ method: "eth_accounts" });
+        if (accounts.length > 0) {
+          const address = accounts[0];
+          console.log(`Connected to wallet with address ${address}`);
+          setAddress(address);
+          localStorage.setItem("walletConnected", true);
+          return address;
+        } else {
+          console.log("No accounts found");
+        }
+        console.log("Connected to Arbitrum network");
+      } else {
+        console.log("Arbitrum network is not available");
+      }
+    })();
+  }, []);
   async function connectToArbitrum() {
     if (window.ethereum) {
       try {
@@ -69,6 +89,7 @@ const NavModal = () => {
             const address = accounts[0];
             console.log(`Connected to wallet with address ${address}`);
             setAddress(address);
+            localStorage.setItem("walletConnected", true);
             return address;
           } else {
             console.log("No accounts found");

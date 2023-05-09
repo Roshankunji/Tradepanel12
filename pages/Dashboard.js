@@ -8,23 +8,23 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Dashboard() {
   const [name, setName] = useState();
-  // useEffect(async () => {
-  //   const addr = "0x824bef9c581f03ffd699b9bfdb9c714ac25f51b1";
-  //   const provider = new ethers.BrowserProvider(window.ethereum);
-  //   const contract = new ethers.Contract(addr, abi, provider);
-  //   const name = await contract.getBalances();
-  //   console.log("name is", name);
-  //   setName(name);
-  // }, []);
-
-  const connect = async () => {
-    const addr = "0x824bef9c581f03ffd699b9bfdb9c714ac25f51b1";
-    const provider = new ethers.BrowserProvider(window.ethereum);
-    const contract = new ethers.Contract(addr, abi, provider);
-    const name = await contract.getBalances();
-    console.log("name is", provider);
-    setName(name);
-  };
+  let walletConnected;
+  if (typeof window !== "undefined") {
+    walletConnected = localStorage.getItem("walletConnected");
+  }
+  useEffect(() => {
+    (async () => {
+      if (walletConnected == true) {
+        const addr = "0x824bef9c581f03ffd699b9bfdb9c714ac25f51b1";
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const contract = new ethers.Contract(addr, abi, provider);
+        const name = await contract.getBalances();
+        console.log("name is", name);
+        setName(name);
+      } else {
+      }
+    })();
+  }, [walletConnected]);
 
   return (
     <div className="flex flex-wrap min-h-screen bg-backgroundColor  py-10 justify-between ">
@@ -40,7 +40,6 @@ export default function Dashboard() {
         name="Funds Rollover"
         className="w-[100%] sm:w-[45%] md:w-[30%]"
       />
-      <button onClick={connect}>connect</button>
     </div>
   );
 }
