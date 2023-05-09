@@ -72,10 +72,10 @@ const ExperModeModal = () => {
               ONLY USE THIS MODE IF YOU KNOW WHAT YOU ARE DOING.
             </p>
             <Button
-              className="bg-[#664d00] w-[100%] py-[9px] mb-[10px]"
+              className="bg-[#cc9900] w-[100%] py-[9px] mb-[10px]"
               onClick={handleOpen1}
             >
-              <text className="text-[15px]">Turn On Expert Mode</text>
+              <text className="text-[15px] ">Turn On Expert Mode</text>
             </Button>
           </div>
         </Box>
