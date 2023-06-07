@@ -22,9 +22,11 @@ import {
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import { arbitrum } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
+import { Provider } from "../provider";
+import { arbitrumFork } from "../constants/chains";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [arbitrum],
+  [arbitrumFork],
   [publicProvider()]
 );
 
@@ -122,10 +124,10 @@ const wagmiConfig = createConfig({
 });
 
 const Disclaimer = ({ Text, Link }) => (
-  <Text>
+  <p>
     New to Kunji Finance?
     <Link href="https://docs.kunji.finance"> Click here to read Kunji Finance documentation.</Link>
-  </Text>
+  </p>
 );
 
 export default function App({ Component, pageProps }) {
@@ -133,9 +135,11 @@ export default function App({ Component, pageProps }) {
     <div id="root">
       <WagmiConfig config={wagmiConfig}>
         <RainbowKitProvider appInfo={{appName: KunjiAppInfo, disclaimer: Disclaimer}} chains={chains} theme={KunjiTheme}>
-          <Layout>
-            <Component {...pageProps} />;
-          </Layout>
+          <Provider>
+            <Layout>
+              <Component {...pageProps} />;
+            </Layout>
+          </Provider>
         </RainbowKitProvider>
       </WagmiConfig>
     </div>

@@ -82,7 +82,7 @@ const NavModal = () => {
                   setClick4(false);
                 }}
               >
-                <text className="text-[15px]">Browser Wallet</text>
+                <p className="text-[15px]">Browser Wallet</p>
                 <Image
                   src={browserWallet}
                   alt="browser wallet"
@@ -104,7 +104,7 @@ const NavModal = () => {
                   setClick4(false);
                 }}
               >
-                <text className="text-[15px]">Wallet Connect</text>
+                <p className="text-[15px]">Wallet Connect</p>
                 <Image
                   src={walletConnect}
                   alt="wallet connect"
@@ -125,7 +125,7 @@ const NavModal = () => {
                   setClick4(false);
                 }}
               >
-                <text className="text-[15px]">Coinbase Wallet</text>
+                <p className="text-[15px]">Coinbase Wallet</p>
                 <Image
                   src={coinbase}
                   alt="coinbase"
@@ -146,7 +146,7 @@ const NavModal = () => {
                   setClick4(false);
                 }}
               >
-                <text className="text-[15px]">Torus</text>
+                <p className="text-[15px]">Torus</p>
                 <Image
                   src={torus}
                   alt="torus"
@@ -167,7 +167,7 @@ const NavModal = () => {
                   setClick4(!click4);
                 }}
               >
-                <text className="text-[15px]">Frame</text>
+                <p className="text-[15px]">Frame</p>
                 <Image
                   src={frame}
                   alt="frame"

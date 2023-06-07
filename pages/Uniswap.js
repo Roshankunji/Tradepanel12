@@ -26,6 +26,10 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import tokenDataFromJson from "../components/controls/Dropdown/TokenData.json";
 import ExperModeModal from "../components/controls/Modal/ExperModeModal";
+import { useContractRead } from 'wagmi'
+import { LensABI } from "../contracts/abis";
+import contractAddress from '../contracts/address'
+import { ethers } from 'ethers'
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -55,6 +59,60 @@ const style1 = {
   padding: 3,
 };
 
+const traderTokens = [
+  {
+    tokenName: "Tether USD",
+    tokenAmount: 10.75,
+    dollarValue: 10.75,
+    tokenSymbol: "USDT",
+    percentChange: 0.05,
+    profitLoss: "loss",
+  },
+  {
+    tokenName: "USD Coin",
+    tokenAmount: 10.35,
+    dollarValue: 10.36,
+    tokenSymbol: "USDC",
+    percentChange: 0.07,
+    profitLoss: "profit",
+  },
+  {
+    tokenName: "Ethereum",
+    tokenAmount: 0.003,
+    dollarValue: 4.86,
+    tokenSymbol: "ETH",
+    percentChange: 1.33,
+    profitLoss: "loss",
+  },
+];
+
+const userTokens = [
+  {
+    tokenName: "Tether USD",
+    tokenAmount: 100.75,
+    dollarValue: 100.75,
+    tokenSymbol: "USDT",
+    percentChange: 1.05,
+    profitLoss: "loss",
+  },
+  {
+    tokenName: "USD Coin",
+    tokenAmount: 100.35,
+    dollarValue: 100.36,
+    tokenSymbol: "USDC",
+    percentChange: 1.07,
+    profitLoss: "profit",
+  },
+  {
+    tokenName: "Ethereum",
+    tokenAmount: 1.003,
+    dollarValue: 40.86,
+    tokenSymbol: "ETH",
+    percentChange: 10.33,
+    profitLoss: "loss",
+  },
+];
+
 const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
   const [totalTraderTokenAmount, setTotalTraderTokenAmount] = useState();
@@ -75,6 +133,36 @@ const Uniswap = () => {
   const [second, setSecond] = useState(false);
   let [counter, setCounter] = useState(0);
   const [toggle, setToggle] = useState("Trader wallet");
+
+  // const { data: Lens, isError, isLoading } = useContractRead({
+  //   address: contractAddress.lensAddress,
+  //   abi: LensABI,
+  //   functionName: 'getAmountOut'
+  // })
+
+  // const fetchAmountIn = async () => {
+  //   const tokenDecimal = 18;
+  //   const path = ethers.utils.solidityPack(["address", "uint24", "address"], [usdc, poolFee, weth]);
+  //   const amountIn = 1850 * 10 ** tokenDecimal;
+  //   const amountOut = await Lens.getAmountOut(path, amountIn);
+  //   setSwapSecondAmount(amountOut);
+  // }
+
+  // useEffect(() => {
+  //   fetchAmountIn();
+  // }, [swapAmount])
+
+  // const fetchAmountOut = async () => {
+  //   const tokenDecimal = 18;
+  //   const path = ethers.utils.solidityPack(["address", "uint24", "address"], [usdc, poolFee, weth]);
+  //   const amountOut = 1850 * 10 ** tokenDecimal;
+  //   const amountIn = await Lens.getAmountOut(path, amountIn);
+  //   setSwapAmount(amountOut);
+  // }
+
+  // useEffect(() => {
+  //   fetchAmountOut();
+  // }, [swapSecondAmount])
 
   const handleChange = () => {
     setChecked(!checked);
@@ -139,60 +227,6 @@ const Uniswap = () => {
   const toggleHandler = (type) => {
     setToggle(type);
   };
-
-  let traderTokens = [
-    {
-      tokenName: "Tether USD",
-      tokenAmount: 10.75,
-      dollarValue: 10.75,
-      tokenSymbol: "USDT",
-      percentChange: 0.05,
-      profitLoss: "loss",
-    },
-    {
-      tokenName: "USD Coin",
-      tokenAmount: 10.35,
-      dollarValue: 10.36,
-      tokenSymbol: "USDC",
-      percentChange: 0.07,
-      profitLoss: "profit",
-    },
-    {
-      tokenName: "Ethereum",
-      tokenAmount: 0.003,
-      dollarValue: 4.86,
-      tokenSymbol: "ETH",
-      percentChange: 1.33,
-      profitLoss: "loss",
-    },
-  ];
-
-  let userTokens = [
-    {
-      tokenName: "Tether USD",
-      tokenAmount: 100.75,
-      dollarValue: 100.75,
-      tokenSymbol: "USDT",
-      percentChange: 1.05,
-      profitLoss: "loss",
-    },
-    {
-      tokenName: "USD Coin",
-      tokenAmount: 100.35,
-      dollarValue: 100.36,
-      tokenSymbol: "USDC",
-      percentChange: 1.07,
-      profitLoss: "profit",
-    },
-    {
-      tokenName: "Ethereum",
-      tokenAmount: 1.003,
-      dollarValue: 40.86,
-      tokenSymbol: "ETH",
-      percentChange: 10.33,
-      profitLoss: "loss",
-    },
-  ];
 
   return (
     <>
@@ -485,9 +519,9 @@ const Uniswap = () => {
                     ></Image>
                   )}
 
-                  <text className="text-[18px]">
+                  <p className="text-[18px]">
                     {tokenData.shortName ? tokenData.shortName : "USDT"}
-                  </text>
+                  </p>
                   <KeyboardArrowDownIcon />
                 </div>
                 <div className="text-center">
@@ -530,11 +564,11 @@ const Uniswap = () => {
                   ""
                 )}
 
-                <text className="text-[18px]">
+                <p className="text-[18px]">
                   {tokenDataNext && tokenDataNext.shortName
                     ? tokenDataNext.shortName
                     : "Select Token"}
-                </text>
+                </p>
                 <KeyboardArrowDownIcon />
               </div>
               <div className="text-center">
@@ -544,7 +578,7 @@ const Uniswap = () => {
           </div>
 
           <div className="flex mb-[10px] px-[20px]">
-            <text className="mr-[10px]">Slippage Tolerance</text>
+            <p className="mr-[10px]">Slippage Tolerance</p>
             <HelpOutlineIcon />
           </div>
           <div className="flex-col mb-[10px] px-[20px]">
@@ -556,7 +590,7 @@ const Uniswap = () => {
                     setAuto(!auto);
                   }}
                 >
-                  <text className="text-[16px]">Auto</text>
+                  <p className="text-[16px]">Auto</p>
                 </Button>
               ) : (
                 <Button
@@ -565,7 +599,7 @@ const Uniswap = () => {
                     setAuto(!auto);
                   }}
                 >
-                  <text className="text-[16px]">Auto</text>
+                  <p className="text-[16px]">Auto</p>
                 </Button>
               )}
 
@@ -580,7 +614,7 @@ const Uniswap = () => {
                     setPercentage(e.target.value);
                   }}
                 ></input>
-                <text className="font-semibold mr-[5px]">%</text>
+                <p className="font-semibold mr-[5px]">%</p>
               </div>
             </div>
             {/* <ErrorWarning className="text-[12px] my-[10px]">
@@ -593,7 +627,7 @@ const Uniswap = () => {
           <div className="mb-[10px] px-[20px]">Interface Setting</div>
           <div className="flex justify-between items-center px-[20px] mb-[10px]">
             <div className="flex items-center">
-              <text className="mr-[10px] text-[15px]">Auto Router Api</text>
+              <p className="mr-[10px] text-[15px]">Auto Router Api</p>
               <HelpOutlineIcon className="text-[18px]" />
             </div>
             <Switch1 checked={checked} change={handleChange} />
@@ -601,7 +635,7 @@ const Uniswap = () => {
 
           <div className="flex justify-between items-center px-[20px] mb-[10px]">
             <div className="flex items-center">
-              <text className="mr-[10px] text-[15px]">Exper Mode</text>
+              <p className="mr-[10px] text-[15px]">Exper Mode</p>
               <HelpOutlineIcon className="text-[18px]" />
             </div>
             <ExperModeModal />
@@ -617,7 +651,7 @@ const Uniswap = () => {
               <div className="flex items-center">
                 <InfoOutlinedIcon className="text-lightbluetext text-[15px] mr-[5px]" />
                 <div>
-                  <text className="text-[14px]">1 USDT = 1.0045(USDC) </text>
+                  <p className="text-[14px]">1 USDT = 1.0045(USDC) </p>
                   <span className="text-lightbluetext text-[14px]">
                     ($1.002)
                   </span>
@@ -685,7 +719,7 @@ const Uniswap = () => {
                   >
                     <CircularProgress className="p-[5px]" />
                   </Box>
-                  <text>Approve in your wallet</text>
+                  <p>Approve in your wallet</p>
                 </div>
               </Button>
             </div>
@@ -699,7 +733,7 @@ const Uniswap = () => {
               >
                 <div className="flex items-center justify-center">
                   <InfoOutlinedIcon className="text-lightblutext text-[25px] mr-[10px]" />
-                  <text>Approve use of USDC</text>
+                  <p>Approve use of USDC</p>
                 </div>
               </Button>
             </div>

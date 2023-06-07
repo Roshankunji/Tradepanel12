@@ -22,15 +22,15 @@ const Login = () => {
           {/* bg-gradient-to-r from-[#000033] from-30% to-[#00001a] to-100% */}
           <div>
             <div className="mb-[15px] flex flex-col">
-              <text className="text-white mb-[10px] ml-[10px] font-sora">
+              <p className="text-white mb-[10px] ml-[10px] font-sora">
                 Email Address
-              </text>
+              </p>
               <UserEmail className="bg-darkBlueBlack text-white" />
             </div>
             <div className="mb-[40px] flex flex-col">
-              <text className="text-white mb-[10px] ml-[10px] font-sora">
+              <p className="text-white mb-[10px] ml-[10px] font-sora">
                 Password
-              </text>
+              </p>
               <PassWord className="bg-darkBlueBlack text-white" />
             </div>
             <Button

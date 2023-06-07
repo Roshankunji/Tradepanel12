@@ -19,59 +19,59 @@ const BaseCard = ({ name, className }) => {
           ) : (
             <div className="py-[15px] px-[25px]">
               <div className="flex flex-col py-[6px] ">
-                <text className="text-[12px] font-sora">Total Funds</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Total Funds</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $34,44,44,4788
-                </text>
+                </p>
               </div>
               <div className="flex flex-col py-[6px] ">
-                <text className="text-[12px] font-sora">Unused</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Unused</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $34,44,44,4788
-                </text>
+                </p>
               </div>
               <div className="flex flex-col py-[6px] ">
-                <text className="text-[12px] font-sora">Deployed</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Deployed</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $34,44,44,4788
-                </text>
+                </p>
               </div>
               <div className="flex flex-col py-[6px]">
-                <text className="text-[12px] font-sora">Current Value</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Current Value</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $34,44,44,4788
-                </text>
+                </p>
               </div>
               <div className="flex flex-col py-[6px] ">
-                <text className="text-[12px] font-sora">Returns</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Returns</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $34,44,44,4788{" "}
                   <span className="text-green-500 font-normal">(+50.3%)</span>
-                </text>
+                </p>
               </div>
               {name === "User Vault" ? (
                 <div>
                   <div className="flex flex-col py-[6px] ">
-                    <text className="text-[12px] font-sora">Total Shares</text>
-                    <text className="text-[18px] font-semibold font-sora">
+                    <p className="text-[12px] font-sora">Total Shares</p>
+                    <p className="text-[18px] font-semibold font-sora">
                       $34,44,44,4788
-                    </text>
+                    </p>
                   </div>
                   <div className="flex flex-col py-[6px] ">
-                    <text className="text-[12px] font-sora">
+                    <p className="text-[12px] font-sora">
                       Price Per Share
-                    </text>
-                    <text className="text-[18px] font-semibold font-sora">
+                    </p>
+                    <p className="text-[18px] font-semibold font-sora">
                       $34,44,44,4788
-                    </text>
+                    </p>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col py-[6px] ">
-                  <text className="text-[12px] font-sora">Uv/Tw(Unused)</text>
-                  <text className="text-[18px] font-semibold font-sora">
+                  <p className="text-[12px] font-sora">Uv/Tw(Unused)</p>
+                  <p className="text-[18px] font-semibold font-sora">
                     1,000.45
-                  </text>
+                  </p>
                 </div>
               )}
             </div>

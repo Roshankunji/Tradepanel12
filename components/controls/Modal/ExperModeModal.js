@@ -75,7 +75,7 @@ const ExperModeModal = () => {
               className="bg-[#664d00] w-[100%] py-[9px] mb-[10px]"
               onClick={handleOpen1}
             >
-              <text className="text-[15px]">Turn On Expert Mode</text>
+              <p className="text-[15px]">Turn On Expert Mode</p>
             </Button>
           </div>
         </Box>
