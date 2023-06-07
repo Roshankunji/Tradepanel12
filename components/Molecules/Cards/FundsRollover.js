@@ -27,17 +27,17 @@ const FundsRollover = () => {
           }}
         >
           <div className={"flex justify-between mb-[10px]"}>
-            <text className="text-[20px] font-semibold font-sora">
+            <p className="text-[20px] font-semibold font-sora">
               Deposits
-            </text>
+            </p>
             {depositShow === false ? <ExpandMoreIcon /> : <ExpandLessIcon />}
           </div>
           {depositShow === false ? (
             <div className="flex flex-col mb-[10px]">
-              <text className="text-[12px] font-sora">Amount</text>
-              <text className="text-[18px] font-semibold font-sora">
+              <p className="text-[12px] font-sora">Amount</p>
+              <p className="text-[18px] font-semibold font-sora">
                 $10,000,363
-              </text>
+              </p>
             </div>
           ) : (
             ""
@@ -46,28 +46,28 @@ const FundsRollover = () => {
           {depositShow === true && (
             <div>
               <div className="flex flex-col mb-[10px]">
-                <text className="text-[12px] font-sora">Amount</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Amount</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $10,000,363
-                </text>
+                </p>
               </div>
               <div className="flex flex-col mb-[10px]">
-                <text className="text-[12px] font-sora">Mint Shares</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Mint Shares</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $10,000,363
-                </text>
+                </p>
               </div>
               <div className="flex flex-col mb-[10px]">
-                <text className="text-[12px] font-sora">Share Price</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Share Price</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $10,000,363
-                </text>
+                </p>
               </div>
               <div className="flex flex-col mb-[10px]">
-                <text className="text-[12px] font-sora">Total Requests</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Total Requests</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $10,000,363
-                </text>
+                </p>
               </div>
             </div>
           )}
@@ -79,15 +79,15 @@ const FundsRollover = () => {
           }}
         >
           <div className={"flex justify-between mb-[10px]"}>
-            <text className="text-[20px] font-semibold">Withdrawals</text>
+            <p className="text-[20px] font-semibold">Withdrawals</p>
             {withdrawShow === false ? <ExpandMoreIcon /> : <ExpandLessIcon />}
           </div>
           {withdrawShow === false ? (
             <div className="flex flex-col mb-[10px]">
-              <text className="text-[12px] font-sora">Amount</text>
-              <text className="text-[18px] font-semibold font-sora">
+              <p className="text-[12px] font-sora">Amount</p>
+              <p className="text-[18px] font-semibold font-sora">
                 $10,000,363
-              </text>
+              </p>
             </div>
           ) : (
             ""
@@ -95,34 +95,34 @@ const FundsRollover = () => {
           {withdrawShow === true && (
             <div>
               <div className="flex flex-col mb-[10px]">
-                <text className="text-[12px] font-sora">Amount</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Amount</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $10,000,363
-                </text>
+                </p>
               </div>
               <div className="flex flex-col mb-[10px]">
-                <text className="text-[12px] font-sora">Mint Shares</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Mint Shares</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $10,000,363
-                </text>
+                </p>
               </div>
               <div className="flex flex-col mb-[10px]">
-                <text className="text-[12px] font-sora">Share Price</text>
-                <text className="text-[18px] font-semibold font-sora">
+                <p className="text-[12px] font-sora">Share Price</p>
+                <p className="text-[18px] font-semibold font-sora">
                   $10,000,363
-                </text>
+                </p>
               </div>
               <div className="flex flex-col mb-[10px]">
-                <text className="text-[12px] font-sora">Total Requests</text>
-                <text className="text-[18px] font-semibold hover:text-primary underline underline-offset-4 border-b-0 border-[#2054A5] font-sora">
+                <p className="text-[12px] font-sora">Total Requests</p>
+                <p className="text-[18px] font-semibold hover:text-primary underline underline-offset-4 border-b-0 border-[#2054A5] font-sora">
                   $10,000,365
-                </text>
+                </p>
               </div>
             </div>
           )}
         </div>
         <div className="flex justify-between px-[25px]">
-          <text className="font-sora">Freeze Request</text>
+          <p className="font-sora">Freeze Request</p>
 
           <Switch1 checked={checked} change={handleChange} />
         </div>

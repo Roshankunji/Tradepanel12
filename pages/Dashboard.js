@@ -1,8 +1,8 @@
 import Image from "next/image";
-import { Inter } from "next/font/google";
+// import { Inter } from "next/font/google";
 import BaseCard from "../components/Molecules/Cards/BaseCard";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export default function Dashboard() {
   return (
