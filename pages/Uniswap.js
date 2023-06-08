@@ -29,11 +29,12 @@ import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
 import ExperModeModal from "../components/controls/Modal/ExperModeModal";
 import { erc20ABI, useAccount, usePublicClient } from 'wagmi'
 import { LensABI } from "../contracts/abis";
-import contractAddress from '../contracts/address'
+import { contractAddress } from '../contracts/address'
 import { encodePacked } from "viem";
-import { formatEtherValue } from "../utils/formatNumber";
+import { formatEtherValue, formatUnitValue } from "../utils/formatNumber";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { jsNumberForAddress } from "react-jazzicon";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -142,38 +143,55 @@ const Uniswap = () => {
   const [balance1, setBalance1] = useState(0.00);
   const [balance2, setBalance2] = useState(0.00);
   const [usdValue, setUsdValue] = useState(0);
-
-  // const poolFee = 10;
-
-  // const fetchAmountIn = async () => {
-  //   const tokenDecimal = 18;
-  //   const amountOut = swapSecondAmount * 10 ** tokenDecimal;
-  //   const path = encodePacked(["address", "uint24", "address"], [tokenData.address ?? "0x0000000000000000000000000000000000000000", poolFee, tokenDataNext.address ?? "0x0000000000000000000000000000000000000000"])
-  //   console.log("path: ", path)
-  //   // const amountIn = await Lens.getAmountOut(path, amountIn);
-  //   const _amountIn = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountIn", args: [path, amountOut] })
-  //   const amountIn = formatEtherValue(_amountIn);
-  //   setSwapAmount(amountIn);
-  // }
-
-  // const fetchAmountOut = async () => {
-  //   const tokenDecimal = 18;
-    
-  //   const amountIn = swapAmount * 10 ** tokenDecimal;
-  //   const path = encodePacked(["address", "uint24", "address"], [tokenData.address ?? "0x0000000000000000000000000000000000000000", poolFee, tokenDataNext.address ?? "0x0000000000000000000000000000000000000000"])
-  //   const _amountOut = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountOut", args: [path, amountIn] })
-  //   const amountOut = formatEtherValue(_amountOut);
-  //   setSwapSecondAmount(amountOut);
-  // }
-
-  // useEffect(() => {
-  //   fetchAmountIn();
-  // }, [swapSecondAmount])
+  const [poolFee, setPoolFee] = useState(100);
 
 
-  // useEffect(() => {
-  //   fetchAmountOut();
-  // }, [swapAmount])
+  const fetchAmountIn = async (amount) => {
+    console.log("amountOut: ", amount);
+    if(amount === 0 || amount === "") {
+      setSwapAmount(0);
+    } else {
+      const token1Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
+      const amountOut = amount * 10 ** token1Decimal;
+      const path = encodePacked(["address", "uint24", "address"], [tokenDataNext.address, poolFee, tokenData.address])
+      console.log(path)
+      const _amountIn = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountIn", args: [path, amountOut] })
+      const token2Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
+      const amountIn = formatUnitValue(_amountIn[0], token2Decimal);
+      console.log("amountIn-result: ", amountIn);
+      setSwapAmount(amountIn);
+    }
+  }
+
+  const fetchAmountOut = async (amount) => {
+    console.log("amountIn: ", amount);
+    if(amount === 0 || amount === "") {
+      setSwapSecondAmount(0);
+    } else {
+      const tokenDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
+      const amountIn = amount * 10 ** tokenDecimal;
+      const path = encodePacked(["address", "uint24", "address"], [tokenData.address, poolFee, tokenDataNext.address])
+      console.log(path);
+      const _amountOut = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountOut", args: [path, amountIn] })
+      const token2Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
+      console.log("token2Decimal: ", token2Decimal)
+      const amountOut = formatUnitValue(_amountOut[0], token2Decimal);
+      console.log("amountOut-result: ", amountOut)
+      setSwapSecondAmount(amountOut);
+    }
+  }
+
+  const handleInputAmount = async (e) => {
+    const amount = Number(e.target.value);
+    setSwapAmount(amount);
+    fetchAmountOut(amount);
+  } 
+
+  const handleOutputAmount = async (e) => {
+    const amount = Number(e.target.value);
+    setSwapSecondAmount(amount);
+    fetchAmountIn(amount);
+  } 
 
   const handleChange = () => {
     setChecked(!checked);
@@ -239,11 +257,11 @@ const Uniswap = () => {
     setToggle(type);
   };
 
-  const fetchBalances = async (tokenAddress, setBalance) => {
+  const fetchBalances = async (shortName, tokenAddress, setBalance) => {
     if(userAddress === undefined) { 
       setBalance(0) 
     } else {
-      if(tokenAddress === "") {
+      if(shortName === "ETH") {
         const _amount = await publicClient.getBalance({ address: userAddress });
         const amount = formatEtherValue(_amount);
         setBalance(amount);
@@ -261,8 +279,8 @@ const Uniswap = () => {
   }
 
   useEffect(() => {
-    fetchBalances(tokenData.address, setBalance1);
-    fetchBalances(tokenDataNext.address, setBalance2);
+    fetchBalances(tokenData.shortName, tokenData.address, setBalance1);
+    fetchBalances(tokenDataNext.shortName, tokenDataNext.address, setBalance2);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenData, tokenDataNext])
 
@@ -524,11 +542,9 @@ const Uniswap = () => {
                 <input
                   type="number"
                   className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                  value={swapAmount}
+                  value={Number(swapAmount)}
                   placeholder="0"
-                  onChange={(e) => {
-                    setSwapAmount(e.target.value);
-                  }}
+                  onChange={handleInputAmount}
                 ></input>
                 <div className="text-lightbluetext text-[14px] ">${usdValue}</div>
               </div>
@@ -567,12 +583,10 @@ const Uniswap = () => {
               <input
                 type="number"
                 className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                value={swapSecondAmount}
+                value={Number(swapSecondAmount)}
                 placeholder="0"
-                onChange={(e) => {
-                  setSwapSecondAmount(e.target.value);
-                }}
-              ></input>
+                onChange={handleOutputAmount}
+              />
               <div className="text-lightbluetext text-[14px]">${usdValue}</div>
             </div>
             <div className="w-[40%]">
@@ -608,10 +622,10 @@ const Uniswap = () => {
             <HelpOutlineIcon />
           </div>
           <div className="flex-col mb-[10px] px-[20px]">
-            <div className="w-[100%] flex items-center">
+            <div className="w-[100%] flex items-center gap-3">
               {auto === true ? (
                 <Button
-                  className="bg-darkBlueBlack py-[5px] h-[50px] px-[10px] mr-[10px] rounded-[10px] border-[1px] border-borderColor1 "
+                  className="bg-darkBlueBlack py-[5px] h-[50px] px-[10px] rounded-[10px] border-[1px] border-borderColor1 "
                   onClick={() => {
                     setAuto(!auto);
                   }}
@@ -620,7 +634,7 @@ const Uniswap = () => {
                 </Button>
               ) : (
                 <Button
-                  className="bg-primary py-[5px] px-[10px] h-[50px] mr-[10px] rounded-[10px] border-[1px] border-borderColor1 border-primary"
+                  className="bg-primary py-[5px] px-[10px] h-[50px] rounded-[10px] border-[1px] border-borderColor1 border-primary"
                   onClick={() => {
                     setAuto(!auto);
                   }}
@@ -639,9 +653,21 @@ const Uniswap = () => {
                   onChange={(e) => {
                     setPercentage(e.target.value);
                   }}
-                ></input>
+                />
                 <p className="font-semibold mr-[5px]">%</p>
               </div>
+                <select
+                  id="demo-simple-select"
+                  value={poolFee}
+                  label="Age"
+                  className="w-[100%] h-[50px] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[5px] text-right"
+                  onChange={(e) => setPoolFee(e.target.value)}
+                >
+                  <option value={100}>0.01 %</option>
+                  <option value={300}>0.05 %</option>
+                  <option value={3000}>0.3 %</option>
+                  <option value={10000}>1 %</option>
+                </select>
             </div>
             {/* <ErrorWarning className="text-[12px] my-[10px]">
               Your transaction may be fontrun

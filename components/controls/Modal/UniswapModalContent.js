@@ -19,7 +19,6 @@ const UniswapModalContent = ({
   closeModal
 }) => {
   const [searchData, setSearchData] = useState("");
-  const [data, setData] = useState([]);
   const { address } = useAccount();
   const [isLoad, setLoad] = useState(false);
   const [tokenDataArray, setTokenDataArray] = useState(tokenInfoData);
@@ -32,9 +31,7 @@ const UniswapModalContent = ({
       try {
         const token = await getTokenDetail(val);
         const balance = await getTokenBalance(val);
-        let count = 0;
         if (token?.tokenName !== undefined && balance !== undefined) {
-          count++;
           const newToken = [
             {
               id: 0,
@@ -134,7 +131,7 @@ const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled 
     if(userAddress === undefined) { 
       setBalance(0) 
     } else {
-      if(tokenAddress === "") {
+      if(shortName === "ETH") {
         const _amount = await publicClient.getBalance({ address: userAddress });
         const amount = formatEtherValue(_amount);
         console.log("_amount: ", _amount)

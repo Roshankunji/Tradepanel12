@@ -7,7 +7,7 @@ export const tokenInfoData = [
     "image": EthSvg,
     "name": "Ether",
     "shortName": "ETH",
-    "address": '',
+    "address": tokenAddress.weth,
     "balance": 0
   },
   {
