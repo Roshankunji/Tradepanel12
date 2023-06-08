@@ -66,7 +66,7 @@ const Gmx = () => {
   };
 
   useEffect(() => {
-    setData(tokenData);
+    setData(tokenInfoData);
   }, []);
 
   useEffect(() => {
@@ -128,7 +128,7 @@ const Gmx = () => {
     });
     setData(dataOfToken);
     if (searchData === "") {
-      setData(tokenData);
+      setData(tokenInfoData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchData]);
@@ -644,7 +644,7 @@ const Gmx = () => {
                                 }}
                               />
                               <hr className="border-[1px] border-lightBlue mb-[20px]"></hr>
-                              <div className="overflow-y-auto h-[100%] mb-[10px] scroll">
+                              <div className="overflow-y-auto h-[100%] scroll">
                                 {data.map((e) => {
                                   return (
                                     <div
