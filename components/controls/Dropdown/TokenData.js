@@ -35,7 +35,7 @@ export const tokenInfoData = [
     "balance": 0
   },
   {
-    "id": 4,
+    "id": 5,
     "image": FraxSvg,
     "name": "Frax",
     "shortName": "FRAX",
@@ -43,7 +43,7 @@ export const tokenInfoData = [
     "balance": 0
   },
   {
-    "id": 5,
+    "id": 6,
     "image": WethSvg,
     "name": "Wrapped Ether",
     "shortName": "WETH",
@@ -51,7 +51,7 @@ export const tokenInfoData = [
     "balance": 0
   },
   {
-    "id": 6,
+    "id": 7,
     "image": WbtcSvg,
     "name": "Wrapped BTC",
     "shortName": "WBTC",
@@ -59,7 +59,7 @@ export const tokenInfoData = [
     "balance": 0
   },
   {
-    "id": 7,
+    "id": 8,
     "image": UniSvg,
     "name": "Uniswap",
     "shortName": "UNI",
@@ -67,7 +67,7 @@ export const tokenInfoData = [
     "balance": 0
   },
   {
-    "id": 8,
+    "id": 9,
     "image": LinkSvg,
     "name": "ChainLink Token",
     "shortName": "LINK",
@@ -76,7 +76,7 @@ export const tokenInfoData = [
   },
   ,
   {
-    "id": 9,
+    "id": 10,
     "name": "ShitCoin",
     "shortName": "SC",
     "address": tokenAddress.link,
