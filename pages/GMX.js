@@ -16,6 +16,8 @@ import Modal from "@mui/material/Modal";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import Dropdown from "../components/controls/Dropdown/Dropdown";
 import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
+import { jsNumberForAddress } from "react-jazzicon";
 
 const Gmx = () => {
   const [toggle, setToggle] = useState("Long");
@@ -659,11 +661,14 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={e.image}
-                                            alt="Token Image"
-                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
                                           <p className="font-semibold text-[18px] text-white">
@@ -773,11 +778,14 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={e.image}
-                                            alt="Token Image"
-                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
                                           <p className="font-semibold text-[18px] text-white">
@@ -893,11 +901,14 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={e.image}
-                                            alt="Token Image"
-                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
                                           <p className="font-semibold text-[18px] text-white">
@@ -1038,11 +1049,14 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={e.image}
-                                            alt="Token Image"
-                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
-                                          />
+                                         {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
                                           <p className="font-semibold text-[18px] text-white">
@@ -1152,11 +1166,14 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={e.image}
-                                            alt="Token Image"
-                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
                                           <p className="font-semibold text-[18px] text-white">
@@ -1294,11 +1311,14 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={e.image}
-                                            alt="Token Image"
-                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
                                           <p className="font-semibold text-[18px] text-white">
