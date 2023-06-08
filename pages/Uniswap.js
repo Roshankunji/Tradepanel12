@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import paper from "../public/Images/paper.png";
@@ -24,12 +25,15 @@ import ErrorWarning from "../components/Molecules/ErrorMessge/ErrorWarning";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
-import tokenDataFromJson from "../components/controls/Dropdown/TokenData.json";
+import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
 import ExperModeModal from "../components/controls/Modal/ExperModeModal";
-import { useContractRead } from 'wagmi'
+import { erc20ABI, useAccount, usePublicClient } from 'wagmi'
 import { LensABI } from "../contracts/abis";
 import contractAddress from '../contracts/address'
-import { ethers } from 'ethers'
+import { encodePacked } from "viem";
+import { formatEtherValue } from "../utils/formatNumber";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
+import { jsNumberForAddress } from "react-jazzicon";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -124,45 +128,52 @@ const Uniswap = () => {
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
-  const [swapAmount, setSwapAmount] = useState();
-  const [swapSecondAmount, setSwapSecondAmount] = useState();
-  const [tokenData, setTokenData] = useState("");
-  const [tokenDataNext, setTokenDataNext] = useState("");
+  const [swapAmount, setSwapAmount] = useState(0);
+  const [swapSecondAmount, setSwapSecondAmount] = useState(0);
+  const [tokenData, setTokenData] = useState(tokenInfoData[0]);
+  const [tokenDataNext, setTokenDataNext] = useState(tokenInfoData[1]);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [first, setFirst] = useState(false);
   const [second, setSecond] = useState(false);
   let [counter, setCounter] = useState(0);
   const [toggle, setToggle] = useState("Trader wallet");
+  const publicClient = usePublicClient();
+  const { address: userAddress } = useAccount();
+  const [balance1, setBalance1] = useState(0.00);
+  const [balance2, setBalance2] = useState(0.00);
+  const [usdValue, setUsdValue] = useState(0);
 
-  // const { data: Lens, isError, isLoading } = useContractRead({
-  //   address: contractAddress.lensAddress,
-  //   abi: LensABI,
-  //   functionName: 'getAmountOut'
-  // })
+  // const poolFee = 10;
 
   // const fetchAmountIn = async () => {
   //   const tokenDecimal = 18;
-  //   const path = ethers.utils.solidityPack(["address", "uint24", "address"], [usdc, poolFee, weth]);
-  //   const amountIn = 1850 * 10 ** tokenDecimal;
-  //   const amountOut = await Lens.getAmountOut(path, amountIn);
+  //   const amountOut = swapSecondAmount * 10 ** tokenDecimal;
+  //   const path = encodePacked(["address", "uint24", "address"], [tokenData.address ?? "0x0000000000000000000000000000000000000000", poolFee, tokenDataNext.address ?? "0x0000000000000000000000000000000000000000"])
+  //   console.log("path: ", path)
+  //   // const amountIn = await Lens.getAmountOut(path, amountIn);
+  //   const _amountIn = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountIn", args: [path, amountOut] })
+  //   const amountIn = formatEtherValue(_amountIn);
+  //   setSwapAmount(amountIn);
+  // }
+
+  // const fetchAmountOut = async () => {
+  //   const tokenDecimal = 18;
+    
+  //   const amountIn = swapAmount * 10 ** tokenDecimal;
+  //   const path = encodePacked(["address", "uint24", "address"], [tokenData.address ?? "0x0000000000000000000000000000000000000000", poolFee, tokenDataNext.address ?? "0x0000000000000000000000000000000000000000"])
+  //   const _amountOut = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountOut", args: [path, amountIn] })
+  //   const amountOut = formatEtherValue(_amountOut);
   //   setSwapSecondAmount(amountOut);
   // }
 
   // useEffect(() => {
   //   fetchAmountIn();
-  // }, [swapAmount])
+  // }, [swapSecondAmount])
 
-  // const fetchAmountOut = async () => {
-  //   const tokenDecimal = 18;
-  //   const path = ethers.utils.solidityPack(["address", "uint24", "address"], [usdc, poolFee, weth]);
-  //   const amountOut = 1850 * 10 ** tokenDecimal;
-  //   const amountIn = await Lens.getAmountOut(path, amountIn);
-  //   setSwapAmount(amountOut);
-  // }
 
   // useEffect(() => {
   //   fetchAmountOut();
-  // }, [swapSecondAmount])
+  // }, [swapAmount])
 
   const handleChange = () => {
     setChecked(!checked);
@@ -228,6 +239,33 @@ const Uniswap = () => {
     setToggle(type);
   };
 
+  const fetchBalances = async (tokenAddress, setBalance) => {
+    if(userAddress === undefined) { 
+      setBalance(0) 
+    } else {
+      if(tokenAddress === "") {
+        const _amount = await publicClient.getBalance({ address: userAddress });
+        const amount = formatEtherValue(_amount);
+        setBalance(amount);
+      } else {
+        const _amount = await publicClient.readContract({ 
+          address: tokenAddress,
+          abi: erc20ABI, 
+          functionName: 'balanceOf', 
+          args: [userAddress] 
+        });
+        const amount = formatEtherValue(_amount);
+        setBalance(amount)
+    }
+   }
+  }
+
+  useEffect(() => {
+    fetchBalances(tokenData.address, setBalance1);
+    fetchBalances(tokenDataNext.address, setBalance2);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenData, tokenDataNext])
+
   return (
     <>
       <Modal
@@ -239,14 +277,12 @@ const Uniswap = () => {
       >
         <Box sx={style} className="border-[1px] border-borderColor1">
           <UniswapModalContent
-            tokenData1={(e) => {
-              setTokenData(e);
-            }}
+            token={tokenData}
+            setToken={setTokenData}
+            tokenNext={tokenDataNext}
+            setTokenNext={setTokenDataNext}
             first={first}
             second={second}
-            tokenData2={(e) => {
-              setTokenDataNext(e);
-            }}
             closeModal={() => {
               handleClose();
             }}
@@ -494,7 +530,7 @@ const Uniswap = () => {
                     setSwapAmount(e.target.value);
                   }}
                 ></input>
-                <div className="text-lightbluetext text-[14px] ">$45.00</div>
+                <div className="text-lightbluetext text-[14px] ">${usdValue}</div>
               </div>
               <div className="w-[40%]">
                 <div
@@ -503,29 +539,21 @@ const Uniswap = () => {
                 >
                   {tokenData && tokenData.image ? (
                     <Image
-                      src={`data:image/png;base64,${tokenData?.image}`}
-                      height={25}
-                      width={25}
+                      src={tokenData?.image}
                       alt="Token"
-                      className="mr-[8px] rounded-[20px]"
+                      className="mr-[8px] rounded-[20px] w-[25px] h-[25px]"
                     ></Image>
                   ) : (
-                    <Image
-                      src={`data:image/png;base64,${tokenDataFromJson[0].image}`}
-                      height={25}
-                      width={25}
-                      alt="Token"
-                      className="mr-[8px] rounded-[20px]"
-                    ></Image>
+                    <Jazzicon diameter={25} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(tokenData.address)} />
                   )}
 
                   <p className="text-[18px]">
-                    {tokenData.shortName ? tokenData.shortName : "USDT"}
+                    {tokenData.shortName ? tokenData.shortName : tokenInfoData[0].shortName}
                   </p>
                   <KeyboardArrowDownIcon />
                 </div>
                 <div className="text-center">
-                  Balance : 13.83 <span>Max</span>
+                  Balance : { balance1 } <span style={{ cursor: 'pointer' }} onClick={() => setSwapAmount(balance1)}>Max</span>
                 </div>
               </div>
             </div>
@@ -534,7 +562,7 @@ const Uniswap = () => {
             </div> */}
           </div>
 
-          <div className="flex justify-between py-[20px] mb-[10px] mx-[20px] px-[20px] bg-darkBlue rounded-[10px] cursor-pointer">
+          <div className="flex justify-between py-[20px] mb-[10px] mx-[20px] px-[20px] bg-darkBlue rounded-[10px] ">
             <div className="w-[60%] mr-[10px]">
               <input
                 type="number"
@@ -545,7 +573,7 @@ const Uniswap = () => {
                   setSwapSecondAmount(e.target.value);
                 }}
               ></input>
-              <div className="text-lightbluetext text-[14px]">$45.00</div>
+              <div className="text-lightbluetext text-[14px]">${usdValue}</div>
             </div>
             <div className="w-[40%]">
               <div
@@ -554,14 +582,12 @@ const Uniswap = () => {
               >
                 {tokenDataNext && tokenDataNext.image ? (
                   <Image
-                    src={`data:image/png;base64,${tokenDataNext.image}`}
-                    height={25}
-                    width={25}
+                    src={tokenDataNext.image}
                     alt="Token"
-                    className="mr-[8px] rounded-[20px]"
+                    className="mr-[8px] rounded-[20px] w-[25px] h-[25px]"
                   ></Image>
                 ) : (
-                  ""
+                  <Jazzicon diameter={25} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(tokenDataNext.address)} />
                 )}
 
                 <p className="text-[18px]">
@@ -572,7 +598,7 @@ const Uniswap = () => {
                 <KeyboardArrowDownIcon />
               </div>
               <div className="text-center">
-                Balance : 13.83 <span>Max</span>
+                Balance : { balance2 } <span style={{ cursor: 'pointer' }} onClick={() => setSwapSecondAmount(balance2)}>Max</span>
               </div>
             </div>
           </div>

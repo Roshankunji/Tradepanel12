@@ -10,4 +10,16 @@ const usersVaultDeployerAddress = ""
 
 const mainnetAddress = { baseVaultAddress, contractsFactoryAddress, gmxAdapterAddress, lensAddress, traderWalletAddress, traderWalletDeployerAddress, uniswapV3AdapterAddress, usersVaultAddress, usersVaultDeployerAddress }
 
+export const mainnetTokens = {
+  usdc: "",
+  usdt: "",
+  dai: "",
+  frax: "",
+  weth: "", // shortable
+  wbtc: "", // shortable
+  uni: "", // shortable
+  link: "", // shortable
+  randomCoin: "",
+}
+
 export default mainnetAddress;

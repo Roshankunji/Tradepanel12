@@ -6,7 +6,6 @@ import CheckBox from "../components/atoms/Checkbox/Checkbox";
 import Button from "../components/atoms/Button/Button";
 import DrawerC from "../components/controls/SideDrawer/SideDrawer";
 import Search from "../components/controls/Input/Search";
-import tokenData from "../components/controls/Dropdown/TokenData.json";
 import Image from "next/image";
 import LongBtcModal from "../components/controls/Modal/LongBtcModal";
 import ClosePositionModal from "../components/controls/Modal/ClosePositionModal";
@@ -16,6 +15,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import Dropdown from "../components/controls/Dropdown/Dropdown";
+import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
 
 const Gmx = () => {
   const [toggle, setToggle] = useState("Long");
@@ -660,11 +660,9 @@ const Gmx = () => {
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
                                           <Image
-                                            src={`data:image/png;base64,${e.image}`}
+                                            src={e.image}
                                             alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
+                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
                                           />
                                         </div>
                                         <div className="flex flex-col">
@@ -776,11 +774,9 @@ const Gmx = () => {
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
                                           <Image
-                                            src={`data:image/png;base64,${e.image}`}
+                                            src={e.image}
                                             alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
+                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
                                           />
                                         </div>
                                         <div className="flex flex-col">
@@ -898,11 +894,9 @@ const Gmx = () => {
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
                                           <Image
-                                            src={`data:image/png;base64,${e.image}`}
+                                            src={e.image}
                                             alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
+                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
                                           />
                                         </div>
                                         <div className="flex flex-col">
@@ -1045,11 +1039,9 @@ const Gmx = () => {
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
                                           <Image
-                                            src={`data:image/png;base64,${e.image}`}
+                                            src={e.image}
                                             alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
+                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
                                           />
                                         </div>
                                         <div className="flex flex-col">
@@ -1161,11 +1153,9 @@ const Gmx = () => {
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
                                           <Image
-                                            src={`data:image/png;base64,${e.image}`}
+                                            src={e.image}
                                             alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
+                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
                                           />
                                         </div>
                                         <div className="flex flex-col">
@@ -1305,11 +1295,9 @@ const Gmx = () => {
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
                                           <Image
-                                            src={`data:image/png;base64,${e.image}`}
+                                            src={e.image}
                                             alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
+                                            className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
                                           />
                                         </div>
                                         <div className="flex flex-col">

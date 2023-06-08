@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import Search from "../Input/Search";
-import tokenData from "../../controls/Dropdown/TokenData.json";
+import { tokenInfoData } from "../Dropdown/TokenData.js";
 import Image from "next/image";
 import { isValidAddress } from "../../../utils/isValidAddress";
-import { useAccount } from 'wagmi'
-import { getTokenDetail } from "../../../contracts";
+import { erc20ABI, useAccount, usePublicClient } from 'wagmi'
+import { getTokenBalance, getTokenDetail } from "../../../contracts";
+import { formatEtherValue } from "../../../utils/formatNumber";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
+import { jsNumberForAddress } from "react-jazzicon";
 const UniswapModalContent = ({
-  tokenData1,
-  tokenData2,
-  closeModal,
+  token,
+  setToken,
+  tokenNext,
+  setTokenNext,
   first,
   second,
+  closeModal
 }) => {
   const [searchData, setSearchData] = useState("");
   const [data, setData] = useState([]);
   const { address } = useAccount();
   const [isLoad, setLoad] = useState(false);
+  const [tokenDataArray, setTokenDataArray] = useState(tokenInfoData);
+
   const search = async (e) => {
     const val = e;
     setSearchData(val);
@@ -24,8 +31,10 @@ const UniswapModalContent = ({
       setLoad(true);
       try {
         const token = await getTokenDetail(val);
-        // const balance = await getTokenBalance(val);
+        const balance = await getTokenBalance(val);
+        let count = 0;
         if (token?.tokenName !== undefined && balance !== undefined) {
+          count++;
           const newToken = [
             {
               id: 0,
@@ -33,14 +42,16 @@ const UniswapModalContent = ({
               shortName: token.tokenSymbol,
               image: undefined,
               address: val,
-              // balance: balance.toString()
-              balance: 0
+              balance: balance
             }
           ];
-          setData(newToken);
+          console.log("newToken: ", newToken);
+          setTokenDataArray(newToken);
+          console.log("done")
         }
         setLoad(false);
       } catch(err) {
+        console.log("count: ", count)
         setLoad(false);
         console.log(err);
       }
@@ -48,7 +59,7 @@ const UniswapModalContent = ({
   };
 
   useEffect(() => {
-    const dataOfToken = tokenData.filter((e) => {
+    const dataOfToken = tokenDataArray.filter((e) => {
       const uppercase = e?.name?.toUpperCase();
       const lowercase = e?.name?.toLowerCase();
       const uppercase1 = e?.shortName?.toUpperCase();
@@ -65,15 +76,15 @@ const UniswapModalContent = ({
         lowercase1.startsWith(searchData.toLowerCase())
       );
     });
-    setData(dataOfToken);
+    setTokenDataArray(dataOfToken);
     if (searchData === "") {
-      setData(tokenData);
+      setTokenDataArray(tokenInfoData);
     }
   }, [searchData]);
 
-  useEffect(() => {
-    setData(tokenData);
-  }, []);
+  // useEffect(() => {
+  //   setData(tokenInfoData);
+  // }, []);
 
   return (
     <div>
@@ -95,16 +106,16 @@ const UniswapModalContent = ({
         }}
       />
       <div className="overflow-y-auto h-[370px] mb-[10px] scroll">
-        {data.map((e) => {
+        {tokenDataArray.map((e) => {
           return (
             <TokenDetails onClick={() => {
               if (first === true) {
-                tokenData1(e);
+                setToken(e);
               } else if (second === true) {
-                tokenData2(e);
+                setTokenNext(e);
               }
               closeModal();
-            }} image={e.image} name={e.name} shortName={e.shortName} balance={0.002571} key={e.id} />
+            }} image={e.image} name={e.name} shortName={e.shortName} tokenAddress={e.address} key={e.id} disabled={first ? e === tokenNext : second ? e === token : false} />
           );
         })}
       </div>
@@ -112,21 +123,52 @@ const UniswapModalContent = ({
   );
 };
 
-const TokenDetails = ({ onClick, image, name, shortName, balance }) => {
+const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled }) => {
+  const publicClient = usePublicClient();
+  const [balance, setBalance] = useState(0);
+  const { address: userAddress } = useAccount();
+  console.log("tokenAddress: ", tokenAddress);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchBalances = async () => {
+    if(userAddress === undefined) { 
+      setBalance(0) 
+    } else {
+      if(tokenAddress === "") {
+        const _amount = await publicClient.getBalance({ address: userAddress });
+        const amount = formatEtherValue(_amount);
+        console.log("_amount: ", _amount)
+        setBalance(amount);
+      } else {
+        const _amount = await publicClient.readContract({ 
+          address: tokenAddress,
+          abi: erc20ABI, 
+          functionName: 'balanceOf', 
+          args: [userAddress] 
+        });
+        const amount = formatEtherValue(_amount);
+        setBalance(amount)
+    }
+   }
+  }
+  useEffect(() => {
+    fetchBalances();
+  }, [balance, fetchBalances])
   return(
     <div
-    className="flex justify-between items-center cursor-pointer hover:bg-backgroundColor"
-    onClick={onClick}
+    className="flex justify-between items-center cursor-pointer hover:bg-backgroundColor pointer"
+    onClick={disabled ? undefined : onClick}
   >
     <div className="flex w-[100%] px-4 py-2">
       <div className="flex items-center">
-        <Image
-          src={`data:image/png;base64,${image}`}
-          alt="Token Image"
-          width={35}
-          height={35}
-          className="rounded-[20px] mr-[20px]"
-        />
+        {
+          image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(tokenAddress)} />:
+          <Image
+            src={image}
+            alt="Token Image"
+            className="rounded-[20px] mr-[20px] w-[35px] h-[35px]"
+          />
+        }
       </div>
       <div className="flex flex-col">
         <p className="font-semibold text-[18px]">{name}</p>

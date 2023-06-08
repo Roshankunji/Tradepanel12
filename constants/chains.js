@@ -7,10 +7,10 @@ const arbitrumFork = {
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: {
       default: {
-        http: ['https://rpc.tenderly.co/fork/63e43ae4-c660-4f58-a0e1-325d54f24923']
+        http: ['https://rpc.tenderly.co/fork/cf94355b-e254-41d4-8240-230a56d108b7']
       },
       public: {
-        http: ['https://rpc.tenderly.co/fork/63e43ae4-c660-4f58-a0e1-325d54f24923']
+        http: ['https://rpc.tenderly.co/fork/cf94355b-e254-41d4-8240-230a56d108b7']
       }
     }
   };
