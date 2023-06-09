@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 const Search = ({ className, searchToken }) => {
   // const [search, setSearch] = useState("");
+
   return (
     <>
       <div

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import paper from "../public/Images/paper.png";
@@ -24,8 +25,16 @@ import ErrorWarning from "../components/Molecules/ErrorMessge/ErrorWarning";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
-import tokenDataFromJson from "../components/controls/Dropdown/TokenData.json";
+import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
 import ExperModeModal from "../components/controls/Modal/ExperModeModal";
+import { erc20ABI, useAccount, usePublicClient } from 'wagmi'
+import { LensABI } from "../contracts/abis";
+import { contractAddress } from '../contracts/address'
+import { encodePacked } from "viem";
+import { formatEtherValue, formatUnitValue } from "../utils/formatNumber";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
+import { jsNumberForAddress } from "react-jazzicon";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -55,6 +64,60 @@ const style1 = {
   padding: 3,
 };
 
+const traderTokens = [
+  {
+    tokenName: "Tether USD",
+    tokenAmount: 10.75,
+    dollarValue: 10.75,
+    tokenSymbol: "USDT",
+    percentChange: 0.05,
+    profitLoss: "loss",
+  },
+  {
+    tokenName: "USD Coin",
+    tokenAmount: 10.35,
+    dollarValue: 10.36,
+    tokenSymbol: "USDC",
+    percentChange: 0.07,
+    profitLoss: "profit",
+  },
+  {
+    tokenName: "Ethereum",
+    tokenAmount: 0.003,
+    dollarValue: 4.86,
+    tokenSymbol: "ETH",
+    percentChange: 1.33,
+    profitLoss: "loss",
+  },
+];
+
+const userTokens = [
+  {
+    tokenName: "Tether USD",
+    tokenAmount: 100.75,
+    dollarValue: 100.75,
+    tokenSymbol: "USDT",
+    percentChange: 1.05,
+    profitLoss: "loss",
+  },
+  {
+    tokenName: "USD Coin",
+    tokenAmount: 100.35,
+    dollarValue: 100.36,
+    tokenSymbol: "USDC",
+    percentChange: 1.07,
+    profitLoss: "profit",
+  },
+  {
+    tokenName: "Ethereum",
+    tokenAmount: 1.003,
+    dollarValue: 40.86,
+    tokenSymbol: "ETH",
+    percentChange: 10.33,
+    profitLoss: "loss",
+  },
+];
+
 const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
   const [totalTraderTokenAmount, setTotalTraderTokenAmount] = useState();
@@ -66,15 +129,69 @@ const Uniswap = () => {
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
-  const [swapAmount, setSwapAmount] = useState();
-  const [swapSecondAmount, setSwapSecondAmount] = useState();
-  const [tokenData, setTokenData] = useState("");
-  const [tokenDataNext, setTokenDataNext] = useState("");
+  const [swapAmount, setSwapAmount] = useState(0);
+  const [swapSecondAmount, setSwapSecondAmount] = useState(0);
+  const [tokenData, setTokenData] = useState(tokenInfoData[0]);
+  const [tokenDataNext, setTokenDataNext] = useState(tokenInfoData[1]);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [first, setFirst] = useState(false);
   const [second, setSecond] = useState(false);
   let [counter, setCounter] = useState(0);
   const [toggle, setToggle] = useState("Trader wallet");
+  const publicClient = usePublicClient();
+  const { address: userAddress } = useAccount();
+  const [balance1, setBalance1] = useState(0.00);
+  const [balance2, setBalance2] = useState(0.00);
+  const [usdValue, setUsdValue] = useState(0);
+  const [poolFee, setPoolFee] = useState(100);
+
+
+  const fetchAmountIn = async (amount) => {
+    console.log("amountOut: ", amount);
+    if(amount === 0 || amount === "") {
+      setSwapAmount(0);
+    } else {
+      const token1Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
+      const amountOut = amount * 10 ** token1Decimal;
+      const path = encodePacked(["address", "uint24", "address"], [tokenDataNext.address, poolFee, tokenData.address])
+      console.log(path)
+      const _amountIn = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountIn", args: [path, amountOut] })
+      const token2Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
+      const amountIn = formatUnitValue(_amountIn[0], token2Decimal);
+      console.log("amountIn-result: ", amountIn);
+      setSwapAmount(amountIn);
+    }
+  }
+
+  const fetchAmountOut = async (amount) => {
+    console.log("amountIn: ", amount);
+    if(amount === 0 || amount === "") {
+      setSwapSecondAmount(0);
+    } else {
+      const tokenDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
+      const amountIn = amount * 10 ** tokenDecimal;
+      const path = encodePacked(["address", "uint24", "address"], [tokenData.address, poolFee, tokenDataNext.address])
+      console.log(path);
+      const _amountOut = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountOut", args: [path, amountIn] })
+      const token2Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
+      console.log("token2Decimal: ", token2Decimal)
+      const amountOut = formatUnitValue(_amountOut[0], token2Decimal);
+      console.log("amountOut-result: ", amountOut)
+      setSwapSecondAmount(amountOut);
+    }
+  }
+
+  const handleInputAmount = async (e) => {
+    const amount = Number(e.target.value);
+    setSwapAmount(amount);
+    fetchAmountOut(amount);
+  } 
+
+  const handleOutputAmount = async (e) => {
+    const amount = Number(e.target.value);
+    setSwapSecondAmount(amount);
+    fetchAmountIn(amount);
+  } 
 
   const handleChange = () => {
     setChecked(!checked);
@@ -140,59 +257,32 @@ const Uniswap = () => {
     setToggle(type);
   };
 
-  let traderTokens = [
-    {
-      tokenName: "Tether USD",
-      tokenAmount: 10.75,
-      dollarValue: 10.75,
-      tokenSymbol: "USDT",
-      percentChange: 0.05,
-      profitLoss: "loss",
-    },
-    {
-      tokenName: "USD Coin",
-      tokenAmount: 10.35,
-      dollarValue: 10.36,
-      tokenSymbol: "USDC",
-      percentChange: 0.07,
-      profitLoss: "profit",
-    },
-    {
-      tokenName: "Ethereum",
-      tokenAmount: 0.003,
-      dollarValue: 4.86,
-      tokenSymbol: "ETH",
-      percentChange: 1.33,
-      profitLoss: "loss",
-    },
-  ];
+  const fetchBalances = async (shortName, tokenAddress, setBalance) => {
+    if(userAddress === undefined) { 
+      setBalance(0) 
+    } else {
+      if(shortName === "ETH") {
+        const _amount = await publicClient.getBalance({ address: userAddress });
+        const amount = formatEtherValue(_amount);
+        setBalance(amount);
+      } else {
+        const _amount = await publicClient.readContract({ 
+          address: tokenAddress,
+          abi: erc20ABI, 
+          functionName: 'balanceOf', 
+          args: [userAddress] 
+        });
+        const amount = formatEtherValue(_amount);
+        setBalance(amount)
+    }
+   }
+  }
 
-  let userTokens = [
-    {
-      tokenName: "Tether USD",
-      tokenAmount: 100.75,
-      dollarValue: 100.75,
-      tokenSymbol: "USDT",
-      percentChange: 1.05,
-      profitLoss: "loss",
-    },
-    {
-      tokenName: "USD Coin",
-      tokenAmount: 100.35,
-      dollarValue: 100.36,
-      tokenSymbol: "USDC",
-      percentChange: 1.07,
-      profitLoss: "profit",
-    },
-    {
-      tokenName: "Ethereum",
-      tokenAmount: 1.003,
-      dollarValue: 40.86,
-      tokenSymbol: "ETH",
-      percentChange: 10.33,
-      profitLoss: "loss",
-    },
-  ];
+  useEffect(() => {
+    fetchBalances(tokenData.shortName, tokenData.address, setBalance1);
+    fetchBalances(tokenDataNext.shortName, tokenDataNext.address, setBalance2);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokenData, tokenDataNext])
 
   return (
     <>
@@ -205,14 +295,12 @@ const Uniswap = () => {
       >
         <Box sx={style} className="border-[1px] border-borderColor1">
           <UniswapModalContent
-            tokenData1={(e) => {
-              setTokenData(e);
-            }}
+            token={tokenData}
+            setToken={setTokenData}
+            tokenNext={tokenDataNext}
+            setTokenNext={setTokenDataNext}
             first={first}
             second={second}
-            tokenData2={(e) => {
-              setTokenDataNext(e);
-            }}
             closeModal={() => {
               handleClose();
             }}
@@ -454,13 +542,11 @@ const Uniswap = () => {
                 <input
                   type="number"
                   className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                  value={swapAmount}
+                  value={Number(swapAmount)}
                   placeholder="0"
-                  onChange={(e) => {
-                    setSwapAmount(e.target.value);
-                  }}
+                  onChange={handleInputAmount}
                 ></input>
-                <div className="text-lightbluetext text-[14px] ">$45.00</div>
+                <div className="text-lightbluetext text-[14px] ">${usdValue}</div>
               </div>
               <div className="w-[40%]">
                 <div
@@ -469,29 +555,21 @@ const Uniswap = () => {
                 >
                   {tokenData && tokenData.image ? (
                     <Image
-                      src={`data:image/png;base64,${tokenData?.image}`}
-                      height={25}
-                      width={25}
+                      src={tokenData?.image}
                       alt="Token"
-                      className="mr-[8px] rounded-[20px]"
+                      className="mr-[8px] rounded-[20px] w-[25px] h-[25px]"
                     ></Image>
                   ) : (
-                    <Image
-                      src={`data:image/png;base64,${tokenDataFromJson[0].image}`}
-                      height={25}
-                      width={25}
-                      alt="Token"
-                      className="mr-[8px] rounded-[20px]"
-                    ></Image>
+                    <Jazzicon diameter={25} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(tokenData.address)} />
                   )}
 
-                  <text className="text-[18px]">
-                    {tokenData.shortName ? tokenData.shortName : "USDT"}
-                  </text>
+                  <p className="text-[18px]">
+                    {tokenData.shortName ? tokenData.shortName : tokenInfoData[0].shortName}
+                  </p>
                   <KeyboardArrowDownIcon />
                 </div>
                 <div className="text-center">
-                  Balance : 13.83 <span>Max</span>
+                  Balance : { balance1 } <span style={{ cursor: 'pointer' }} onClick={() => setSwapAmount(balance1)}>Max</span>
                 </div>
               </div>
             </div>
@@ -500,18 +578,16 @@ const Uniswap = () => {
             </div> */}
           </div>
 
-          <div className="flex justify-between py-[20px] mb-[10px] mx-[20px] px-[20px] bg-darkBlue rounded-[10px] cursor-pointer">
+          <div className="flex justify-between py-[20px] mb-[10px] mx-[20px] px-[20px] bg-darkBlue rounded-[10px] ">
             <div className="w-[60%] mr-[10px]">
               <input
                 type="number"
                 className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                value={swapSecondAmount}
+                value={Number(swapSecondAmount)}
                 placeholder="0"
-                onChange={(e) => {
-                  setSwapSecondAmount(e.target.value);
-                }}
-              ></input>
-              <div className="text-lightbluetext text-[14px]">$45.00</div>
+                onChange={handleOutputAmount}
+              />
+              <div className="text-lightbluetext text-[14px]">${usdValue}</div>
             </div>
             <div className="w-[40%]">
               <div
@@ -520,52 +596,50 @@ const Uniswap = () => {
               >
                 {tokenDataNext && tokenDataNext.image ? (
                   <Image
-                    src={`data:image/png;base64,${tokenDataNext.image}`}
-                    height={25}
-                    width={25}
+                    src={tokenDataNext.image}
                     alt="Token"
-                    className="mr-[8px] rounded-[20px]"
+                    className="mr-[8px] rounded-[20px] w-[25px] h-[25px]"
                   ></Image>
                 ) : (
-                  ""
+                  <Jazzicon diameter={25} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(tokenDataNext.address)} />
                 )}
 
-                <text className="text-[18px]">
+                <p className="text-[18px]">
                   {tokenDataNext && tokenDataNext.shortName
                     ? tokenDataNext.shortName
                     : "Select Token"}
-                </text>
+                </p>
                 <KeyboardArrowDownIcon />
               </div>
               <div className="text-center">
-                Balance : 13.83 <span>Max</span>
+                Balance : { balance2 } <span style={{ cursor: 'pointer' }} onClick={() => setSwapSecondAmount(balance2)}>Max</span>
               </div>
             </div>
           </div>
 
           <div className="flex mb-[10px] px-[20px]">
-            <text className="mr-[10px]">Slippage Tolerance</text>
+            <p className="mr-[10px]">Slippage Tolerance</p>
             <HelpOutlineIcon />
           </div>
           <div className="flex-col mb-[10px] px-[20px]">
-            <div className="w-[100%] flex items-center">
+            <div className="w-[100%] flex items-center gap-3">
               {auto === true ? (
                 <Button
-                  className="bg-darkBlueBlack py-[5px] h-[50px] px-[10px] mr-[10px] rounded-[10px] border-[1px] border-borderColor1 "
+                  className="bg-darkBlueBlack py-[5px] h-[50px] px-[10px] rounded-[10px] border-[1px] border-borderColor1 "
                   onClick={() => {
                     setAuto(!auto);
                   }}
                 >
-                  <text className="text-[16px]">Auto</text>
+                  <p className="text-[16px]">Auto</p>
                 </Button>
               ) : (
                 <Button
-                  className="bg-primary py-[5px] px-[10px] h-[50px] mr-[10px] rounded-[10px] border-[1px] border-borderColor1 border-primary"
+                  className="bg-primary py-[5px] px-[10px] h-[50px] rounded-[10px] border-[1px] border-borderColor1 border-primary"
                   onClick={() => {
                     setAuto(!auto);
                   }}
                 >
-                  <text className="text-[16px]">Auto</text>
+                  <p className="text-[16px]">Auto</p>
                 </Button>
               )}
 
@@ -579,9 +653,21 @@ const Uniswap = () => {
                   onChange={(e) => {
                     setPercentage(e.target.value);
                   }}
-                ></input>
-                <text className="font-semibold mr-[5px]">%</text>
+                />
+                <p className="font-semibold mr-[5px]">%</p>
               </div>
+                <select
+                  id="demo-simple-select"
+                  value={poolFee}
+                  label="Age"
+                  className="w-[100%] h-[50px] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[5px] text-right"
+                  onChange={(e) => setPoolFee(e.target.value)}
+                >
+                  <option value={100}>0.01 %</option>
+                  <option value={300}>0.05 %</option>
+                  <option value={3000}>0.3 %</option>
+                  <option value={10000}>1 %</option>
+                </select>
             </div>
             {/* <ErrorWarning className="text-[12px] my-[10px]">
               Your transaction may be fontrun
@@ -593,7 +679,7 @@ const Uniswap = () => {
           <div className="mb-[10px] px-[20px]">Interface Setting</div>
           <div className="flex justify-between items-center px-[20px] mb-[10px]">
             <div className="flex items-center">
-              <text className="mr-[10px] text-[15px]">Auto Router Api</text>
+              <p className="mr-[10px] text-[15px]">Auto Router Api</p>
               <HelpOutlineIcon className="text-[18px]" />
             </div>
             <Switch1 checked={checked} change={handleChange} />
@@ -601,7 +687,7 @@ const Uniswap = () => {
 
           <div className="flex justify-between items-center px-[20px] mb-[10px]">
             <div className="flex items-center">
-              <text className="mr-[10px] text-[15px]">Exper Mode</text>
+              <p className="mr-[10px] text-[15px]">Exper Mode</p>
               <HelpOutlineIcon className="text-[18px]" />
             </div>
             <ExperModeModal />
@@ -617,7 +703,7 @@ const Uniswap = () => {
               <div className="flex items-center">
                 <InfoOutlinedIcon className="text-lightbluetext text-[15px] mr-[5px]" />
                 <div>
-                  <text className="text-[14px]">1 USDT = 1.0045(USDC) </text>
+                  <p className="text-[14px]">1 USDT = 1.0045(USDC) </p>
                   <span className="text-lightbluetext text-[14px]">
                     ($1.002)
                   </span>
@@ -685,7 +771,7 @@ const Uniswap = () => {
                   >
                     <CircularProgress className="p-[5px]" />
                   </Box>
-                  <text>Approve in your wallet</text>
+                  <p>Approve in your wallet</p>
                 </div>
               </Button>
             </div>
@@ -699,7 +785,7 @@ const Uniswap = () => {
               >
                 <div className="flex items-center justify-center">
                   <InfoOutlinedIcon className="text-lightblutext text-[25px] mr-[10px]" />
-                  <text>Approve use of USDC</text>
+                  <p>Approve use of USDC</p>
                 </div>
               </Button>
             </div>

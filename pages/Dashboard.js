@@ -1,10 +1,11 @@
-import { Inter } from "next/font/google";
+import Image from "next/image";
+// import { Inter } from "next/font/google";
 import BaseCard from "../components/Molecules/Cards/BaseCard";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import abi from "./abi.json";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 export default function Dashboard() {
   const [name, setName] = useState();

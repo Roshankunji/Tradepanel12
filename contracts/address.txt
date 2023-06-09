@@ -1,0 +1,53 @@
+DEPLOYING GMX (Library)
+GMX Library DEPLOYED. txHash:  0xac2157239160e88ac316048e9b70c4298788cfc8bbb37d50844e584d15ef7b9a
+Contract Address:  0xd3Bae94407B79c733712eccBbe8625b8409d8DB3 
+
+
+DEPLOYING UniswapV3Adapter
+Adapter DEPLOYED. txHash:  0x3f44e4d3e92623e0579aa220998df08972d286469d02b8784fdf1c3cac984652
+Contract Address:  0x324934DeC111EC7357201d54BC66B033BaF9eE3f 
+
+
+DEPLOYING AdaptersRegistry
+AdaptersRegistry DEPLOYED. txHash:  0xed255e7690b049ee533a9a851d69f7acbc88064772a86426f237b8b6c621fe0b
+Contract Address:  0x28d449B7c4922860790Ec007AddE8CF5788C99Ff 
+Set Uniswap Adapter on Registry
+Uniswap Adapter Set txHash:  0xa411aef2d37fa06a73f60517c84c2427440868555c99a89863ecd1bca38982e6 
+
+
+DEPLOYING Lens Contract
+Lens Contract DEPLOYED. txHash:  0xacb7a0ee61d2fda205197694cc362f1210079281f6b5ec7bc837b362f9909aba
+Contract Address:  0x3aa7a1985232C2caCc20996F97afD6c3251998dD 
+
+
+DEPLOYING TraderWalletDeployer (Library)
+TraderWalletDeployer DEPLOYED. txHash:  0x7e42a6c1139ad964f05528ee8f92ae7efc7aaadf7f10882388e7317adcab1c2b
+Contract Address:  0x3aa4e150ac6Dc0C897dc7859d275D199eF087598 
+
+
+DEPLOYING UsersVaultDeployer (Library)
+UsersVaultDeployer DEPLOYED. txHash:  0x3b4e702da2acbe4801e1adfb28f6692aa3ae404a8a25c8217e313e7fc78aa639
+Contract Address:  0x1B8C875e16EBAdAb5fBeCdcB2A83E5C0D86c69dD 
+
+
+DEPLOYING ContractsFactory
+ContractsFactory DEPLOYED. txHash:  0x01522232cc055c0e309fecda9f09931d535cada0295c8939eb58d2b84810826c
+Contract Address:  0x8FC2434dd3a5Ddaefac0b8a6d12bd14C2790e1Dd 
+Set Adapter Registry in Factory
+Adapter Registry Set txHash:  0x434d09b126b50fd8ba4dc7eb68038089c0e89eb985526beba886f72daeb97ae1 
+
+
+===> DEPLOYING TraderWallet - 1
+TraderWallet DEPLOYED. txHash:  0xbc0a27cb5e3852968aed7bf69b2f0b8b5621d0f81e95b715111a8ed270563eb4
+Contract Address:  0xa5429a46244FEE9ED33cF0C820ed9Ce57786Ef4A
+===> DEPLOYING UsersVault   - 1
+UsersVault DEPLOYED. txHash:  0xa0bf1567f37507650875f73898bf657e77b36934303e63add434272b3c78310f
+Contract Address:  0x8E519670206C2CAcF882282c0F51aD93aD90Bf0a 
+ 
+
+DEPLOYING TraderWallet - 2
+TraderWallet DEPLOYED. txHash:  0xe82528e198dc8dd1b54f1eaaaad99e3123b9a04abccf0cd187b7099aaf985ae4
+Contract Address:  0x31AE6b3ddd14E6732b6750EB6F5fc369Bad06007 
+DEPLOYING UsersVault   - 2
+UsersVault DEPLOYED. txHash:  0xa9f509a96c14e961f416c076812f9c24edfebc320e94855caca516110a94ceb3
+Contract Address:  0x0515e103B8fB41D9e9ACe9222eEDf24ff81f1204

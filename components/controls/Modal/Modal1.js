@@ -89,17 +89,17 @@ const Modal1 = ({ control }) => {
             ""
           )}
 
-          <text>
+          <p>
             {process === false ? "Process Rollover" : "Processing Rollover"}
-          </text>
+          </p>
         </Button>
         {/* <div className="flex flex-col justify-center items-center">
           <Button className="w-[92px] mb-[10px]">Finish</Button>
           <div className="flex justify-center items-center">
             <CheckCircleOutlineIcon className="text-[15px] text-[#67DF9F] mr-1" />
-            <text className="text-[13px] text-[#67DF9F]">
+            <p className="text-[13px] text-[#67DF9F]">
               Rollover Completed
-            </text>
+            </p>
           </div>
         </div> */}
       </div>

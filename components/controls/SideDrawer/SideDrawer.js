@@ -49,7 +49,7 @@ export default function TransientDrawer(props) {
     <div
       // onClick={toggleDrawer(anchor, false)}
       // onKeyDown={toggleDrawer(anchor, false)}
-      className="bg-[#0d111d] border border-[#1e2331] w-[340px] h-full"
+      className="bg-[#0d111d] border border-[#1e2331] w-[340px] h-[calc(100%+20px)]"
     >
       <div
         id={props.commissionFees ? "commissionDrawer" : "closeTransient"}

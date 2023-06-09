@@ -113,10 +113,10 @@ const ClosePositionModal = (props) => {
                 <div>
                   <div className="bg-gray-800 py-[15px] px-[13px] m-[15px] rounded-[5px]">
                     <div className="flex justify-between mb-1">
-                      <text className="text-[14px] text-gray-300">Close</text>
-                      <text className="text-[14px] text-gray-300">
+                      <p className="text-[14px] text-gray-300">Close</p>
+                      <p className="text-[14px] text-gray-300">
                         Max: 28,031.23
-                      </text>
+                      </p>
                     </div>
                     <div className="flex items-center justify-between w-[100%]">
                       <input
@@ -236,10 +236,10 @@ const ClosePositionModal = (props) => {
                 <div>
                   <div className="bg-gray-800 py-[15px] px-[13px] mb-[15px] mx-[15px] rounded-[5px]">
                     <div className="flex justify-between mb-1">
-                      <text className="text-[14px] text-gray-300">Close</text>
-                      <text className="text-[14px] text-gray-300">
+                      <p className="text-[14px] text-gray-300">Close</p>
+                      <p className="text-[14px] text-gray-300">
                         Max: 28,031.23
-                      </text>
+                      </p>
                     </div>
                     <div className="flex items-center justify-between w-[100%]">
                       <input
@@ -271,10 +271,10 @@ const ClosePositionModal = (props) => {
                   </div>
                   <div className="bg-gray-800 py-[15px] px-[13px] mx-[15px] rounded-[5px]">
                     <div className="flex justify-between mb-1">
-                      <text className="text-[14px] text-gray-300">Price</text>
-                      <text className="text-[14px] text-gray-300">
+                      <p className="text-[14px] text-gray-300">Price</p>
+                      <p className="text-[14px] text-gray-300">
                         Mark: 28,031.23
-                      </text>
+                      </p>
                     </div>
                     <div className="flex items-center justify-between w-[100%]">
                       <input

@@ -1,23 +1,62 @@
 import React, { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import Search from "../Input/Search";
-import tokenData from "../../controls/Dropdown/TokenData.json";
+import { tokenInfoData } from "../Dropdown/TokenData.js";
 import Image from "next/image";
+import { isValidAddress } from "../../../utils/isValidAddress";
+import { erc20ABI, useAccount, usePublicClient } from 'wagmi'
+import { getTokenBalance, getTokenDetail } from "../../../contracts";
+import { formatEtherValue } from "../../../utils/formatNumber";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
+import { jsNumberForAddress } from "react-jazzicon";
 const UniswapModalContent = ({
-  tokenData1,
-  tokenData2,
-  closeModal,
+  token,
+  setToken,
+  tokenNext,
+  setTokenNext,
   first,
   second,
+  closeModal
 }) => {
   const [searchData, setSearchData] = useState("");
-  const [data, setData] = useState([]);
-  const search = (e) => {
-    setSearchData(e);
+  const { address } = useAccount();
+  const [isLoad, setLoad] = useState(false);
+  const [tokenDataArray, setTokenDataArray] = useState(tokenInfoData);
+
+  const search = async (e) => {
+    const val = e;
+    setSearchData(val);
+    if(isValidAddress(val) && address !== undefined) {
+      setLoad(true);
+      try {
+        const token = await getTokenDetail(val);
+        const balance = await getTokenBalance(val);
+        if (token?.tokenName !== undefined && balance !== undefined) {
+          const newToken = [
+            {
+              id: 0,
+              name: token.tokenName,
+              shortName: token.tokenSymbol,
+              image: undefined,
+              address: val,
+              balance: balance
+            }
+          ];
+          console.log("newToken: ", newToken);
+          setTokenDataArray(newToken);
+          console.log("done")
+        }
+        setLoad(false);
+      } catch(err) {
+        console.log("count: ", count)
+        setLoad(false);
+        console.log(err);
+      }
+    } 
   };
 
   useEffect(() => {
-    const dataOfToken = tokenData.filter((e) => {
+    const dataOfToken = tokenDataArray.filter((e) => {
       const uppercase = e?.name?.toUpperCase();
       const lowercase = e?.name?.toLowerCase();
       const uppercase1 = e?.shortName?.toUpperCase();
@@ -34,22 +73,22 @@ const UniswapModalContent = ({
         lowercase1.startsWith(searchData.toLowerCase())
       );
     });
-    setData(dataOfToken);
+    setTokenDataArray(dataOfToken);
     if (searchData === "") {
-      setData(tokenData);
+      setTokenDataArray(tokenInfoData);
     }
   }, [searchData]);
 
-  useEffect(() => {
-    setData(tokenData);
-  }, []);
+  // useEffect(() => {
+  //   setData(tokenInfoData);
+  // }, []);
 
   return (
     <div>
       <div className="flex justify-between items-center p-4">
-        <text className="font-semibold my-[2px] text-[18px]">
+        <p className="font-semibold my-[2px] text-[18px]">
           Select a Token
-        </text>
+        </p>
         <CloseIcon
           className="cursor-pointer"
           onClick={() => {
@@ -64,45 +103,80 @@ const UniswapModalContent = ({
         }}
       />
       <div className="overflow-y-auto h-[370px] mb-[10px] scroll">
-        {data.map((e) => {
+        {tokenDataArray.map((e) => {
           return (
-            <div
-              className="flex justify-between items-center cursor-pointer hover:bg-backgroundColor"
-              key={data.id}
-              onClick={() => {
-                if (first === true) {
-                  tokenData1(e);
-                } else if (second === true) {
-                  tokenData2(e);
-                }
-
-                closeModal();
-              }}
-            >
-              <div className="flex w-[100%] px-4 py-2">
-                <div className="flex items-center">
-                  <Image
-                    src={`data:image/png;base64,${e.image}`}
-                    alt="Token Image"
-                    width={35}
-                    height={35}
-                    className="rounded-[20px] mr-[20px]"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <text className="font-semibold text-[18px]">{e.name}</text>
-                  <text className="font-extralight text-[13px]">
-                    {e.shortName}
-                  </text>
-                </div>
-              </div>
-              <div className="mr-[12px] text-[14px]">0.002571</div>
-            </div>
+            <TokenDetails onClick={() => {
+              if (first === true) {
+                setToken(e);
+              } else if (second === true) {
+                setTokenNext(e);
+              }
+              closeModal();
+            }} image={e.image} name={e.name} shortName={e.shortName} tokenAddress={e.address} key={e.id} disabled={first ? e === tokenNext : second ? e === token : false} />
           );
         })}
       </div>
     </div>
   );
 };
+
+const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled }) => {
+  const publicClient = usePublicClient();
+  const [balance, setBalance] = useState(0);
+  const { address: userAddress } = useAccount();
+  console.log("tokenAddress: ", tokenAddress);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchBalances = async () => {
+    if(userAddress === undefined) { 
+      setBalance(0) 
+    } else {
+      if(shortName === "ETH") {
+        const _amount = await publicClient.getBalance({ address: userAddress });
+        const amount = formatEtherValue(_amount);
+        console.log("_amount: ", _amount)
+        setBalance(amount);
+      } else {
+        const _amount = await publicClient.readContract({ 
+          address: tokenAddress,
+          abi: erc20ABI, 
+          functionName: 'balanceOf', 
+          args: [userAddress] 
+        });
+        const amount = formatEtherValue(_amount);
+        setBalance(amount)
+    }
+   }
+  }
+  useEffect(() => {
+    fetchBalances();
+  }, [balance, fetchBalances])
+  return(
+    <div
+    className="flex justify-between items-center cursor-pointer hover:bg-backgroundColor pointer"
+    onClick={disabled ? undefined : onClick}
+  >
+    <div className="flex w-[100%] px-4 py-2">
+      <div className="flex items-center">
+        {
+          image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(tokenAddress)} />:
+          <Image
+            src={image}
+            alt="Token Image"
+            className="rounded-[20px] mr-[20px] w-[35px] h-[35px]"
+          />
+        }
+      </div>
+      <div className="flex flex-col">
+        <p className="font-semibold text-[18px]">{name}</p>
+        <p className="font-extralight text-[13px]">
+          {shortName}
+        </p>
+      </div>
+    </div>
+    <div className="mr-[12px] text-[14px]">{balance}</div>
+  </div>
+  )
+}
 
 export default UniswapModalContent;

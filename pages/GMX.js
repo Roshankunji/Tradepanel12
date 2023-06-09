@@ -6,7 +6,6 @@ import CheckBox from "../components/atoms/Checkbox/Checkbox";
 import Button from "../components/atoms/Button/Button";
 import DrawerC from "../components/controls/SideDrawer/SideDrawer";
 import Search from "../components/controls/Input/Search";
-import tokenData from "../components/controls/Dropdown/TokenData.json";
 import Image from "next/image";
 import LongBtcModal from "../components/controls/Modal/LongBtcModal";
 import ClosePositionModal from "../components/controls/Modal/ClosePositionModal";
@@ -16,6 +15,9 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import Dropdown from "../components/controls/Dropdown/Dropdown";
+import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
+import { jsNumberForAddress } from "react-jazzicon";
 
 const Gmx = () => {
   const [toggle, setToggle] = useState("Long");
@@ -66,7 +68,7 @@ const Gmx = () => {
   };
 
   useEffect(() => {
-    setData(tokenData);
+    setData(tokenInfoData);
   }, []);
 
   useEffect(() => {
@@ -128,7 +130,7 @@ const Gmx = () => {
     });
     setData(dataOfToken);
     if (searchData === "") {
-      setData(tokenData);
+      setData(tokenInfoData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchData]);
@@ -600,8 +602,8 @@ const Gmx = () => {
                 <div>
                   <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px] mb-[10px]">
                     <div className="my-[10px] flex justify-between">
-                      <text>Pay: 10.00 USDC</text>
-                      <text>Balance: 13.8788</text>
+                      <p>Pay: 10.00 USDC</p>
+                      <p>Balance: 13.8788</p>
                     </div>
                     <div className="flex items-center justify-between w-[100%] ">
                       <input
@@ -644,7 +646,7 @@ const Gmx = () => {
                                 }}
                               />
                               <hr className="border-[1px] border-lightBlue mb-[20px]"></hr>
-                              <div className="overflow-y-auto h-[100%] mb-[10px] scroll">
+                              <div className="overflow-y-auto h-[100%] scroll">
                                 {data.map((e) => {
                                   return (
                                     <div
@@ -659,21 +661,22 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={`data:image/png;base64,${e.image}`}
-                                            alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
-                                          <text className="font-semibold text-[18px] text-white">
+                                          <p className="font-semibold text-[18px] text-white">
                                             {e.name}
-                                          </text>
-                                          <text className="font-extralight text-[13px] text-white">
+                                          </p>
+                                          <p className="font-extralight text-[13px] text-white">
                                             {e.shortName}
-                                          </text>
+                                          </p>
                                         </div>
                                       </div>
                                       <div className="flex-col">
@@ -695,11 +698,11 @@ const Gmx = () => {
                               className="box-border flex justify-center w-[80%] items-center py-[5px] rounded-[20px] text-white cursor-pointer"
                               // onClick={handleOpen}
                             >
-                              <text className="text-[18px]">
+                              <p className="text-[18px]">
                                 {tokenData1 && tokenData1.shortName
                                   ? tokenData1.shortName
                                   : "USDT"}
-                              </text>
+                              </p>
                               <KeyboardArrowDownIcon />
                             </div>
                           }
@@ -710,10 +713,10 @@ const Gmx = () => {
 
                   <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px]">
                     <div className="my-[10px] flex justify-between">
-                      <text>
+                      <p>
                         {toggle === "Long" ? "Long" : "Short"}: 10.00 USDC
-                      </text>
-                      <text>Leaverage: 1.10x</text>
+                      </p>
+                      <p>Leaverage: 1.10x</p>
                     </div>
                     <div className="flex items-center justify-between w-[100%]">
                       <input
@@ -775,21 +778,22 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={`data:image/png;base64,${e.image}`}
-                                            alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
-                                          <text className="font-semibold text-[18px] text-white">
+                                          <p className="font-semibold text-[18px] text-white">
                                             {e.name}
-                                          </text>
-                                          <text className="font-extralight text-[13px] text-white">
+                                          </p>
+                                          <p className="font-extralight text-[13px] text-white">
                                             {e.shortName}
-                                          </text>
+                                          </p>
                                         </div>
                                       </div>
                                       <div className="flex-col">
@@ -808,11 +812,11 @@ const Gmx = () => {
                           }
                           button={
                             <div className="box-border flex justify-center w-[80%] items-center py-[5px] rounded-[20px] text-white cursor-pointer">
-                              <text className="text-[18px]">
+                              <p className="text-[18px]">
                                 {tokenData2 && tokenData2.shortName
                                   ? tokenData2.shortName
                                   : "USDT"}
-                              </text>
+                              </p>
                               <KeyboardArrowDownIcon />
                             </div>
                           }
@@ -862,9 +866,9 @@ const Gmx = () => {
                   )}
                   <div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Collateral In</text>
+                      <p className="text-[14px]">Collateral In</p>
                       {toggle === "Long" ? (
-                        <text className="text-[14px]">USD</text>
+                        <p className="text-[14px]">USD</p>
                       ) : (
                         <DrawerC
                           anchor="right"
@@ -897,21 +901,22 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={`data:image/png;base64,${e.image}`}
-                                            alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
-                                          <text className="font-semibold text-[18px] text-white">
+                                          <p className="font-semibold text-[18px] text-white">
                                             {e.name}
-                                          </text>
-                                          <text className="font-extralight text-[13px] text-white">
+                                          </p>
+                                          <p className="font-extralight text-[13px] text-white">
                                             {e.shortName}
-                                          </text>
+                                          </p>
                                         </div>
                                       </div>
                                       <div className="flex-col">
@@ -933,11 +938,11 @@ const Gmx = () => {
                               className="box-border flex justify-center items-center py-[5px] rounded-[20px] text-white cursor-pointer"
                               // onClick={handleOpen}
                             >
-                              <text className="text-[14px] mr-[2px]">
+                              <p className="text-[14px] mr-[2px]">
                                 {tokenData1 && tokenData1.shortName
                                   ? tokenData1.shortName
                                   : "USDC"}
-                              </text>
+                              </p>
                               <KeyboardArrowDownIcon className="text-[18px]" />
                             </div>
                           }
@@ -945,22 +950,22 @@ const Gmx = () => {
                       )}
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Leaverage</text>
-                      <text className="text-[14px]">1.10x</text>
+                      <p className="text-[14px]">Leaverage</p>
+                      <p className="text-[14px]">1.10x</p>
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Entry Price</text>
-                      <text className="text-[14px]">$28.065.45</text>
+                      <p className="text-[14px]">Entry Price</p>
+                      <p className="text-[14px]">$28.065.45</p>
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Liq. price</text>
-                      <text className="text-[14px]">$15,269.45</text>
+                      <p className="text-[14px]">Liq. price</p>
+                      <p className="text-[14px]">$15,269.45</p>
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Fees</text>
-                      <text className="underline decoration-dashed text-[14px]">
+                      <p className="text-[14px]">Fees</p>
+                      <p className="underline decoration-dashed text-[14px]">
                         $0.05
-                      </text>
+                      </p>
                     </div>
                   </div>
                   {
@@ -985,8 +990,8 @@ const Gmx = () => {
                 <div>
                   <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px] mb-[10px]">
                     <div className="my-[10px] flex justify-between">
-                      <text>Pay: 10.00 USDC</text>
-                      <text>Balance: 13.8788</text>
+                      <p>Pay: 10.00 USDC</p>
+                      <p>Balance: 13.8788</p>
                     </div>
                     <div className="flex items-center justify-between w-[100%] ">
                       <input
@@ -1044,21 +1049,22 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={`data:image/png;base64,${e.image}`}
-                                            alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
-                                          />
+                                         {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
-                                          <text className="font-semibold text-[18px] text-white">
+                                          <p className="font-semibold text-[18px] text-white">
                                             {e.name}
-                                          </text>
-                                          <text className="font-extralight text-[13px] text-white">
+                                          </p>
+                                          <p className="font-extralight text-[13px] text-white">
                                             {e.shortName}
-                                          </text>
+                                          </p>
                                         </div>
                                       </div>
                                       <div className="flex-col">
@@ -1080,11 +1086,11 @@ const Gmx = () => {
                               className="box-border flex justify-center w-[80%] items-center py-[5px] rounded-[20px] text-white cursor-pointer"
                               // onClick={handleOpen}
                             >
-                              <text className="text-[18px]">
+                              <p className="text-[18px]">
                                 {tokenData1 && tokenData1.shortName
                                   ? tokenData1.shortName
                                   : "USDT"}
-                              </text>
+                              </p>
                               <KeyboardArrowDownIcon />
                             </div>
                           }
@@ -1095,10 +1101,10 @@ const Gmx = () => {
 
                   <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px] mb-[10px]">
                     <div className="my-[10px] flex justify-between">
-                      <text>
+                      <p>
                         {toggle === "Long" ? "Long" : "Short"}: 10.00 USDC
-                      </text>
-                      <text>Leaverage: 1.10x</text>
+                      </p>
+                      <p>Leaverage: 1.10x</p>
                     </div>
                     <div className="flex items-center justify-between w-[100%]">
                       <input
@@ -1160,21 +1166,22 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={`data:image/png;base64,${e.image}`}
-                                            alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
-                                          <text className="font-semibold text-[18px] text-white">
+                                          <p className="font-semibold text-[18px] text-white">
                                             {e.name}
-                                          </text>
-                                          <text className="font-extralight text-[13px] text-white">
+                                          </p>
+                                          <p className="font-extralight text-[13px] text-white">
                                             {e.shortName}
-                                          </text>
+                                          </p>
                                         </div>
                                       </div>
                                       <div className="flex-col">
@@ -1196,11 +1203,11 @@ const Gmx = () => {
                               className="box-border flex justify-center w-[80%] items-center py-[5px] rounded-[20px] text-white cursor-pointer"
                               // onClick={handleOpen}
                             >
-                              <text className="text-[18px]">
+                              <p className="text-[18px]">
                                 {tokenData2 && tokenData2.shortName
                                   ? tokenData2.shortName
                                   : "USDT"}
-                              </text>
+                              </p>
                               <KeyboardArrowDownIcon />
                             </div>
                           }
@@ -1210,8 +1217,8 @@ const Gmx = () => {
                   </div>
                   <div className="bg-backgroundColor py-[10px] px-[10px] rounded-[2px]">
                     <div className="my-[10px] flex justify-between">
-                      <text>Price</text>
-                      <text>Mark: 28,031.23</text>
+                      <p>Price</p>
+                      <p>Mark: 28,031.23</p>
                     </div>
                     <div className="flex items-center justify-between w-[100%]">
                       <input
@@ -1269,9 +1276,9 @@ const Gmx = () => {
                   )}
                   <div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Collateral In</text>
+                      <p className="text-[14px]">Collateral In</p>
                       {toggle === "Long" ? (
-                        <text className="text-[14px]">USD</text>
+                        <p className="text-[14px]">USD</p>
                       ) : (
                         <DrawerC
                           anchor="right"
@@ -1304,21 +1311,22 @@ const Gmx = () => {
                                     >
                                       <div className="flex w-[100%] px-4 py-1 ">
                                         <div className="flex items-center">
-                                          <Image
-                                            src={`data:image/png;base64,${e.image}`}
-                                            alt="Token Image"
-                                            width={35}
-                                            height={35}
-                                            className="rounded-[20px] mr-[10px]"
-                                          />
+                                          {
+                                            e.image === undefined ? <Jazzicon diameter={35} paperStyles={{ marginRight: '20px' }} seed={jsNumberForAddress(e.address)} />:
+                                            <Image
+                                              src={e.image}
+                                              alt="Token Image"
+                                              className="rounded-[20px] mr-[10px] w-[35px] h-[35px]"
+                                            />
+                                          }
                                         </div>
                                         <div className="flex flex-col">
-                                          <text className="font-semibold text-[18px] text-white">
+                                          <p className="font-semibold text-[18px] text-white">
                                             {e.name}
-                                          </text>
-                                          <text className="font-extralight text-[13px] text-white">
+                                          </p>
+                                          <p className="font-extralight text-[13px] text-white">
                                             {e.shortName}
-                                          </text>
+                                          </p>
                                         </div>
                                       </div>
                                       <div className="flex-col">
@@ -1337,11 +1345,11 @@ const Gmx = () => {
                           }
                           button={
                             <div className="box-border flex justify-center items-center py-[5px] rounded-[20px] text-white cursor-pointer">
-                              <text className="text-[14px] mr-[2px]">
+                              <p className="text-[14px] mr-[2px]">
                                 {tokenData2 && tokenData2.shortName
                                   ? tokenData2.shortName
                                   : "USDC"}
-                              </text>
+                              </p>
                               <KeyboardArrowDownIcon className="text-[18px]" />
                             </div>
                           }
@@ -1349,22 +1357,22 @@ const Gmx = () => {
                       )}
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Leaverage</text>
-                      <text className="text-[14px]">1.10x</text>
+                      <p className="text-[14px]">Leaverage</p>
+                      <p className="text-[14px]">1.10x</p>
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Entry Price</text>
-                      <text className="text-[14px]">$28.065.45</text>
+                      <p className="text-[14px]">Entry Price</p>
+                      <p className="text-[14px]">$28.065.45</p>
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Liq. price</text>
-                      <text className="text-[14px]">$15,269.45</text>
+                      <p className="text-[14px]">Liq. price</p>
+                      <p className="text-[14px]">$15,269.45</p>
                     </div>
                     <div className="flex items-center justify-between my-[5px]">
-                      <text className="text-[14px]">Fees</text>
-                      <text className="underline decoration-dashed text-[14px]">
+                      <p className="text-[14px]">Fees</p>
+                      <p className="underline decoration-dashed text-[14px]">
                         $0.05
-                      </text>
+                      </p>
                     </div>
                   </div>
 
@@ -1391,28 +1399,28 @@ const Gmx = () => {
               <div>Long BTC</div>
               <hr className="border-lightBlue border-[1px] my-[8px]"></hr>
               <div className="flex items-center justify-between my-[5px]">
-                <text className="text-[14px]">Entry Price</text>
-                <text className="underline decoration-dashed text-[14px]">
+                <p className="text-[14px]">Entry Price</p>
+                <p className="underline decoration-dashed text-[14px]">
                   $28,065.45
-                </text>
+                </p>
               </div>
               <div className="flex items-center justify-between my-[5px]">
-                <text className="text-[14px]">Exit Price</text>
-                <text className="underline decoration-dashed text-[14px]">
+                <p className="text-[14px]">Exit Price</p>
+                <p className="underline decoration-dashed text-[14px]">
                   $28,065.45
-                </text>
+                </p>
               </div>
               <div className="flex items-center justify-between my-[5px]">
-                <text className="text-[14px]">Borrow Fee</text>
-                <text className="underline decoration-dashed text-[14px]">
+                <p className="text-[14px]">Borrow Fee</p>
+                <p className="underline decoration-dashed text-[14px]">
                   0.00079% / 1h
-                </text>
+                </p>
               </div>
               <div className="flex items-center justify-between my-[5px]">
-                <text className="text-[14px]">Available Liquidity</text>
-                <text className="underline decoration-dashed text-[14px]">
+                <p className="text-[14px]">Available Liquidity</p>
+                <p className="underline decoration-dashed text-[14px]">
                   $4,545.79
-                </text>
+                </p>
               </div>
             </div>
           </div>
