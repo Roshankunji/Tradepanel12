@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import "../styles/globals.css";
 import '../styles/rainbowkit.css'
+import '../styles/toast.css'
 import Layout from "../components/Molecules/Layout";
 import {
   RainbowKitProvider,

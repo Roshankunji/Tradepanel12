@@ -42,13 +42,10 @@ const UniswapModalContent = ({
               balance: balance
             }
           ];
-          console.log("newToken: ", newToken);
           setTokenDataArray(newToken);
-          console.log("done")
         }
         setLoad(false);
       } catch(err) {
-        console.log("count: ", count)
         setLoad(false);
         console.log(err);
       }
@@ -124,7 +121,6 @@ const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled 
   const publicClient = usePublicClient();
   const [balance, setBalance] = useState(0);
   const { address: userAddress } = useAccount();
-  console.log("tokenAddress: ", tokenAddress);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchBalances = async () => {
@@ -134,7 +130,6 @@ const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled 
       if(shortName === "ETH") {
         const _amount = await publicClient.getBalance({ address: userAddress });
         const amount = formatEtherValue(_amount);
-        console.log("_amount: ", _amount)
         setBalance(amount);
       } else {
         const _amount = await publicClient.readContract({ 

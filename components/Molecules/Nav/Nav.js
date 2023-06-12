@@ -92,8 +92,8 @@ const Nav = () => {
           </li>
         </ul>
         <div className="flex w-[60%] justify-end md:flex-nowrap flex-wrap">
-          {/* <Dropdown1 names={names} background="#0C1020" width={390} />
-          <NavModal /> */}
+          <Dropdown1 names={names} background="#0C1020" width={390} />
+          {/* <NavModal /> */}
           <WalletConnectButton />
         </div>
       </div>
