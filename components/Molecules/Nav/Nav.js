@@ -6,7 +6,7 @@ import Dropdown1 from "../../controls/Dropdown/Dropdown";
 import Link from "next/link";
 import NavModal from "../../controls/Modal/NavModal";
 import { useRouter } from "next/router";
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { WalletConnectButton } from "../../controls/Button/WalletConnectButton";
 
 const Nav = () => {
