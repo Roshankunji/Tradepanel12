@@ -27,10 +27,10 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
 import ExperModeModal from "../components/controls/Modal/ExperModeModal";
-import { erc20ABI, useAccount, useNetwork, usePublicClient, useWalletClient } from 'wagmi'
-import { LensABI, TraderWalletABI } from "../contracts/abis";
+import { erc20ABI, useAccount, useNetwork, usePublicClient } from 'wagmi'
+import { LensABI } from "../contracts/abis";
 import { contractAddress } from '../contracts/address'
-import { encodePacked, parseUnits } from "viem";
+import { encodePacked } from "viem";
 import { formatEtherValue, formatUnitValue } from "../utils/formatNumber";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { jsNumberForAddress } from "react-jazzicon";
@@ -145,8 +145,7 @@ const Uniswap = () => {
   let [counter, setCounter] = useState(0);
   const [toggle, setToggle] = useState("Trader wallet");
   const publicClient = usePublicClient();
-  const { data: walletClient } = useWalletClient();
-  const { address: userAddress } = useAccount();
+  const { address: userAddress, isConnected } = useAccount();
   const [balance1, setBalance1] = useState(0.00);
   const [balance2, setBalance2] = useState(0.00);
   const [usdValue, setUsdValue] = useState(0);
@@ -154,7 +153,6 @@ const Uniswap = () => {
   const [ratio, setRatio] = useState(0);
   const priceImpact = usePriceImpact(ratio, swapAmount, swapSecondAmount);
   const { isApproveLoad, setApproveLoad } = useStore();
-  const { isConnected } = useAccount();
   const { chain } = useNetwork();
   const { isInitialized } = useWeb3Store();
 
@@ -172,8 +170,9 @@ const Uniswap = () => {
   }, [isInitialized, isApproveLoad])
 
   const fetchAmountIn = async (amount) => {
-    if(amount === 0 || amount === "" || amount === undefined) {
-      return 0;
+    console.log("amountOut: ", amount);
+    if(amount === 0 || amount === "") {
+      setSwapAmount(0);
     } else {
       const token1Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
       const amountOut = amount * 10 ** token1Decimal;
@@ -186,8 +185,9 @@ const Uniswap = () => {
   }
 
   const fetchAmountOut = async (amount) => {
-    if(amount === 0 || amount === "" || amount === undefined) {
-      return 0;
+    console.log("amountIn: ", amount);
+    if(amount === 0 || amount === "") {
+      setSwapSecondAmount(0);
     } else {
       const tokenDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
       const amountIn = amount * 10 ** tokenDecimal;
@@ -196,31 +196,20 @@ const Uniswap = () => {
       const token2Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
       const amountOut = formatUnitValue(_amountOut[0], token2Decimal);
       return amountOut;
+      return amountOut;
     }
   }
 
-  const handleInputAmount = async (_amount) => {
-    const amount = Number(_amount);
+  const handleInputAmount = async (e) => {
+    const amount = Number(e.target.value);
     setSwapAmount(amount);
-    const debounceTimeout = setTimeout(async () => {
-    const amountOut = await fetchAmountOut(amount);
-      setSwapSecondAmount(amountOut);
-    }, 500);
-    return () => {
-      clearTimeout(debounceTimeout);
-    }
+    fetchAmountOut(amount);
   } 
 
-  const handleOutputAmount = async (_amount) => {
-    const amount = Number(_amount);
+  const handleOutputAmount = async (e) => {
+    const amount = Number(e.target.value);
     setSwapSecondAmount(amount);
-    const debounceTimeout = setTimeout(async () => {
-      const amountIn = await fetchAmountIn(amount);
-      setSwapAmount(amountIn);
-    }, 500);
-    return () => {
-      clearTimeout(debounceTimeout);
-    }
+    fetchAmountIn(amount);
   } 
 
   const handleChange = () => {
@@ -312,66 +301,7 @@ const Uniswap = () => {
     fetchBalances(tokenData.shortName, tokenData.address, setBalance1);
     fetchBalances(tokenDataNext.shortName, tokenDataNext.address, setBalance2);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenData, tokenDataNext, isConnected])
-
-  const handleTokenData = async() => {
-    const amountOut = await fetchAmountOut(swapAmount);
-    setSwapSecondAmount(amountOut);
-    const _ratio = await fetchAmountOut(1);
-    setRatio(_ratio);
-  }
-
-  const handleTokenNextData = async () => {
-    const amountIn = await fetchAmountIn(swapSecondAmount);
-    setSwapAmount(amountIn);
-    const _ratio = await fetchAmountOut(1);
-    setRatio(_ratio);
-  }
-
-  useEffect(() => {
-    handleTokenData();
-  }, [tokenData])
-
-  useEffect(() => {
-    handleTokenNextData();
-  }, [tokenDataNext])
-
-  const handleTokenApprove = () => {
-    setApproveLoad(true);
-    tokenApprove?.();
-  }
-
-  const handleSwap = async () => {
-    if(walletClient === null || walletClient === undefined) return;
-    try {
-      const protocolId = 2;
-      const replicate = true;
-      const tokenADecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
-      const tokenBDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
-      debugger;
-      const amountIn = parseUnits(`${swapAmount}`, tokenADecimal);
-      const amountOut = parseUnits(`${swapSecondAmount}`, tokenBDecimal);
-      const fee = percentage * 1000;
-      const path = encodePacked(["address", "uint24", "address"], [tokenData.address, fee, tokenDataNext.address])
-      const operationId = 1; // Sell
-      const tradeData = encodePacked(["bytes", "uint256", "uint256"], [path, amountIn, amountOut]);
-      const tradeOperation = { operationId, data: tradeData };
-      const { request } = await publicClient.simulateContract({ 
-        address: contractAddress.traderWalletAddress, 
-        abi: TraderWalletABI, 
-        functionName: 'executeOnProtocol', 
-        args: [protocolId, tradeOperation, replicate] 
-      });
-      const hash = await walletClient.writeContract(request);
-      const tx = await waitForTransaction({ hash });
-      if(tx.status === 'reverted') {
-        toast.dismiss();
-        toast.error('Swapping Failed!');
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  }, [tokenData, tokenDataNext])
 
   return (
     <>
@@ -672,9 +602,9 @@ const Uniswap = () => {
               <input
                 type="number"
                 className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                value={Number(swapSecondAmount ?? 0)}
+                value={Number(swapSecondAmount)}
                 placeholder="0"
-                onChange={(e) => handleOutputAmount(e.target.value)}
+                onChange={handleOutputAmount}
               />
               <div className="text-lightbluetext text-[14px]">${usdValue}</div>
             </div>
@@ -701,59 +631,50 @@ const Uniswap = () => {
                 <KeyboardArrowDownIcon />
               </div>
               <div className="text-center">
-                Balance : { balance2 } <span style={{ cursor: 'pointer' }} onClick={() => handleOutputAmount(balance2)}>Max</span>
+                Balance : { balance2 } <span style={{ cursor: 'pointer' }} onClick={() => setSwapSecondAmount(balance2)}>Max</span>
               </div>
             </div>
           </div>
 
+          <div className="flex mb-[10px] px-[20px]">
+            <p className="mr-[10px]">Slippage Tolerance</p>
+            <HelpOutlineIcon />
+          </div>
           <div className="flex-col mb-[10px] px-[20px]">
-            <div className="flex items-center gap-3">
-              <div className="flex-col items-start w-[60%]">
-                <div className="flex mb-[10px]">
-                  <p className="mr-[10px]">Slippage Tolerance</p>
-                  <HelpOutlineIcon />
-                </div>
-                <div className="flex gap-3">
-                  {auto === true ? (
-                    <Button
-                      className="bg-darkBlueBlack py-[5px] h-[50px] px-[10px] rounded-[10px] border-[1px] border-borderColor1 "
-                      onClick={() => {
-                        setAuto(!auto);
-                      }}
-                    >
-                      <p className="text-[16px]">Auto</p>
-                    </Button>
-                  ) : (
-                    <Button
-                      className="bg-primary py-[5px] px-[10px] h-[50px] rounded-[10px] border-[1px] border-borderColor1 border-primary"
-                      onClick={() => {
-                        setAuto(!auto);
-                      }}
-                    >
-                      <p className="text-[16px]">Auto</p>
-                    </Button>
-                  )}
+            <div className="w-[100%] flex items-center gap-3">
+              {auto === true ? (
+                <Button
+                  className="bg-darkBlueBlack py-[5px] h-[50px] px-[10px] rounded-[10px] border-[1px] border-borderColor1 "
+                  onClick={() => {
+                    setAuto(!auto);
+                  }}
+                >
+                  <p className="text-[16px]">Auto</p>
+                </Button>
+              ) : (
+                <Button
+                  className="bg-primary py-[5px] px-[10px] h-[50px] rounded-[10px] border-[1px] border-borderColor1 border-primary"
+                  onClick={() => {
+                    setAuto(!auto);
+                  }}
+                >
+                  <p className="text-[16px]">Auto</p>
+                </Button>
+              )}
 
-                  <div className="username flex justify-between items-center w-[100%] h-[50px] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[10px] border-[1px] border-borderColor1  rounded-[10px]">
-                    {/* <WarningIcon className="text-[18px] text-yellow-600 ml-[5px]" /> */}
-                    <input
-                      type="number"
-                      className="w-[100%] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[5px] text-right"
-                      placeholder="0.10"
-                      controls={false}
-                      value={percentage}
-                      onChange={(e) => {
-                        setPercentage(e.target.value);
-                      }}
-                    />
-                    <p className="font-semibold mr-[5px]">%</p>
-                  </div>
-                </div>
+              <div className="username flex justify-between items-center w-[100%] h-[50px] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[10px] border-[1px] border-borderColor1  rounded-[10px]">
+                {/* <WarningIcon className="text-[18px] text-yellow-600 ml-[5px]" /> */}
+                <input
+                  type="number"
+                  className="w-[100%] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[5px] text-right"
+                  placeholder="0.10"
+                  controls={false}
+                  onChange={(e) => {
+                    setPercentage(e.target.value);
+                  }}
+                />
+                <p className="font-semibold mr-[5px]">%</p>
               </div>
-              <div className="flex-col items-start w-[40%]">
-                <div className="flex mb-[10px]">
-                  <p className="mr-[10px]">Pool Fee</p>
-                </div>
                 <select
                   id="demo-simple-select"
                   value={poolFee}
@@ -763,10 +684,9 @@ const Uniswap = () => {
                 >
                   <option value={100}>0.01 %</option>
                   <option value={300}>0.05 %</option>
-                  <option value={3000} defaultValue={3000}>0.3 %</option>
+                  <option value={3000}>0.3 %</option>
                   <option value={10000}>1 %</option>
                 </select>
-              </div>
             </div>
             {/* <ErrorWarning className="text-[12px] my-[10px]">
               Your transaction may be fontrun
@@ -786,7 +706,7 @@ const Uniswap = () => {
 
           <div className="flex justify-between items-center px-[20px] mb-[10px]">
             <div className="flex items-center">
-              <p className="mr-[10px] text-[15px]">Expert Mode</p>
+              <p className="mr-[10px] text-[15px]">Exper Mode</p>
               <HelpOutlineIcon className="text-[18px]" />
             </div>
             <ExperModeModal />
@@ -802,7 +722,7 @@ const Uniswap = () => {
               <div className="flex items-center">
                 <InfoOutlinedIcon className="text-lightbluetext text-[15px] mr-[5px]" />
                 <div>
-                  <p className="text-[14px]">1 {tokenData.shortName} = {ratio}({tokenDataNext.shortName}) </p>
+                  <p className="text-[14px]">1 USDT = 1.0045(USDC) </p>
                   <span className="text-lightbluetext text-[14px]">
                     ($1.002)
                   </span>
@@ -821,26 +741,24 @@ const Uniswap = () => {
                 <div className="mb-[10px]">
                   <div className="flex justify-between mb-[10px]">
                     <div className="text-lightbluetext text-[14px]">
-                      Expected Output
+                      Ecpected Output
                     </div>
-                    <div>{swapSecondAmount} {tokenDataNext.shortName}</div>
+                    <div>999.45 USDT</div>
                   </div>
                   <div className="flex justify-between">
                     <div className="text-lightbluetext text-[14px]">
                       Price Impact
                     </div>
-                    <div className="text-lightbluetext text-[14px]">
-                    {priceImpact}
-                    </div>
+                    <div className="text-lightbluetext text-[14px]">0.00%</div>
                   </div>
                 </div>
                 <hr className="border-borderColor1"></hr>
                 <div className="my-[10px]">
                   <div className="flex justify-between mb-[10px]">
                     <div className="text-lightbluetext text-[14px]">
-                      Minimum recieved after slipage ({percentage}%)
+                      Minimum recieved after slipage (0.10%)
                     </div>
-                    <div>{(swapSecondAmount - (percentage / 100)) > 0 ? (swapSecondAmount - (percentage / 100)).toFixed(3) : 0} {tokenDataNext.shortName}</div>
+                    <div>999.45 USDT</div>
                   </div>
                   <div className="flex justify-between">
                     <div className="text-lightbluetext text-[14px]">
@@ -860,7 +778,7 @@ const Uniswap = () => {
               Insufficient Balance
             </Button>
           </div>
-          {isApproveLoad === true ? (
+          {approve === true ? (
             <div className="mx-[20px]">
               <Button className="bg-darkBlue w-[100%] mb-[20px] text-borderColor1 font-semibold">
                 <div className="flex items-center justify-center">
