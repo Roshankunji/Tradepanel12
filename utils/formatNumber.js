@@ -8,7 +8,6 @@ export const formatEtherValue = (tokenBalance) => {
 
 export const formatUnitValue = (tokenBalance, unit) => {
     const balance = parseFloat(formatUnits(tokenBalance, unit));
-    console.log("balance: ", balance)
     const formattedBalance = Math.floor(balance * 100) / 100;
     return formattedBalance;
 }

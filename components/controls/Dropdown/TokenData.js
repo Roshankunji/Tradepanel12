@@ -5,7 +5,7 @@ export const tokenInfoData = [
   {
     "id": 1,
     "image": EthSvg,
-    "name": "Ether",
+    "name": "Ethereum",
     "shortName": "ETH",
     "address": tokenAddress.weth,
     "balance": 0
@@ -13,7 +13,7 @@ export const tokenInfoData = [
   {
     "id": 2,
     "image": UsdcSvg,
-    "name": "USDC Coin",
+    "name": "USD Coin",
     "shortName": "USDC",
     "address": tokenAddress.usdc,
     "balance": 0

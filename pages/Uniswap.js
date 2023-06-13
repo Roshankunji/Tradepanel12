@@ -27,14 +27,20 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
 import ExperModeModal from "../components/controls/Modal/ExperModeModal";
-import { erc20ABI, useAccount, usePublicClient } from 'wagmi'
-import { LensABI } from "../contracts/abis";
+import { erc20ABI, useAccount, useNetwork, usePublicClient, useWalletClient } from 'wagmi'
+import { LensABI, TraderWalletABI } from "../contracts/abis";
 import { contractAddress } from '../contracts/address'
-import { encodePacked } from "viem";
+import { encodePacked, parseUnits } from "viem";
 import { formatEtherValue, formatUnitValue } from "../utils/formatNumber";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { jsNumberForAddress } from "react-jazzicon";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { usePriceImpact } from '../hook/usePriceImpact.js'
+import { useApproveToken } from "../hook/useToken";
+import { useStore } from "../context/StoreContext";
+import { waitForTransaction } from '@wagmi/core';
+import { toast } from "react-toastify";
+import { useWeb3Store } from "../context/WebContext";
+import { isApproved } from "../contracts";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -124,13 +130,13 @@ const Uniswap = () => {
   const [totalUserTokenAmount, setTotalUserTokenAmount] = useState();
   const [walletAddress, setWalletAddress] = useState("0x5175...526A");
   const [open, setOpen] = useState(false);
-  const [percentage, setPercentage] = useState();
+  const [percentage, setPercentage] = useState(0.5);
   const [checked, setChecked] = useState(false);
   const [expand, setExpand] = useState(true);
   const [auto, setAuto] = useState(false);
   const [approve, setApprove] = useState(false);
-  const [swapAmount, setSwapAmount] = useState(0);
-  const [swapSecondAmount, setSwapSecondAmount] = useState(0);
+  const [swapAmount, setSwapAmount] = useState();
+  const [swapSecondAmount, setSwapSecondAmount] = useState();
   const [tokenData, setTokenData] = useState(tokenInfoData[0]);
   const [tokenDataNext, setTokenDataNext] = useState(tokenInfoData[1]);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
@@ -139,58 +145,82 @@ const Uniswap = () => {
   let [counter, setCounter] = useState(0);
   const [toggle, setToggle] = useState("Trader wallet");
   const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
   const { address: userAddress } = useAccount();
   const [balance1, setBalance1] = useState(0.00);
   const [balance2, setBalance2] = useState(0.00);
   const [usdValue, setUsdValue] = useState(0);
-  const [poolFee, setPoolFee] = useState(100);
+  const [poolFee, setPoolFee] = useState(3000);
+  const [ratio, setRatio] = useState(0);
+  const priceImpact = usePriceImpact(ratio, swapAmount, swapSecondAmount);
+  const { isApproveLoad, setApproveLoad } = useStore();
+  const { isConnected } = useAccount();
+  const { chain } = useNetwork();
+  const { isInitialized } = useWeb3Store();
 
+  const [ tokenApprove ] = useApproveToken(tokenData.address, contractAddress.traderWalletAddress);
+
+  const checkApprove = async () => {
+    if(isInitialized) {
+      const isAllow = await isApproved(tokenData.address, contractAddress.traderWalletAddress);
+      setApprove(isAllow);
+    }
+  }
+
+  useEffect(() => {
+    checkApprove();
+  }, [isInitialized, isApproveLoad])
 
   const fetchAmountIn = async (amount) => {
-    console.log("amountOut: ", amount);
-    if(amount === 0 || amount === "") {
-      setSwapAmount(0);
+    if(amount === 0 || amount === "" || amount === undefined) {
+      return 0;
     } else {
       const token1Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
       const amountOut = amount * 10 ** token1Decimal;
       const path = encodePacked(["address", "uint24", "address"], [tokenDataNext.address, poolFee, tokenData.address])
-      console.log(path)
       const _amountIn = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountIn", args: [path, amountOut] })
       const token2Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
       const amountIn = formatUnitValue(_amountIn[0], token2Decimal);
-      console.log("amountIn-result: ", amountIn);
-      setSwapAmount(amountIn);
+      return amountIn;
     }
   }
 
   const fetchAmountOut = async (amount) => {
-    console.log("amountIn: ", amount);
-    if(amount === 0 || amount === "") {
-      setSwapSecondAmount(0);
+    if(amount === 0 || amount === "" || amount === undefined) {
+      return 0;
     } else {
       const tokenDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
       const amountIn = amount * 10 ** tokenDecimal;
       const path = encodePacked(["address", "uint24", "address"], [tokenData.address, poolFee, tokenDataNext.address])
-      console.log(path);
       const _amountOut = await publicClient.readContract({ address: contractAddress.lensAddress, abi: LensABI, functionName: "getAmountOut", args: [path, amountIn] })
       const token2Decimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
-      console.log("token2Decimal: ", token2Decimal)
       const amountOut = formatUnitValue(_amountOut[0], token2Decimal);
-      console.log("amountOut-result: ", amountOut)
-      setSwapSecondAmount(amountOut);
+      return amountOut;
     }
   }
 
-  const handleInputAmount = async (e) => {
-    const amount = Number(e.target.value);
+  const handleInputAmount = async (_amount) => {
+    const amount = Number(_amount);
     setSwapAmount(amount);
-    fetchAmountOut(amount);
+    const debounceTimeout = setTimeout(async () => {
+    const amountOut = await fetchAmountOut(amount);
+      setSwapSecondAmount(amountOut);
+    }, 500);
+    return () => {
+      clearTimeout(debounceTimeout);
+    }
   } 
 
-  const handleOutputAmount = async (e) => {
-    const amount = Number(e.target.value);
+  const handleOutputAmount = async (_amount) => {
+    const amount = Number(_amount);
     setSwapSecondAmount(amount);
-    fetchAmountIn(amount);
+    const debounceTimeout = setTimeout(async () => {
+      const amountIn = await fetchAmountIn(amount);
+      setSwapAmount(amountIn);
+    }, 500);
+    return () => {
+      clearTimeout(debounceTimeout);
+    }
   } 
 
   const handleChange = () => {
@@ -282,7 +312,66 @@ const Uniswap = () => {
     fetchBalances(tokenData.shortName, tokenData.address, setBalance1);
     fetchBalances(tokenDataNext.shortName, tokenDataNext.address, setBalance2);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenData, tokenDataNext])
+  }, [tokenData, tokenDataNext, isConnected])
+
+  const handleTokenData = async() => {
+    const amountOut = await fetchAmountOut(swapAmount);
+    setSwapSecondAmount(amountOut);
+    const _ratio = await fetchAmountOut(1);
+    setRatio(_ratio);
+  }
+
+  const handleTokenNextData = async () => {
+    const amountIn = await fetchAmountIn(swapSecondAmount);
+    setSwapAmount(amountIn);
+    const _ratio = await fetchAmountOut(1);
+    setRatio(_ratio);
+  }
+
+  useEffect(() => {
+    handleTokenData();
+  }, [tokenData])
+
+  useEffect(() => {
+    handleTokenNextData();
+  }, [tokenDataNext])
+
+  const handleTokenApprove = () => {
+    setApproveLoad(true);
+    tokenApprove?.();
+  }
+
+  const handleSwap = async () => {
+    if(walletClient === null || walletClient === undefined) return;
+    try {
+      const protocolId = 2;
+      const replicate = true;
+      const tokenADecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
+      const tokenBDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
+      debugger;
+      const amountIn = parseUnits(`${swapAmount}`, tokenADecimal);
+      const amountOut = parseUnits(`${swapSecondAmount}`, tokenBDecimal);
+      const fee = percentage * 1000;
+      const path = encodePacked(["address", "uint24", "address"], [tokenData.address, fee, tokenDataNext.address])
+      const operationId = 1; // Sell
+      const tradeData = encodePacked(["bytes", "uint256", "uint256"], [path, amountIn, amountOut]);
+      const tradeOperation = { operationId, data: tradeData };
+      const { request } = await publicClient.simulateContract({ 
+        address: contractAddress.traderWalletAddress, 
+        abi: TraderWalletABI, 
+        functionName: 'executeOnProtocol', 
+        args: [protocolId, tradeOperation, replicate] 
+      });
+      const hash = await walletClient.writeContract(request);
+      const tx = await waitForTransaction({ hash });
+      if(tx.status === 'reverted') {
+        toast.dismiss();
+        toast.error('Swapping Failed!');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
     <>
@@ -542,10 +631,10 @@ const Uniswap = () => {
                 <input
                   type="number"
                   className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                  value={Number(swapAmount)}
+                  value={Number(swapAmount ?? 0) }
                   placeholder="0"
-                  onChange={handleInputAmount}
-                ></input>
+                  onChange={(e) => handleInputAmount(e.target.value)}
+                />
                 <div className="text-lightbluetext text-[14px] ">${usdValue}</div>
               </div>
               <div className="w-[40%]">
@@ -569,7 +658,7 @@ const Uniswap = () => {
                   <KeyboardArrowDownIcon />
                 </div>
                 <div className="text-center">
-                  Balance : { balance1 } <span style={{ cursor: 'pointer' }} onClick={() => setSwapAmount(balance1)}>Max</span>
+                  Balance : { balance1 } <span style={{ cursor: 'pointer' }} onClick={() => handleInputAmount(balance1) }>Max</span>
                 </div>
               </div>
             </div>
@@ -583,9 +672,9 @@ const Uniswap = () => {
               <input
                 type="number"
                 className="text-[36px] bg-darkBlue w-[100%] outline-none rounded-[18px]  font-sora bg-backgroundColor text-white"
-                value={Number(swapSecondAmount)}
+                value={Number(swapSecondAmount ?? 0)}
                 placeholder="0"
-                onChange={handleOutputAmount}
+                onChange={(e) => handleOutputAmount(e.target.value)}
               />
               <div className="text-lightbluetext text-[14px]">${usdValue}</div>
             </div>
@@ -612,50 +701,59 @@ const Uniswap = () => {
                 <KeyboardArrowDownIcon />
               </div>
               <div className="text-center">
-                Balance : { balance2 } <span style={{ cursor: 'pointer' }} onClick={() => setSwapSecondAmount(balance2)}>Max</span>
+                Balance : { balance2 } <span style={{ cursor: 'pointer' }} onClick={() => handleOutputAmount(balance2)}>Max</span>
               </div>
             </div>
           </div>
 
-          <div className="flex mb-[10px] px-[20px]">
-            <p className="mr-[10px]">Slippage Tolerance</p>
-            <HelpOutlineIcon />
-          </div>
           <div className="flex-col mb-[10px] px-[20px]">
-            <div className="w-[100%] flex items-center gap-3">
-              {auto === true ? (
-                <Button
-                  className="bg-darkBlueBlack py-[5px] h-[50px] px-[10px] rounded-[10px] border-[1px] border-borderColor1 "
-                  onClick={() => {
-                    setAuto(!auto);
-                  }}
-                >
-                  <p className="text-[16px]">Auto</p>
-                </Button>
-              ) : (
-                <Button
-                  className="bg-primary py-[5px] px-[10px] h-[50px] rounded-[10px] border-[1px] border-borderColor1 border-primary"
-                  onClick={() => {
-                    setAuto(!auto);
-                  }}
-                >
-                  <p className="text-[16px]">Auto</p>
-                </Button>
-              )}
+            <div className="flex items-center gap-3">
+              <div className="flex-col items-start w-[60%]">
+                <div className="flex mb-[10px]">
+                  <p className="mr-[10px]">Slippage Tolerance</p>
+                  <HelpOutlineIcon />
+                </div>
+                <div className="flex gap-3">
+                  {auto === true ? (
+                    <Button
+                      className="bg-darkBlueBlack py-[5px] h-[50px] px-[10px] rounded-[10px] border-[1px] border-borderColor1 "
+                      onClick={() => {
+                        setAuto(!auto);
+                      }}
+                    >
+                      <p className="text-[16px]">Auto</p>
+                    </Button>
+                  ) : (
+                    <Button
+                      className="bg-primary py-[5px] px-[10px] h-[50px] rounded-[10px] border-[1px] border-borderColor1 border-primary"
+                      onClick={() => {
+                        setAuto(!auto);
+                      }}
+                    >
+                      <p className="text-[16px]">Auto</p>
+                    </Button>
+                  )}
 
-              <div className="username flex justify-between items-center w-[100%] h-[50px] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[10px] border-[1px] border-borderColor1  rounded-[10px]">
-                {/* <WarningIcon className="text-[18px] text-yellow-600 ml-[5px]" /> */}
-                <input
-                  type="number"
-                  className="w-[100%] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[5px] text-right"
-                  placeholder="0.10"
-                  controls={false}
-                  onChange={(e) => {
-                    setPercentage(e.target.value);
-                  }}
-                />
-                <p className="font-semibold mr-[5px]">%</p>
+                  <div className="username flex justify-between items-center w-[100%] h-[50px] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[10px] border-[1px] border-borderColor1  rounded-[10px]">
+                    {/* <WarningIcon className="text-[18px] text-yellow-600 ml-[5px]" /> */}
+                    <input
+                      type="number"
+                      className="w-[100%] outline-none rounded-[18px] font-sora bg-darkBlueBlack text-white py-[3px] px-[5px] text-right"
+                      placeholder="0.10"
+                      controls={false}
+                      value={percentage}
+                      onChange={(e) => {
+                        setPercentage(e.target.value);
+                      }}
+                    />
+                    <p className="font-semibold mr-[5px]">%</p>
+                  </div>
+                </div>
               </div>
+              <div className="flex-col items-start w-[40%]">
+                <div className="flex mb-[10px]">
+                  <p className="mr-[10px]">Pool Fee</p>
+                </div>
                 <select
                   id="demo-simple-select"
                   value={poolFee}
@@ -665,9 +763,10 @@ const Uniswap = () => {
                 >
                   <option value={100}>0.01 %</option>
                   <option value={300}>0.05 %</option>
-                  <option value={3000}>0.3 %</option>
+                  <option value={3000} defaultValue={3000}>0.3 %</option>
                   <option value={10000}>1 %</option>
                 </select>
+              </div>
             </div>
             {/* <ErrorWarning className="text-[12px] my-[10px]">
               Your transaction may be fontrun
@@ -687,7 +786,7 @@ const Uniswap = () => {
 
           <div className="flex justify-between items-center px-[20px] mb-[10px]">
             <div className="flex items-center">
-              <p className="mr-[10px] text-[15px]">Exper Mode</p>
+              <p className="mr-[10px] text-[15px]">Expert Mode</p>
               <HelpOutlineIcon className="text-[18px]" />
             </div>
             <ExperModeModal />
@@ -703,7 +802,7 @@ const Uniswap = () => {
               <div className="flex items-center">
                 <InfoOutlinedIcon className="text-lightbluetext text-[15px] mr-[5px]" />
                 <div>
-                  <p className="text-[14px]">1 USDT = 1.0045(USDC) </p>
+                  <p className="text-[14px]">1 {tokenData.shortName} = {ratio}({tokenDataNext.shortName}) </p>
                   <span className="text-lightbluetext text-[14px]">
                     ($1.002)
                   </span>
@@ -722,24 +821,26 @@ const Uniswap = () => {
                 <div className="mb-[10px]">
                   <div className="flex justify-between mb-[10px]">
                     <div className="text-lightbluetext text-[14px]">
-                      Ecpected Output
+                      Expected Output
                     </div>
-                    <div>999.45 USDT</div>
+                    <div>{swapSecondAmount} {tokenDataNext.shortName}</div>
                   </div>
                   <div className="flex justify-between">
                     <div className="text-lightbluetext text-[14px]">
                       Price Impact
                     </div>
-                    <div className="text-lightbluetext text-[14px]">0.00%</div>
+                    <div className="text-lightbluetext text-[14px]">
+                    {priceImpact}
+                    </div>
                   </div>
                 </div>
                 <hr className="border-borderColor1"></hr>
                 <div className="my-[10px]">
                   <div className="flex justify-between mb-[10px]">
                     <div className="text-lightbluetext text-[14px]">
-                      Minimum recieved after slipage (0.10%)
+                      Minimum recieved after slipage ({percentage}%)
                     </div>
-                    <div>999.45 USDT</div>
+                    <div>{(swapSecondAmount - (percentage / 100)) > 0 ? (swapSecondAmount - (percentage / 100)).toFixed(3) : 0} {tokenDataNext.shortName}</div>
                   </div>
                   <div className="flex justify-between">
                     <div className="text-lightbluetext text-[14px]">
@@ -759,7 +860,7 @@ const Uniswap = () => {
               Insufficient Balance
             </Button>
           </div>
-          {approve === true ? (
+          {isApproveLoad === true ? (
             <div className="mx-[20px]">
               <Button className="bg-darkBlue w-[100%] mb-[20px] text-borderColor1 font-semibold">
                 <div className="flex items-center justify-center">
@@ -776,23 +877,25 @@ const Uniswap = () => {
               </Button>
             </div>
           ) : (
+            tokenData.shortName !== "ETH" &&
             <div className="mx-[20px]">
               <Button
                 className="bg-primary w-[100%] mb-[20px]"
-                onClick={() => {
-                  setApprove(!approve);
-                }}
+                disabled={approve}
+                onClick={
+                  handleTokenApprove
+                }
               >
                 <div className="flex items-center justify-center">
                   <InfoOutlinedIcon className="text-lightblutext text-[25px] mr-[10px]" />
-                  <p>Approve use of USDC</p>
+                  <p>{approve ? "Approved" : `Approve use of ${tokenData.shortName}`}</p>
                 </div>
               </Button>
             </div>
           )}
 
           <div className="mx-[20px]">
-            <Button className="bg-primary w-[100%] mb-[20px]">Swap</Button>
+            <Button className="bg-primary w-[100%] mb-[20px]" onClick={handleSwap}>Swap</Button>
           </div>
           <div className="mx-[20px]">
             <Button
