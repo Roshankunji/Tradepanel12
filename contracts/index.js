@@ -29,7 +29,12 @@ export const getTokenDetail = async (tokenAddress) => {
 
 export const getTokenBalance = async (tokenAddress) => {
     if(isValidAddress(tokenAddress)) {
-        const tokenBalance = await client.readContract({ address: tokenAddress, abi: erc20ABI, functionName: 'balanceOf', args: [address] });
+        const trader = await publicClient.readContract({ 
+            abi: TraderWalletABI, 
+            address: contractAddress.traderWalletAddress, 
+            functionName: "traderAddress" 
+        });
+        const tokenBalance = await client.readContract({ address: tokenAddress, abi: erc20ABI, functionName: 'balanceOf', args: [trader] });
         const decimalsData = await client.readContract({ address: tokenAddress, abi: erc20ABI, functionName: 'decimals'});
         const decimals = decimalsData !== undefined ? Number(decimalsData) : 18;
         const balance = tokenBalance !== undefined ? Number(tokenBalance) : 0;

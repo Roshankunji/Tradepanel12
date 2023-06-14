@@ -9,6 +9,8 @@ import { getTokenBalance, getTokenDetail } from "../../../contracts";
 import { formatEtherValue } from "../../../utils/formatNumber";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { jsNumberForAddress } from "react-jazzicon";
+import { TraderWalletABI, UsersVaultABI } from "../../../contracts/abis";
+import { contractAddress } from "../../../contracts/address";
 const UniswapModalContent = ({
   token,
   setToken,
@@ -120,25 +122,37 @@ const UniswapModalContent = ({
 const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled }) => {
   const publicClient = usePublicClient();
   const [balance, setBalance] = useState(0);
-  const { address: userAddress } = useAccount();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchBalances = async () => {
-    if(userAddress === undefined) { 
+    const trader = await publicClient.readContract({ 
+        abi: UsersVaultABI, 
+        address: contractAddress.usersVaultAddress, 
+        functionName: "traderWalletAddress" 
+    });
+    console.log("trader: ", trader);
+    // const underlyingToken = await publicClient.readContract({ 
+    //     abi: TraderWalletABI, 
+    //     address: contractAddress.traderWalletAddress, 
+    //     functionName: "underlyingTokenAddress" 
+    //   });
+    if(fetchBalances === undefined) { 
       setBalance(0) 
     } else {
       if(shortName === "ETH") {
-        const _amount = await publicClient.getBalance({ address: userAddress });
+        const _amount = await publicClient.getBalance({ address: trader });
         const amount = formatEtherValue(_amount);
+        console.log("shortName: ", shortName, "Balance: ", amount);
         setBalance(amount);
       } else {
         const _amount = await publicClient.readContract({ 
           address: tokenAddress,
           abi: erc20ABI, 
           functionName: 'balanceOf', 
-          args: [userAddress] 
+          args: [trader] 
         });
         const amount = formatEtherValue(_amount);
+        console.log("shortName: ", shortName, "Balance: ", amount);
         setBalance(amount)
     }
    }

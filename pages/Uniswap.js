@@ -41,6 +41,8 @@ import { waitForTransaction } from '@wagmi/core';
 import { toast } from "react-toastify";
 import { useWeb3Store } from "../context/WebContext";
 import { isApproved } from "../contracts";
+import { simplifyAddress } from "../utils/simplifyAddy";
+import axios from "axios";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -128,7 +130,7 @@ const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
   const [totalTraderTokenAmount, setTotalTraderTokenAmount] = useState();
   const [totalUserTokenAmount, setTotalUserTokenAmount] = useState();
-  const [walletAddress, setWalletAddress] = useState("0x5175...526A");
+  const [traderWallet, setTraderWallet] = useState("Loading...");
   const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState(0.5);
   const [checked, setChecked] = useState(false);
@@ -146,15 +148,16 @@ const Uniswap = () => {
   const [toggle, setToggle] = useState("Trader wallet");
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const { address: userAddress } = useAccount();
+  const { address: userAddress, isConnected } = useAccount();
   const [balance1, setBalance1] = useState(0.00);
   const [balance2, setBalance2] = useState(0.00);
-  const [usdValue, setUsdValue] = useState(0);
+  const [usdValue1, setUsdValue1] = useState(0);
+  const [usdValue2, setUsdValue2] = useState(0);
+
   const [poolFee, setPoolFee] = useState(3000);
   const [ratio, setRatio] = useState(0);
   const priceImpact = usePriceImpact(ratio, swapAmount, swapSecondAmount);
   const { isApproveLoad, setApproveLoad } = useStore();
-  const { isConnected } = useAccount();
   const { chain } = useNetwork();
   const { isInitialized } = useWeb3Store();
 
@@ -287,12 +290,30 @@ const Uniswap = () => {
     setToggle(type);
   };
 
+  const setTraderWalletAddress = async () => {
+    const trader = await publicClient.readContract({ 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "traderAddress" 
+    });
+    setTraderWallet(trader);
+  }
+
+  useEffect(() => {
+    setTraderWalletAddress();
+  }, [])
+
   const fetchBalances = async (shortName, tokenAddress, setBalance) => {
-    if(userAddress === undefined) { 
+    const trader = await publicClient.readContract({ 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "traderAddress" 
+    });
+    if(trader === undefined) { 
       setBalance(0) 
     } else {
       if(shortName === "ETH") {
-        const _amount = await publicClient.getBalance({ address: userAddress });
+        const _amount = await publicClient.getBalance({ address: trader });
         const amount = formatEtherValue(_amount);
         setBalance(amount);
       } else {
@@ -300,7 +321,7 @@ const Uniswap = () => {
           address: tokenAddress,
           abi: erc20ABI, 
           functionName: 'balanceOf', 
-          args: [userAddress] 
+          args: [trader] 
         });
         const amount = formatEtherValue(_amount);
         setBalance(amount)
@@ -344,23 +365,37 @@ const Uniswap = () => {
   const handleSwap = async () => {
     if(walletClient === null || walletClient === undefined) return;
     try {
+      const trader = await publicClient.readContract({ 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "vaultAddress" 
+      });
+      const underlyingToken = await publicClient.readContract({ 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "underlyingTokenAddress" 
+      });
+      console.log("underlyingToken: ", underlyingToken);
+      console.log("trader: ", trader);
       const protocolId = 2;
       const replicate = true;
       const tokenADecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
       const tokenBDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
-      debugger;
       const amountIn = parseUnits(`${swapAmount}`, tokenADecimal);
       const amountOut = parseUnits(`${swapSecondAmount}`, tokenBDecimal);
       const fee = percentage * 1000;
       const path = encodePacked(["address", "uint24", "address"], [tokenData.address, fee, tokenDataNext.address])
+      console.log("path: ", path);
       const operationId = 1; // Sell
       const tradeData = encodePacked(["bytes", "uint256", "uint256"], [path, amountIn, amountOut]);
       const tradeOperation = { operationId, data: tradeData };
+      
       const { request } = await publicClient.simulateContract({ 
         address: contractAddress.traderWalletAddress, 
         abi: TraderWalletABI, 
         functionName: 'executeOnProtocol', 
-        args: [protocolId, tradeOperation, replicate] 
+        args: [protocolId, tradeOperation, replicate],
+        account: trader
       });
       const hash = await walletClient.writeContract(request);
       const tx = await waitForTransaction({ hash });
@@ -372,6 +407,29 @@ const Uniswap = () => {
       console.log(err);
     }
   }
+
+  const fetchUSDPrice = async (tokenData, setPrice) => {
+    const tokenName = tokenData.ids;
+    const apiUrl = 'https://api.coingecko.com/api/v3/simple/price';
+    if(tokenName === undefined) {
+      setPrice(0)
+    } else {
+      const response = await axios.get(apiUrl, {
+        params: {
+          ids: tokenName,
+          vs_currencies: 'usd'
+        }
+      })
+      const price = response.data[tokenName].usd;
+      console.log("price: ", price);
+      setPrice(price);
+    }
+  }
+
+  useEffect(() => {
+    fetchUSDPrice(tokenData, setUsdValue1);
+    fetchUSDPrice(tokenDataNext, setUsdValue2);
+  }, [swapAmount, swapSecondAmount, tokenData, tokenDataNext])
 
   return (
     <>
@@ -485,7 +543,7 @@ const Uniswap = () => {
                 className="mr-2"
               />
               <div className="text-[16px] font-medium text-white">
-                {walletAddress}
+                {simplifyAddress(traderWallet)}
               </div>
             </div>
           }
@@ -602,7 +660,7 @@ const Uniswap = () => {
                   alt="wallet"
                   className="mr-2"
                 />
-                <div className="text-[16px] font-medium">{walletAddress}</div>
+                <div className="text-[16px] font-medium">{simplifyAddress(traderWallet)}</div>
               </div>
             </div>
           }
@@ -635,7 +693,7 @@ const Uniswap = () => {
                   placeholder="0"
                   onChange={(e) => handleInputAmount(e.target.value)}
                 />
-                <div className="text-lightbluetext text-[14px] ">${usdValue}</div>
+                <div className="text-lightbluetext text-[14px] ">${(usdValue1 * swapAmount).toFixed(2)}</div>
               </div>
               <div className="w-[40%]">
                 <div
@@ -676,7 +734,7 @@ const Uniswap = () => {
                 placeholder="0"
                 onChange={(e) => handleOutputAmount(e.target.value)}
               />
-              <div className="text-lightbluetext text-[14px]">${usdValue}</div>
+              <div className="text-lightbluetext text-[14px]">${(usdValue2 * swapSecondAmount).toFixed(2)}</div>
             </div>
             <div className="w-[40%]">
               <div
@@ -804,7 +862,7 @@ const Uniswap = () => {
                 <div>
                   <p className="text-[14px]">1 {tokenData.shortName} = {ratio}({tokenDataNext.shortName}) </p>
                   <span className="text-lightbluetext text-[14px]">
-                    ($1.002)
+                    (${(usdValue1)})
                   </span>
                 </div>
               </div>
