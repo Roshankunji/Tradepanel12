@@ -862,7 +862,7 @@ const Uniswap = () => {
                 <div>
                   <p className="text-[14px]">1 {tokenData.shortName} = {ratio}({tokenDataNext.shortName}) </p>
                   <span className="text-lightbluetext text-[14px]">
-                    (${(usdValue1)})
+                    (${usdValue1})
                   </span>
                 </div>
               </div>
