@@ -15,7 +15,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import Dropdown from "../components/controls/Dropdown/Dropdown";
-import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
+import { tokenInfoData } from "../constants/TokenData.js";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { jsNumberForAddress } from "react-jazzicon";
 

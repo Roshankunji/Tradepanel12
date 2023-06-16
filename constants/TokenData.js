@@ -1,5 +1,5 @@
-import { EthSvg, FraxSvg, LinkSvg, UniSvg, UsdcSvg, UsdtSvg, WbtcSvg, WethSvg, DaiSvg } from "../../../config/images"
-import { tokenAddress } from "../../../contracts/address"
+import { EthSvg, FraxSvg, LinkSvg, UniSvg, UsdcSvg, UsdtSvg, WbtcSvg, WethSvg, DaiSvg } from "../config/images"
+import { tokenAddress } from "../contracts/address"
 
 export const tokenInfoData = [
   {

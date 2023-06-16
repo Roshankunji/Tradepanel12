@@ -1,18 +1,18 @@
-const arbitrumFork = {
+const arbitrumHardhat = {
     id: 42161,
-    name: 'Arbitrum Fork',
-    network: 'arbitrum fork',
+    name: 'Arbitrum hardhat',
+    network: 'arbitrum hardhat',
     iconUrl: '../public/Images/arb.png',
     iconBackground: 'rgba(0,0,0,0)',
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: {
       default: {
-        http: ['https://rpc.tenderly.co/fork/cf94355b-e254-41d4-8240-230a56d108b7']
+        http: ['http://127.0.0.1:8545/']
       },
       public: {
-        http: ['https://rpc.tenderly.co/fork/cf94355b-e254-41d4-8240-230a56d108b7']
+        http: ['http://127.0.0.1:8545/']
       }
     }
   };
 
-  export { arbitrumFork }
+  export { arbitrumHardhat }

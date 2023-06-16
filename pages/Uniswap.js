@@ -25,12 +25,12 @@ import ErrorWarning from "../components/Molecules/ErrorMessge/ErrorWarning";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
-import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
+import { tokenInfoData } from "../constants/TokenData.js";
 import ExperModeModal from "../components/controls/Modal/ExperModeModal";
-import { erc20ABI, useAccount, useNetwork, usePublicClient, useWalletClient } from 'wagmi'
-import { LensABI, TraderWalletABI } from "../contracts/abis";
+import { erc20ABI, useAccount, useFeeData, useNetwork, usePublicClient, useWalletClient } from 'wagmi'
+import { LensABI, TraderWalletABI, UsersVaultABI } from "../contracts/abis";
 import { contractAddress } from '../contracts/address'
-import { encodePacked, parseUnits } from "viem";
+import { encodePacked, formatEther, parseEther, parseGwei, parseUnits } from "viem";
 import { formatEtherValue, formatUnitValue } from "../utils/formatNumber";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { jsNumberForAddress } from "react-jazzicon";
@@ -42,7 +42,7 @@ import { toast } from "react-toastify";
 import { useWeb3Store } from "../context/WebContext";
 import { isApproved } from "../contracts";
 import { simplifyAddress } from "../utils/simplifyAddy";
-import axios from "axios";
+import { fetchUSDPrice } from "../api/utils";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -72,34 +72,34 @@ const style1 = {
   padding: 3,
 };
 
-const traderTokens = [
-  {
-    tokenName: "Tether USD",
-    tokenAmount: 10.75,
-    dollarValue: 10.75,
-    tokenSymbol: "USDT",
-    percentChange: 0.05,
-    profitLoss: "loss",
-  },
-  {
-    tokenName: "USD Coin",
-    tokenAmount: 10.35,
-    dollarValue: 10.36,
-    tokenSymbol: "USDC",
-    percentChange: 0.07,
-    profitLoss: "profit",
-  },
-  {
-    tokenName: "Ethereum",
-    tokenAmount: 0.003,
-    dollarValue: 4.86,
-    tokenSymbol: "ETH",
-    percentChange: 1.33,
-    profitLoss: "loss",
-  },
-];
+// const traderTokensArray = [
+//   {
+//     tokenName: "Tether USD",
+//     tokenAmount: 10.75,
+//     dollarValue: 10.75,
+//     tokenSymbol: "USDT",
+//     percentChange: 0.05,
+//     profitLoss: "loss",
+//   },
+//   {
+//     tokenName: "USD Coin",
+//     tokenAmount: 10.35,
+//     dollarValue: 10.36,
+//     tokenSymbol: "USDC",
+//     percentChange: 0.07,
+//     profitLoss: "profit",
+//   },
+//   {
+//     tokenName: "Ethereum",
+//     tokenAmount: 0.003,
+//     dollarValue: 4.86,
+//     tokenSymbol: "ETH",
+//     percentChange: 1.33,
+//     profitLoss: "loss",
+//   },
+// ];
 
-const userTokens = [
+const userTokensArray = [
   {
     tokenName: "Tether USD",
     tokenAmount: 100.75,
@@ -131,6 +131,7 @@ const Uniswap = () => {
   const [totalTraderTokenAmount, setTotalTraderTokenAmount] = useState();
   const [totalUserTokenAmount, setTotalUserTokenAmount] = useState();
   const [traderWallet, setTraderWallet] = useState("Loading...");
+  const [vaultAddress, setVaultAddress] = useState("Loading...");
   const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState(0.5);
   const [checked, setChecked] = useState(false);
@@ -157,9 +158,14 @@ const Uniswap = () => {
   const [poolFee, setPoolFee] = useState(3000);
   const [ratio, setRatio] = useState(0);
   const priceImpact = usePriceImpact(ratio, swapAmount, swapSecondAmount);
-  const { isApproveLoad, setApproveLoad } = useStore();
+  const { isApproveLoad, setApproveLoad, traderTotalAmount, userTotalAmount } = useStore();
   const { chain } = useNetwork();
   const { isInitialized } = useWeb3Store();
+
+  const [userTokens, setUserTokens] = useState([]);
+  const [traderTokens, setTraderTokens] = useState([]);
+
+  const { data: feeData, isError, isLoading } = useFeeData();
 
   const [ tokenApprove ] = useApproveToken(tokenData.address, contractAddress.traderWalletAddress);
 
@@ -247,21 +253,32 @@ const Uniswap = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    setTotalTraderTokenAmount(
-      traderTokens
-        .map((item) => item.dollarValue)
-        .reduce((prev, next) => prev + next)
-        .toFixed(2)
-    );
-    setTotalUserTokenAmount(
-      userTokens
-        .map((item) => item.dollarValue)
-        .reduce((prev, next) => prev + next)
-        .toFixed(2)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // const addUSD = async (token) => {
+  //   const token1Amount = await publicClient.getBalance({
+  //      address: token,
+  //   });
+
+  //   const total = Number(formatEther(token1Amount));
+  //   return total
+  // }
+
+  // useEffect(() => {
+  //   setTotalTraderTokenAmount(
+  //     traderTokens
+  //       .map((item) => item)
+  //       .reduce(async (prev, next) => {
+  //         addUSD(prev) + addUSD(next);
+  //       }, 0)
+  //   );
+  //   setTotalUserTokenAmount(
+  //     userTokens
+  //       .map((item) => item)
+  //       .reduce(async (prev, next) =>{
+  //         addUSD(prev) + addUSD(next);
+  //       }, 0)
+  //   );
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [traderTokens, userTokens]);
 
   useEffect(() => {
     if (openConfirmModal) {
@@ -296,7 +313,25 @@ const Uniswap = () => {
         address: contractAddress.traderWalletAddress, 
         functionName: "traderAddress" 
     });
+    const userVault = await publicClient.readContract({ 
+      abi: TraderWalletABI,
+      address: contractAddress.traderWalletAddress,
+      functionName: 'vaultAddress'
+    })
+    const tradeTokensArrray = await publicClient.readContract({
+      abi: TraderWalletABI,
+      address: contractAddress.traderWalletAddress,
+      functionName: 'getAllowedTradeTokens'
+    })
+    const userTokensArray = await publicClient.readContract({
+      abi: UsersVaultABI,
+      address: contractAddress.usersVaultAddress,
+      functionName: "getAllowedTradeTokens"
+    })
+    setTraderTokens(tradeTokensArrray);
+    setUserTokens(userTokensArray);
     setTraderWallet(trader);
+    setVaultAddress(userVault);
   }
 
   useEffect(() => {
@@ -408,28 +443,45 @@ const Uniswap = () => {
     }
   }
 
-  const fetchUSDPrice = async (tokenData, setPrice) => {
-    const tokenName = tokenData.ids;
-    const apiUrl = 'https://api.coingecko.com/api/v3/simple/price';
-    if(tokenName === undefined) {
-      setPrice(0)
-    } else {
-      const response = await axios.get(apiUrl, {
-        params: {
-          ids: tokenName,
-          vs_currencies: 'usd'
-        }
-      })
-      const price = response.data[tokenName].usd;
-      console.log("price: ", price);
-      setPrice(price);
-    }
+  const getNetworkFee = async () => {
+    if(traderWallet === "Loading...") return;
+    const gasPrice = feeData.gasPrice;
+    const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+    // const protocolId = 2;
+    // const replicate = true;
+    // const tokenADecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
+    // const tokenBDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
+    // const amountIn = parseUnits(`${swapAmount}`, tokenADecimal);
+    // const amountOut = parseUnits(`${swapSecondAmount}`, tokenBDecimal);
+    // const fee = percentage * 1000;
+    // const path = encodePacked(["address", "uint24", "address"], [tokenData.address, fee, tokenDataNext.address])
+    // console.log("path: ", path);
+    // const operationId = 1; // Sell
+    // const tradeData = encodePacked(["bytes", "uint256", "uint256"], [path, amountIn, amountOut]);
+    // const tradeOperation = { operationId, data: tradeData };
+    // const gasAmount = await publicClient.estimateContractGas({
+    //   address: contractAddress.traderWalletAddress,
+    //   abi: TraderWalletABI,
+    //   functionName: 'executeOnProtocol',
+    //   args: [protocolId, tradeOperation, replicate],
+    //   account: userAddress
+    // });
+    console.log("getNetworkFee: ", gasPrice, maxPriorityFeePerGas)
   }
 
   useEffect(() => {
-    fetchUSDPrice(tokenData, setUsdValue1);
-    fetchUSDPrice(tokenDataNext, setUsdValue2);
+    const getUSDPrice = async () => {
+      const _usd1 = await fetchUSDPrice(tokenData);
+      const _usd2 = await fetchUSDPrice(tokenDataNext);
+      setUsdValue1(_usd1);
+      setUsdValue2(_usd2);
+    }
+    getUSDPrice();
   }, [swapAmount, swapSecondAmount, tokenData, tokenDataNext])
+
+  useEffect(() => {
+    getNetworkFee();
+  }, [traderWallet])
 
   return (
     <>
@@ -543,7 +595,7 @@ const Uniswap = () => {
                 className="mr-2"
               />
               <div className="text-[16px] font-medium text-white">
-                {simplifyAddress(traderWallet)}
+                {toggle === "Trader wallet" ? simplifyAddress(traderWallet) : simplifyAddress(vaultAddress)}
               </div>
             </div>
           }
@@ -585,7 +637,7 @@ const Uniswap = () => {
                 <div>
                   <div>
                     <div className="text-white text-[36px] font-medium">
-                      ${totalTraderTokenAmount}
+                      ${Number(traderTotalAmount).toFixed(2)}
                     </div>
                     <div className="flex items-center text-gray-400 text-[15px] font-medium">
                       {totalProfitLoss === "loss" ? (
@@ -600,16 +652,13 @@ const Uniswap = () => {
                   <div className="text-white text-[15px] font-bold mt-5 mb-3">
                     Tokens
                   </div>
-                  {traderTokens.map(function (e) {
+                  {traderTokens.map(function (address) {
                     return (
                       <TokenInfo
-                        key={""}
-                        tokenName={e.tokenName}
-                        tokenAmount={e.tokenAmount}
-                        dollarValue={e.dollarValue}
-                        tokenSymbol={e.tokenSymbol}
-                        percentChange={e.percentChange}
-                        profitLoss={e.profitLoss}
+                        key={address}
+                        tokenAddress={address}
+                        account={traderWallet}
+                        name="trader"
                       />
                     );
                   })}
@@ -619,7 +668,7 @@ const Uniswap = () => {
                 <div>
                   <div>
                     <div className="text-white text-[36px] font-medium">
-                      ${totalUserTokenAmount}
+                      ${Number(userTotalAmount).toFixed(2)}
                     </div>
                     <div className="flex items-center text-gray-400 text-[15px] font-medium">
                       {totalProfitLoss === "loss" ? (
@@ -634,16 +683,13 @@ const Uniswap = () => {
                   <div className="text-white text-[15px] font-bold mt-5 mb-3">
                     Tokens
                   </div>
-                  {userTokens.map(function (e) {
+                  {userTokens.map(function (address) {
                     return (
                       <TokenInfo
-                        key={""}
-                        tokenName={e.tokenName}
-                        tokenAmount={e.tokenAmount}
-                        dollarValue={e.dollarValue}
-                        tokenSymbol={e.tokenSymbol}
-                        percentChange={e.percentChange}
-                        profitLoss={e.profitLoss}
+                        key={address}
+                        tokenAddress={address}
+                        account={vaultAddress}
+                        name="user"
                       />
                     );
                   })}
@@ -660,7 +706,7 @@ const Uniswap = () => {
                   alt="wallet"
                   className="mr-2"
                 />
-                <div className="text-[16px] font-medium">{simplifyAddress(traderWallet)}</div>
+                <div className="text-[16px] font-medium text-white">{toggle === "Trader wallet" ? simplifyAddress(traderWallet) : simplifyAddress(vaultAddress)}</div>
               </div>
             </div>
           }

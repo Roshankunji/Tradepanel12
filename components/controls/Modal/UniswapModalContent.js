@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import Search from "../Input/Search";
-import { tokenInfoData } from "../Dropdown/TokenData.js";
+import { tokenInfoData } from "../../../constants/TokenData.js";
 import Image from "next/image";
 import { isValidAddress } from "../../../utils/isValidAddress";
 import { erc20ABI, useAccount, usePublicClient } from 'wagmi'
@@ -126,9 +126,9 @@ const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchBalances = async () => {
     const trader = await publicClient.readContract({ 
-        abi: UsersVaultABI, 
-        address: contractAddress.usersVaultAddress, 
-        functionName: "traderWalletAddress" 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "traderAddress" 
     });
     console.log("trader: ", trader);
     // const underlyingToken = await publicClient.readContract({ 
@@ -136,7 +136,7 @@ const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled 
     //     address: contractAddress.traderWalletAddress, 
     //     functionName: "underlyingTokenAddress" 
     //   });
-    if(fetchBalances === undefined) { 
+    if(trader === undefined) { 
       setBalance(0) 
     } else {
       if(shortName === "ETH") {

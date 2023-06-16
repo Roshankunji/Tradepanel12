@@ -1,14 +1,16 @@
 import { isValidAddress } from "../utils/isValidAddress";
 import { erc20ABI } from "wagmi";
-import { arbitrumFork } from "../constants/chains";
+import { arbitrumHardhat } from "../constants/chains";
+import { arbitrum } from "viem/chains";
 import { createPublicClient, http } from 'viem'
+import { isTest } from "../constants/isTest";
 
 let walletClient;
 let publicClient;
 let userAddress;
 
 const client = createPublicClient({
-    chain: arbitrumFork,
+    chain: isTest ? arbitrumHardhat : arbitrum,
     transport: http()
 })
 

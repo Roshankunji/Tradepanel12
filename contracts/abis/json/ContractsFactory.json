@@ -21,6 +21,11 @@
   },
   {
     "inputs": [],
+    "name": "InvalidToken",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidTrader",
     "type": "error"
   },
@@ -36,7 +41,22 @@
   },
   {
     "inputs": [],
+    "name": "InvestorAlreadyExists",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvestorNotExists",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TokenPresent",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TraderAlreadyExists",
     "type": "error"
   },
   {
@@ -48,7 +68,7 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "_target",
+        "name": "target",
         "type": "string"
       }
     ],
@@ -66,7 +86,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_adaptersRegistryAddress",
+        "name": "adaptersRegistryAddress",
         "type": "address"
       }
     ],
@@ -77,13 +97,52 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
+        "internalType": "address",
+        "name": "dynamicValuationAddress",
+        "type": "address"
+      }
+    ],
+    "name": "DynamicValuationAddressSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_newFeeRate",
+        "name": "newFeeRate",
         "type": "uint256"
       }
     ],
     "name": "FeeRateSet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "GlobalTokenAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "GlobalTokenRemoved",
     "type": "event"
   },
   {
@@ -105,7 +164,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_investorAddress",
+        "name": "investorAddress",
         "type": "address"
       }
     ],
@@ -118,7 +177,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_investorAddress",
+        "name": "investorAddress",
         "type": "address"
       }
     ],
@@ -188,7 +247,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_traderAddress",
+        "name": "traderAddress",
         "type": "address"
       }
     ],
@@ -201,7 +260,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_traderAddress",
+        "name": "traderAddress",
         "type": "address"
       }
     ],
@@ -214,19 +273,19 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_traderWalletAddress",
+        "name": "traderWalletAddress",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_traderAddress",
+        "name": "traderAddress",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_underlyingTokenAddress",
+        "name": "underlyingTokenAddress",
         "type": "address"
       }
     ],
@@ -239,23 +298,43 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_usersVaultAddress",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "TraderWalletImplementationChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "usersVaultAddress",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "_traderAddress",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "_underlyingTokenAddress",
+        "name": "traderWalletAddress",
         "type": "address"
       }
     ],
     "name": "UsersVaultDeployed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "UsersVaultImplementationChanged",
     "type": "event"
   },
   {
@@ -269,6 +348,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_tokens",
+        "type": "address[]"
+      }
+    ],
+    "name": "addGlobalAllowedTokens",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -301,12 +393,88 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_underlyingTokenAddress",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "allowedGlobalTokens",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "allowedGlobalTokensArray",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "allowedInvestors",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "allowedTraders",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "underlyingTokenAddress",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_traderAddress",
+        "name": "traderAddress",
         "type": "address"
       },
       {
@@ -324,7 +492,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_traderWalletAddress",
+        "name": "traderWalletAddress",
         "type": "address"
       },
       {
@@ -334,18 +502,31 @@
       },
       {
         "internalType": "string",
-        "name": "_sharesName",
+        "name": "sharesName",
         "type": "string"
       },
       {
         "internalType": "string",
-        "name": "_sharesSymbol",
+        "name": "sharesSymbol",
         "type": "string"
       }
     ],
     "name": "deployUsersVault",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "dynamicValuationAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -363,12 +544,12 @@
   },
   {
     "inputs": [],
-    "name": "getFeeRate",
+    "name": "getAllowedGlobalTokens",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "address[]",
         "name": "",
-        "type": "uint256"
+        "type": "address[]"
       }
     ],
     "stateMutability": "view",
@@ -380,6 +561,16 @@
         "internalType": "uint256",
         "name": "_feeRate",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_traderWalletImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_usersVaultImplementation",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -391,11 +582,40 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_addressToSearch",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_array",
+        "type": "address[]"
+      }
+    ],
+    "name": "isAddressOnArray",
+    "outputs": [
+      {
+        "internalType": "bool",
         "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
         "type": "address"
       }
     ],
-    "name": "investorsAllowList",
+    "name": "isGlobalTokenAllowed",
     "outputs": [
       {
         "internalType": "bool",
@@ -407,76 +627,26 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_investorAddress",
-        "type": "address"
-      }
-    ],
-    "name": "isInvestorAllowed",
+    "inputs": [],
+    "name": "numOfTraderWallets",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint256",
         "name": "",
-        "type": "bool"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_traderAddress",
-        "type": "address"
-      }
-    ],
-    "name": "isTraderAllowed",
+    "inputs": [],
+    "name": "numOfUsersVaults",
     "outputs": [
       {
-        "internalType": "bool",
+        "internalType": "uint256",
         "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_traderWalletAddress",
-        "type": "address"
-      }
-    ],
-    "name": "isTraderWalletAllowed",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_usersVaultAddress",
-        "type": "address"
-      }
-    ],
-    "name": "isVaultAllowed",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -493,6 +663,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      }
+    ],
+    "name": "removeGlobalToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -544,6 +727,19 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_dynamicValuationAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setDynamicValuationAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "_newFeeRate",
         "type": "uint256"
@@ -558,16 +754,74 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "setTraderWalletImplementation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      }
+    ],
+    "name": "setUsersVaultImplementation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "traderWalletImplementation",
+    "outputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
     ],
-    "name": "tradersAllowList",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "tradersWallets",
     "outputs": [
       {
         "internalType": "bool",
         "name": "",
         "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "tradersWalletsArray",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -587,14 +841,8 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "underlyingPerDeployedWallet",
+    "inputs": [],
+    "name": "usersVaultImplementation",
     "outputs": [
       {
         "internalType": "address",
@@ -613,7 +861,26 @@
         "type": "address"
       }
     ],
-    "name": "walletPerDeployedVault",
+    "name": "usersVaults",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "usersVaultsArray",
     "outputs": [
       {
         "internalType": "address",

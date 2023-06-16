@@ -4,16 +4,30 @@ const StoreContext = createContext(null);
 
 const StoreProvider = (props) => {
   const [isApproveLoad, setApproveLoad] = useState(false);
+  const [traderTotalAmount, setTraderTotalAmount] = useState(0);
+  const [userTotalAmount, setUserTotalAmount] = useState(0);
 
   const setLoading = (status) => {
     setApproveLoad(status);
+  }
+
+  const setTraderAmount = (amount) => {
+    setTraderTotalAmount(amount);
+  }
+
+  const setUserAmount = (amount) => {
+    setUserTotalAmount(amount);
   }
 
   return (
     <StoreContext.Provider
       value={{
         isApproveLoad,
-        setApproveLoad: setLoading
+        setApproveLoad: setLoading,
+        traderTotalAmount,
+        setTraderTotalAmount: setTraderAmount,
+        userTotalAmount,
+        setUserTotalAmount: setUserAmount,
       }}
     >
       {props.children}

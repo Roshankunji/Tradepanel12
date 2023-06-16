@@ -24,10 +24,11 @@ import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import { arbitrum } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { Provider } from "../provider";
-import { arbitrumFork } from "../constants/chains";
+import { arbitrumHardhat } from "../constants/chains";
+import { isTest } from "../constants/isTest";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [arbitrumFork],
+  [isTest ? arbitrumHardhat : arbitrum],
   [publicProvider()]
 );
 
