@@ -47,6 +47,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "DoubleSet",
+    "type": "error"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -90,6 +95,11 @@
   },
   {
     "inputs": [],
+    "name": "InvalidToken",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidTraderWallet",
     "type": "error"
   },
@@ -122,6 +132,11 @@
   {
     "inputs": [],
     "name": "SendToTraderFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TokenPresent",
     "type": "error"
   },
   {
@@ -279,6 +294,25 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "address",
+        "name": "collateralToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "indexToken",
+        "type": "address"
+      }
+    ],
+    "name": "NewGmxShortTokens",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "protocolId",
         "type": "uint256"
@@ -371,6 +405,32 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "TradeTokenAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "TradeTokenRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "traderAddress",
@@ -438,12 +498,6 @@
         "internalType": "int256",
         "name": "traderProfit",
         "type": "int256"
-      },
-      {
-        "indexed": false,
-        "internalType": "int256",
-        "name": "vaultProfit",
-        "type": "int256"
       }
     ],
     "name": "TraderWalletRolloverExecuted",
@@ -509,7 +563,7 @@
         "type": "uint256"
       }
     ],
-    "name": "UserVaultRolloverExecuted",
+    "name": "UsersVaultRolloverExecuted",
     "type": "event"
   },
   {
@@ -549,19 +603,6 @@
     ],
     "name": "WithdrawRequest",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "adaptersRegistryAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [],
@@ -631,32 +672,6 @@
   {
     "inputs": [],
     "name": "renounceOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_adaptersRegistryAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setAdaptersRegistryAddress",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_contractsFactoryAddress",
-        "type": "address"
-      }
-    ],
-    "name": "setContractsFactoryAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

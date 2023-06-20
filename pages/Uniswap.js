@@ -25,12 +25,12 @@ import ErrorWarning from "../components/Molecules/ErrorMessge/ErrorWarning";
 import Error from "../components/Molecules/ErrorMessge/Error";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
-import { tokenInfoData } from "../components/controls/Dropdown/TokenData.js";
+import { tokenInfoData } from "../constants/TokenData.js";
 import ExperModeModal from "../components/controls/Modal/ExperModeModal";
-import { erc20ABI, useAccount, useNetwork, usePublicClient, useWalletClient } from 'wagmi'
-import { LensABI, TraderWalletABI } from "../contracts/abis";
+import { erc20ABI, useAccount, useFeeData, useNetwork, usePublicClient, useWalletClient } from 'wagmi'
+import { LensABI, TraderWalletABI, UsersVaultABI } from "../contracts/abis";
 import { contractAddress } from '../contracts/address'
-import { encodePacked, parseUnits } from "viem";
+import { encodePacked, formatEther, parseEther, parseGwei, parseUnits } from "viem";
 import { formatEtherValue, formatUnitValue } from "../utils/formatNumber";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { jsNumberForAddress } from "react-jazzicon";
@@ -39,8 +39,10 @@ import { useApproveToken } from "../hook/useToken";
 import { useStore } from "../context/StoreContext";
 import { waitForTransaction } from '@wagmi/core';
 import { toast } from "react-toastify";
-import { useWeb3Store } from "../context/WebContext";
+import { useWeb3Store } from "../context/Web3Context";
 import { isApproved } from "../contracts";
+import { simplifyAddress } from "../utils/simplifyAddy";
+import { fetchUSDPrice } from "../api/utils";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 
@@ -70,34 +72,34 @@ const style1 = {
   padding: 3,
 };
 
-const traderTokens = [
-  {
-    tokenName: "Tether USD",
-    tokenAmount: 10.75,
-    dollarValue: 10.75,
-    tokenSymbol: "USDT",
-    percentChange: 0.05,
-    profitLoss: "loss",
-  },
-  {
-    tokenName: "USD Coin",
-    tokenAmount: 10.35,
-    dollarValue: 10.36,
-    tokenSymbol: "USDC",
-    percentChange: 0.07,
-    profitLoss: "profit",
-  },
-  {
-    tokenName: "Ethereum",
-    tokenAmount: 0.003,
-    dollarValue: 4.86,
-    tokenSymbol: "ETH",
-    percentChange: 1.33,
-    profitLoss: "loss",
-  },
-];
+// const traderTokensArray = [
+//   {
+//     tokenName: "Tether USD",
+//     tokenAmount: 10.75,
+//     dollarValue: 10.75,
+//     tokenSymbol: "USDT",
+//     percentChange: 0.05,
+//     profitLoss: "loss",
+//   },
+//   {
+//     tokenName: "USD Coin",
+//     tokenAmount: 10.35,
+//     dollarValue: 10.36,
+//     tokenSymbol: "USDC",
+//     percentChange: 0.07,
+//     profitLoss: "profit",
+//   },
+//   {
+//     tokenName: "Ethereum",
+//     tokenAmount: 0.003,
+//     dollarValue: 4.86,
+//     tokenSymbol: "ETH",
+//     percentChange: 1.33,
+//     profitLoss: "loss",
+//   },
+// ];
 
-const userTokens = [
+const userTokensArray = [
   {
     tokenName: "Tether USD",
     tokenAmount: 100.75,
@@ -128,7 +130,6 @@ const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
   const [totalTraderTokenAmount, setTotalTraderTokenAmount] = useState();
   const [totalUserTokenAmount, setTotalUserTokenAmount] = useState();
-  const [walletAddress, setWalletAddress] = useState("0x5175...526A");
   const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState(0.5);
   const [checked, setChecked] = useState(false);
@@ -146,17 +147,23 @@ const Uniswap = () => {
   const [toggle, setToggle] = useState("Trader wallet");
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
-  const { address: userAddress } = useAccount();
+  const { address: userAddress, isConnected } = useAccount();
   const [balance1, setBalance1] = useState(0.00);
   const [balance2, setBalance2] = useState(0.00);
-  const [usdValue, setUsdValue] = useState(0);
+  const [usdValue1, setUsdValue1] = useState(0);
+  const [usdValue2, setUsdValue2] = useState(0);
+
   const [poolFee, setPoolFee] = useState(3000);
   const [ratio, setRatio] = useState(0);
   const priceImpact = usePriceImpact(ratio, swapAmount, swapSecondAmount);
-  const { isApproveLoad, setApproveLoad } = useStore();
-  const { isConnected } = useAccount();
+  const { isApproveLoad, setApproveLoad, traderTotalAmount, userTotalAmount, traderWallet, vaultAddress } = useStore();
   const { chain } = useNetwork();
   const { isInitialized } = useWeb3Store();
+
+  const [userTokens, setUserTokens] = useState([]);
+  const [traderTokens, setTraderTokens] = useState([]);
+
+  const { data: feeData, isError, isLoading } = useFeeData();
 
   const [ tokenApprove ] = useApproveToken(tokenData.address, contractAddress.traderWalletAddress);
 
@@ -244,21 +251,32 @@ const Uniswap = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    setTotalTraderTokenAmount(
-      traderTokens
-        .map((item) => item.dollarValue)
-        .reduce((prev, next) => prev + next)
-        .toFixed(2)
-    );
-    setTotalUserTokenAmount(
-      userTokens
-        .map((item) => item.dollarValue)
-        .reduce((prev, next) => prev + next)
-        .toFixed(2)
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // const addUSD = async (token) => {
+  //   const token1Amount = await publicClient.getBalance({
+  //      address: token,
+  //   });
+
+  //   const total = Number(formatEther(token1Amount));
+  //   return total
+  // }
+
+  // useEffect(() => {
+  //   setTotalTraderTokenAmount(
+  //     traderTokens
+  //       .map((item) => item)
+  //       .reduce(async (prev, next) => {
+  //         addUSD(prev) + addUSD(next);
+  //       }, 0)
+  //   );
+  //   setTotalUserTokenAmount(
+  //     userTokens
+  //       .map((item) => item)
+  //       .reduce(async (prev, next) =>{
+  //         addUSD(prev) + addUSD(next);
+  //       }, 0)
+  //   );
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [traderTokens, userTokens]);
 
   useEffect(() => {
     if (openConfirmModal) {
@@ -287,12 +305,36 @@ const Uniswap = () => {
     setToggle(type);
   };
 
+  const getTokens = async () => {
+    const tradeTokensArrray = await publicClient.readContract({
+      abi: TraderWalletABI,
+      address: contractAddress.traderWalletAddress,
+      functionName: 'getAllowedTradeTokens'
+    })
+    const userTokensArray = await publicClient.readContract({
+      abi: UsersVaultABI,
+      address: contractAddress.usersVaultAddress,
+      functionName: "getAllowedTradeTokens"
+    })
+    setTraderTokens(tradeTokensArrray);
+    setUserTokens(userTokensArray);
+  }
+
+  useEffect(() => {
+    getTokens();
+  }, [])
+
   const fetchBalances = async (shortName, tokenAddress, setBalance) => {
-    if(userAddress === undefined) { 
+    const trader = await publicClient.readContract({ 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "traderAddress" 
+    });
+    if(trader === undefined) { 
       setBalance(0) 
     } else {
       if(shortName === "ETH") {
-        const _amount = await publicClient.getBalance({ address: userAddress });
+        const _amount = await publicClient.getBalance({ address: trader });
         const amount = formatEtherValue(_amount);
         setBalance(amount);
       } else {
@@ -300,7 +342,7 @@ const Uniswap = () => {
           address: tokenAddress,
           abi: erc20ABI, 
           functionName: 'balanceOf', 
-          args: [userAddress] 
+          args: [trader] 
         });
         const amount = formatEtherValue(_amount);
         setBalance(amount)
@@ -344,23 +386,35 @@ const Uniswap = () => {
   const handleSwap = async () => {
     if(walletClient === null || walletClient === undefined) return;
     try {
+      const trader = await publicClient.readContract({ 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "vaultAddress" 
+      });
+      const underlyingToken = await publicClient.readContract({ 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "underlyingTokenAddress" 
+      });
       const protocolId = 2;
       const replicate = true;
       const tokenADecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
       const tokenBDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
-      debugger;
       const amountIn = parseUnits(`${swapAmount}`, tokenADecimal);
       const amountOut = parseUnits(`${swapSecondAmount}`, tokenBDecimal);
       const fee = percentage * 1000;
       const path = encodePacked(["address", "uint24", "address"], [tokenData.address, fee, tokenDataNext.address])
+      console.log("path: ", path);
       const operationId = 1; // Sell
       const tradeData = encodePacked(["bytes", "uint256", "uint256"], [path, amountIn, amountOut]);
       const tradeOperation = { operationId, data: tradeData };
+      
       const { request } = await publicClient.simulateContract({ 
         address: contractAddress.traderWalletAddress, 
         abi: TraderWalletABI, 
         functionName: 'executeOnProtocol', 
-        args: [protocolId, tradeOperation, replicate] 
+        args: [protocolId, tradeOperation, replicate],
+        account: trader
       });
       const hash = await walletClient.writeContract(request);
       const tx = await waitForTransaction({ hash });
@@ -372,6 +426,46 @@ const Uniswap = () => {
       console.log(err);
     }
   }
+
+  const getNetworkFee = async () => {
+    if(traderWallet === "Loading...") return;
+    const gasPrice = feeData.gasPrice;
+    const maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+    // const protocolId = 2;
+    // const replicate = true;
+    // const tokenADecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
+    // const tokenBDecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenDataNext.address, functionName: "decimals" });
+    // const amountIn = parseUnits(`${swapAmount}`, tokenADecimal);
+    // const amountOut = parseUnits(`${swapSecondAmount}`, tokenBDecimal);
+    // const fee = percentage * 1000;
+    // const path = encodePacked(["address", "uint24", "address"], [tokenData.address, fee, tokenDataNext.address])
+    // console.log("path: ", path);
+    // const operationId = 1; // Sell
+    // const tradeData = encodePacked(["bytes", "uint256", "uint256"], [path, amountIn, amountOut]);
+    // const tradeOperation = { operationId, data: tradeData };
+    // const gasAmount = await publicClient.estimateContractGas({
+    //   address: contractAddress.traderWalletAddress,
+    //   abi: TraderWalletABI,
+    //   functionName: 'executeOnProtocol',
+    //   args: [protocolId, tradeOperation, replicate],
+    //   account: userAddress
+    // });
+    console.log("getNetworkFee: ", gasPrice, maxPriorityFeePerGas)
+  }
+
+  useEffect(() => {
+    const getUSDPrice = async () => {
+      const _usd1 = await fetchUSDPrice(tokenData);
+      const _usd2 = await fetchUSDPrice(tokenDataNext);
+      setUsdValue1(_usd1);
+      setUsdValue2(_usd2);
+    }
+    getUSDPrice();
+  }, [swapAmount, swapSecondAmount, tokenData, tokenDataNext])
+
+  useEffect(() => {
+    getNetworkFee();
+  }, [traderWallet])
 
   return (
     <>
@@ -485,7 +579,7 @@ const Uniswap = () => {
                 className="mr-2"
               />
               <div className="text-[16px] font-medium text-white">
-                {walletAddress}
+                {toggle === "Trader wallet" ? simplifyAddress(traderWallet) : simplifyAddress(vaultAddress)}
               </div>
             </div>
           }
@@ -527,7 +621,7 @@ const Uniswap = () => {
                 <div>
                   <div>
                     <div className="text-white text-[36px] font-medium">
-                      ${totalTraderTokenAmount}
+                      ${Number(traderTotalAmount).toFixed(2)}
                     </div>
                     <div className="flex items-center text-gray-400 text-[15px] font-medium">
                       {totalProfitLoss === "loss" ? (
@@ -542,16 +636,13 @@ const Uniswap = () => {
                   <div className="text-white text-[15px] font-bold mt-5 mb-3">
                     Tokens
                   </div>
-                  {traderTokens.map(function (e) {
+                  {traderTokens.map(function (address) {
                     return (
                       <TokenInfo
-                        key={""}
-                        tokenName={e.tokenName}
-                        tokenAmount={e.tokenAmount}
-                        dollarValue={e.dollarValue}
-                        tokenSymbol={e.tokenSymbol}
-                        percentChange={e.percentChange}
-                        profitLoss={e.profitLoss}
+                        key={address}
+                        tokenAddress={address}
+                        account={traderWallet}
+                        name="trader"
                       />
                     );
                   })}
@@ -561,7 +652,7 @@ const Uniswap = () => {
                 <div>
                   <div>
                     <div className="text-white text-[36px] font-medium">
-                      ${totalUserTokenAmount}
+                      ${Number(userTotalAmount).toFixed(2)}
                     </div>
                     <div className="flex items-center text-gray-400 text-[15px] font-medium">
                       {totalProfitLoss === "loss" ? (
@@ -576,16 +667,13 @@ const Uniswap = () => {
                   <div className="text-white text-[15px] font-bold mt-5 mb-3">
                     Tokens
                   </div>
-                  {userTokens.map(function (e) {
+                  {userTokens.map(function (address) {
                     return (
                       <TokenInfo
-                        key={""}
-                        tokenName={e.tokenName}
-                        tokenAmount={e.tokenAmount}
-                        dollarValue={e.dollarValue}
-                        tokenSymbol={e.tokenSymbol}
-                        percentChange={e.percentChange}
-                        profitLoss={e.profitLoss}
+                        key={address}
+                        tokenAddress={address}
+                        account={vaultAddress}
+                        name="user"
                       />
                     );
                   })}
@@ -602,7 +690,7 @@ const Uniswap = () => {
                   alt="wallet"
                   className="mr-2"
                 />
-                <div className="text-[16px] font-medium">{walletAddress}</div>
+                <div className="text-[16px] font-medium text-white">{toggle === "Trader wallet" ? simplifyAddress(traderWallet) : simplifyAddress(vaultAddress)}</div>
               </div>
             </div>
           }
@@ -635,7 +723,7 @@ const Uniswap = () => {
                   placeholder="0"
                   onChange={(e) => handleInputAmount(e.target.value)}
                 />
-                <div className="text-lightbluetext text-[14px] ">${usdValue}</div>
+                <div className="text-lightbluetext text-[14px] ">${(usdValue1 * swapAmount).toFixed(2)}</div>
               </div>
               <div className="w-[40%]">
                 <div
@@ -676,7 +764,7 @@ const Uniswap = () => {
                 placeholder="0"
                 onChange={(e) => handleOutputAmount(e.target.value)}
               />
-              <div className="text-lightbluetext text-[14px]">${usdValue}</div>
+              <div className="text-lightbluetext text-[14px]">${(usdValue2 * swapSecondAmount).toFixed(2)}</div>
             </div>
             <div className="w-[40%]">
               <div
@@ -804,7 +892,7 @@ const Uniswap = () => {
                 <div>
                   <p className="text-[14px]">1 {tokenData.shortName} = {ratio}({tokenDataNext.shortName}) </p>
                   <span className="text-lightbluetext text-[14px]">
-                    ($1.002)
+                    (${usdValue1.toFixed(2)})
                   </span>
                 </div>
               </div>

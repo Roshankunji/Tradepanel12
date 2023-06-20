@@ -1,14 +1,16 @@
 import { isValidAddress } from "../utils/isValidAddress";
 import { erc20ABI } from "wagmi";
-import { arbitrumFork } from "../constants/chains";
+import { arbitrumHardhat } from "../constants/chains";
+import { arbitrum } from "viem/chains";
 import { createPublicClient, http } from 'viem'
+import { isTest } from "../constants/isTest";
 
 let walletClient;
 let publicClient;
 let userAddress;
 
 const client = createPublicClient({
-    chain: arbitrumFork,
+    chain: isTest ? arbitrumHardhat : arbitrum,
     transport: http()
 })
 
@@ -29,7 +31,12 @@ export const getTokenDetail = async (tokenAddress) => {
 
 export const getTokenBalance = async (tokenAddress) => {
     if(isValidAddress(tokenAddress)) {
-        const tokenBalance = await client.readContract({ address: tokenAddress, abi: erc20ABI, functionName: 'balanceOf', args: [address] });
+        const trader = await publicClient.readContract({ 
+            abi: TraderWalletABI, 
+            address: contractAddress.traderWalletAddress, 
+            functionName: "traderAddress" 
+        });
+        const tokenBalance = await client.readContract({ address: tokenAddress, abi: erc20ABI, functionName: 'balanceOf', args: [trader] });
         const decimalsData = await client.readContract({ address: tokenAddress, abi: erc20ABI, functionName: 'decimals'});
         const decimals = decimalsData !== undefined ? Number(decimalsData) : 18;
         const balance = tokenBalance !== undefined ? Number(tokenBalance) : 0;

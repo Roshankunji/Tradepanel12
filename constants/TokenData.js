@@ -1,9 +1,10 @@
-import { EthSvg, FraxSvg, LinkSvg, UniSvg, UsdcSvg, UsdtSvg, WbtcSvg, WethSvg, DaiSvg } from "../../../config/images"
-import { tokenAddress } from "../../../contracts/address"
+import { EthSvg, FraxSvg, LinkSvg, UniSvg, UsdcSvg, UsdtSvg, WbtcSvg, WethSvg, DaiSvg } from "../config/images"
+import { tokenAddress } from "../contracts/address"
 
 export const tokenInfoData = [
   {
     "id": 1,
+    "ids": "ethereum",
     "image": EthSvg,
     "name": "Ethereum",
     "shortName": "ETH",
@@ -12,6 +13,7 @@ export const tokenInfoData = [
   },
   {
     "id": 2,
+    "ids": "usd-coin",
     "image": UsdcSvg,
     "name": "USD Coin",
     "shortName": "USDC",
@@ -20,6 +22,7 @@ export const tokenInfoData = [
   },
   {
     "id": 3,
+    "ids": "tether",
     "image": UsdtSvg,
     "name": "Tether USD",
     "shortName": "USDT",
@@ -28,6 +31,7 @@ export const tokenInfoData = [
   },
   {
     "id": 4,
+    "ids": "dai",
     "image": DaiSvg,
     "name": "Dai Stablecoin",
     "shortName": "DAI",
@@ -36,6 +40,7 @@ export const tokenInfoData = [
   },
   {
     "id": 5,
+    "ids": "frax",
     "image": FraxSvg,
     "name": "Frax",
     "shortName": "FRAX",
@@ -44,6 +49,7 @@ export const tokenInfoData = [
   },
   {
     "id": 6,
+    "ids": "weth",
     "image": WethSvg,
     "name": "Wrapped Ether",
     "shortName": "WETH",
@@ -52,6 +58,7 @@ export const tokenInfoData = [
   },
   {
     "id": 7,
+    "ids": "wrapped-bitcoin",
     "image": WbtcSvg,
     "name": "Wrapped BTC",
     "shortName": "WBTC",
@@ -60,6 +67,7 @@ export const tokenInfoData = [
   },
   {
     "id": 8,
+    "ids": "uniswap",
     "image": UniSvg,
     "name": "Uniswap",
     "shortName": "UNI",
@@ -68,6 +76,7 @@ export const tokenInfoData = [
   },
   {
     "id": 9,
+    "ids": "chainlink",
     "image": LinkSvg,
     "name": "ChainLink Token",
     "shortName": "LINK",
@@ -77,6 +86,7 @@ export const tokenInfoData = [
   ,
   {
     "id": 10,
+    "ids": "siacoin",
     "name": "ShitCoin",
     "shortName": "SC",
     "address": tokenAddress.link,

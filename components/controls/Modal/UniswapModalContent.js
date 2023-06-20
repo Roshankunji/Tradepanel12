@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import Search from "../Input/Search";
-import { tokenInfoData } from "../Dropdown/TokenData.js";
+import { tokenInfoData } from "../../../constants/TokenData.js";
 import Image from "next/image";
 import { isValidAddress } from "../../../utils/isValidAddress";
 import { erc20ABI, useAccount, usePublicClient } from 'wagmi'
@@ -9,6 +9,8 @@ import { getTokenBalance, getTokenDetail } from "../../../contracts";
 import { formatEtherValue } from "../../../utils/formatNumber";
 import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import { jsNumberForAddress } from "react-jazzicon";
+import { TraderWalletABI, UsersVaultABI } from "../../../contracts/abis";
+import { contractAddress } from "../../../contracts/address";
 const UniswapModalContent = ({
   token,
   setToken,
@@ -120,25 +122,37 @@ const UniswapModalContent = ({
 const TokenDetails = ({ onClick, image, name, shortName, tokenAddress, disabled }) => {
   const publicClient = usePublicClient();
   const [balance, setBalance] = useState(0);
-  const { address: userAddress } = useAccount();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchBalances = async () => {
-    if(userAddress === undefined) { 
+    const trader = await publicClient.readContract({ 
+        abi: TraderWalletABI, 
+        address: contractAddress.traderWalletAddress, 
+        functionName: "traderAddress" 
+    });
+    console.log("trader: ", trader);
+    // const underlyingToken = await publicClient.readContract({ 
+    //     abi: TraderWalletABI, 
+    //     address: contractAddress.traderWalletAddress, 
+    //     functionName: "underlyingTokenAddress" 
+    //   });
+    if(trader === undefined) { 
       setBalance(0) 
     } else {
       if(shortName === "ETH") {
-        const _amount = await publicClient.getBalance({ address: userAddress });
+        const _amount = await publicClient.getBalance({ address: trader });
         const amount = formatEtherValue(_amount);
+        console.log("shortName: ", shortName, "Balance: ", amount);
         setBalance(amount);
       } else {
         const _amount = await publicClient.readContract({ 
           address: tokenAddress,
           abi: erc20ABI, 
           functionName: 'balanceOf', 
-          args: [userAddress] 
+          args: [trader] 
         });
         const amount = formatEtherValue(_amount);
+        console.log("shortName: ", shortName, "Balance: ", amount);
         setBalance(amount)
     }
    }

@@ -1,12 +1,13 @@
 const baseVaultAddress = ""
-const contractsFactoryAddress = "0x8FC2434dd3a5Ddaefac0b8a6d12bd14C2790e1Dd"
+const contractsFactoryAddress = "0x77a272EF5Ba33B5c3D1fA68566F75b0144C679AD"
 const gmxAdapterAddress = "0xd3Bae94407B79c733712eccBbe8625b8409d8DB3"
-const lensAddress = "0x3aa7a1985232C2caCc20996F97afD6c3251998dD"
-const traderWalletAddress = "0xa5429a46244FEE9ED33cF0C820ed9Ce57786Ef4A"
+const lensAddress = "0x783e40fBae3E5C427102b496cf8621Fc5dD32F80"
+const traderWalletAddress = "0x8842c31f32bFFB6f07Fa20237d15F8Ad6eDe13A6"
 const traderWalletDeployerAddress = "0x3aa4e150ac6Dc0C897dc7859d275D199eF087598"
-const uniswapV3AdapterAddress = "0x324934DeC111EC7357201d54BC66B033BaF9eE3f"
-const usersVaultAddress = "0x8E519670206C2CAcF882282c0F51aD93aD90Bf0a"
-const usersVaultDeployerAddress = "0x1B8C875e16EBAdAb5fBeCdcB2A83E5C0D86c69dD"
+const uniswapV3AdapterAddress = "0xd8A9d057795fe2ef6171FCB05d2c96001555ff6d"
+const usersVaultAddress = "0x644a0F971422d7C744BB26089fb5267a4F6f5AA1"
+const usersVaultDeployerAddress = "0x8215aE307AD23f482838B99bFD4869F901720360"
+const dynamicValueationAddress = "0xda430a73106D31120Ec5128Bb1008bcd00d25A9C"
 
 export const testnetTokens = {
   usdc: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
@@ -20,6 +21,6 @@ export const testnetTokens = {
   randomCoin: "0x1E5E907F690a2aEa6c68D60f8bb9771FE585bC34",
 };
 
-const testnetAddress = { baseVaultAddress, contractsFactoryAddress, gmxAdapterAddress, lensAddress, traderWalletAddress, traderWalletDeployerAddress, uniswapV3AdapterAddress, usersVaultAddress, usersVaultDeployerAddress }
+const testnetAddress = { baseVaultAddress, contractsFactoryAddress, gmxAdapterAddress, lensAddress, traderWalletAddress, traderWalletDeployerAddress, uniswapV3AdapterAddress, usersVaultAddress, usersVaultDeployerAddress, dynamicValueationAddress }
 
 export default testnetAddress;
