@@ -7,8 +7,9 @@ const traderWalletDeployerAddress = ""
 const uniswapV3AdapterAddress = ""
 const usersVaultAddress = ""
 const usersVaultDeployerAddress = ""
+const dynamicValueationAddress = "" 
 
-const mainnetAddress = { baseVaultAddress, contractsFactoryAddress, gmxAdapterAddress, lensAddress, traderWalletAddress, traderWalletDeployerAddress, uniswapV3AdapterAddress, usersVaultAddress, usersVaultDeployerAddress }
+const mainnetAddress = { baseVaultAddress, contractsFactoryAddress, gmxAdapterAddress, lensAddress, traderWalletAddress, traderWalletDeployerAddress, uniswapV3AdapterAddress, usersVaultAddress, usersVaultDeployerAddress, dynamicValueationAddress }
 
 export const mainnetTokens = {
   usdc: "",

@@ -1,5 +1,5 @@
 import { Bounce, ToastContainer } from "react-toastify"
-import { Web3Provider } from "../context/WebContext"
+import { Web3Provider } from "../context/Web3Context"
 import StoreProvider from "../context/StoreContext"
 
 export const Provider = ({ children }) => {

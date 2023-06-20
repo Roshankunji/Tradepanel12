@@ -6,7 +6,7 @@ const traderWalletAddress = "0x8842c31f32bFFB6f07Fa20237d15F8Ad6eDe13A6"
 const traderWalletDeployerAddress = "0x3aa4e150ac6Dc0C897dc7859d275D199eF087598"
 const uniswapV3AdapterAddress = "0xd8A9d057795fe2ef6171FCB05d2c96001555ff6d"
 const usersVaultAddress = "0x644a0F971422d7C744BB26089fb5267a4F6f5AA1"
-const usersVaultDeployerAddress = "0x1B8C875e16EBAdAb5fBeCdcB2A83E5C0D86c69dD"
+const usersVaultDeployerAddress = "0x8215aE307AD23f482838B99bFD4869F901720360"
 const dynamicValueationAddress = "0xda430a73106D31120Ec5128Bb1008bcd00d25A9C"
 
 export const testnetTokens = {

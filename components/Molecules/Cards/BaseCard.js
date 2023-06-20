@@ -1,7 +1,90 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import FundsRollover from "./FundsRollover";
+import { erc20ABI, useAccount, usePublicClient } from "wagmi";
+import { contractAddress } from "../../../contracts/address";
+import { DynamicValuationABI, TraderWalletABI, UsersVaultABI } from "../../../contracts/abis";
+import { useStore } from "../../../context/StoreContext";
+import { commaSeparators } from "../../../utils/commaSeparator";
+import { formatUnitValue } from "../../../utils/formatNumber";
 
 const BaseCard = ({ name, className }) => {
+  const publicClient = usePublicClient();
+  const { traderWallet, vaultAddress } = useStore();
+
+  const [userValuation, setUserValuation] = useState(0);
+  const [underlyingToken, setUnderlyingToken] = useState();
+  const [underlyingTokenDecimal, setUnderlyingTokenDecimal] = useState();
+  const [underlyingTokenUserBalance, setUnderlyingTokenUserBalance] = useState(0);
+  const [totalSupply, setTotalSupply] = useState(0);
+  const [traderValuation, setTraderValuation] = useState(0);
+  const [underlyingTokenTraderBalance, setUnderlyingTokenTraderBalance] = useState(0);
+  const { isConnected } = useAccount();
+
+  const getUnderlyingToken = async () => {
+    const _underlyingToken = await publicClient.readContract({ 
+      abi: TraderWalletABI, 
+      address: contractAddress.traderWalletAddress, 
+      functionName: "underlyingTokenAddress" 
+    });
+    const _underlyingTokenDecimal = await publicClient.readContract({
+      abi: erc20ABI,
+      address: _underlyingToken,
+      functionName: 'decimals'
+    })
+    setUnderlyingToken(_underlyingToken);
+    setUnderlyingTokenDecimal(_underlyingTokenDecimal);
+  }
+
+  const getDashboardValues = async () => {
+    const [_userValuation, _underlyingTokenUserBalance, _totalSupply, _traderValuation, _underlyingTokenTraderBalance] = (
+      await publicClient.multicall({
+        contracts: [
+          {
+            address: contractAddress.usersVaultAddress,
+            abi: UsersVaultABI,
+            functionName: "getContractValuation" // D6
+          },
+           {
+            address: underlyingToken,
+            abi: erc20ABI,
+            functionName: "balanceOf",
+            args: [vaultAddress] // D7
+          },
+          {
+            address: contractAddress.usersVaultAddress,
+            abi: UsersVaultABI,
+            functionName: "totalSupply" // D11
+          },
+          {
+            address: contractAddress.traderWalletAddress,
+            abi: TraderWalletABI,
+            functionName: "getContractValuation" //D13
+          },
+          {
+            address: underlyingToken,
+            abi: erc20ABI,
+            functionName: "balanceOf",
+            args: [traderWallet] // D14
+          }
+        ]
+      })
+    ).map((v) => v.result);
+    setUserValuation(Number(_userValuation).toFixed(2));
+    setUnderlyingTokenUserBalance(formatUnitValue(_underlyingTokenUserBalance, underlyingTokenDecimal));
+    setTotalSupply(Number(_totalSupply).toFixed(2));
+    setTraderValuation(Number(_traderValuation).toFixed(2));
+    setUnderlyingTokenTraderBalance(formatUnitValue(_underlyingTokenTraderBalance, underlyingTokenDecimal));
+  }
+
+  useEffect(() => {
+    getUnderlyingToken();
+  }, [isConnected])
+
+  useEffect(() => {
+    if(underlyingToken !== undefined && underlyingTokenDecimal !== underlyingToken) {
+      getDashboardValues();
+    }
+  }, [underlyingToken, underlyingTokenDecimal, isConnected])
   return (
     <>
       <div
@@ -21,25 +104,25 @@ const BaseCard = ({ name, className }) => {
               <div className="flex flex-col py-[6px] ">
                 <p className="text-[12px] font-sora">Total Funds</p>
                 <p className="text-[18px] font-semibold font-sora">
-                  $34,44,44,4788
+                  {name === "User Vault" ? `$${userValuation}` : `$${traderValuation}`}
                 </p>
               </div>
               <div className="flex flex-col py-[6px] ">
                 <p className="text-[12px] font-sora">Unused</p>
                 <p className="text-[18px] font-semibold font-sora">
-                  $34,44,44,4788
+                  {name === "User Vault" ? `$${commaSeparators(underlyingTokenUserBalance)}` : `$${commaSeparators(underlyingTokenTraderBalance)}`}
                 </p>
               </div>
               <div className="flex flex-col py-[6px] ">
                 <p className="text-[12px] font-sora">Deployed</p>
                 <p className="text-[18px] font-semibold font-sora">
-                  $34,44,44,4788
+                   {name === "User Vault" ? `$${Number(userValuation) - Number(underlyingTokenUserBalance)}` : `$${Number(traderValuation) - Number(underlyingTokenTraderBalance)}` }
                 </p>
               </div>
               <div className="flex flex-col py-[6px]">
                 <p className="text-[12px] font-sora">Current Value</p>
                 <p className="text-[18px] font-semibold font-sora">
-                  $34,44,44,4788
+                  ${commaSeparators(underlyingTokenTraderBalance)}
                 </p>
               </div>
               <div className="flex flex-col py-[6px] ">
@@ -54,7 +137,7 @@ const BaseCard = ({ name, className }) => {
                   <div className="flex flex-col py-[6px] ">
                     <p className="text-[12px] font-sora">Total Shares</p>
                     <p className="text-[18px] font-semibold font-sora">
-                      $34,44,44,4788
+                      ${commaSeparators(totalSupply)}
                     </p>
                   </div>
                   <div className="flex flex-col py-[6px] ">
@@ -70,7 +153,7 @@ const BaseCard = ({ name, className }) => {
                 <div className="flex flex-col py-[6px] ">
                   <p className="text-[12px] font-sora">Uv/Tw(Unused)</p>
                   <p className="text-[18px] font-semibold font-sora">
-                    1,000.45
+                    {(underlyingTokenUserBalance / underlyingTokenTraderBalance).toFixed(2)}
                   </p>
                 </div>
               )}

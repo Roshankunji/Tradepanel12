@@ -74,24 +74,24 @@ const Modal1 = ({ control }) => {
 
   return (
     <>
-      <div className="flex justify-center">
+      <Box className="flex justify-center">
         <Button
           className="bg-primary py-[17px]  flex items-center w-[257px] flex justify-center"
           onClick={handleOpen}
           disabled={control === true ? false : true}
         >
           {process === true ? (
-            <div>
+            <Box>
               {" "}
               <FacebookCircularProgress />
-            </div>
+            </Box>
           ) : (
             ""
           )}
 
-          <p>
+          <Box>
             {process === false ? "Process Rollover" : "Processing Rollover"}
-          </p>
+          </Box>
         </Button>
         {/* <div className="flex flex-col justify-center items-center">
           <Button className="w-[92px] mb-[10px]">Finish</Button>
@@ -102,7 +102,7 @@ const Modal1 = ({ control }) => {
             </p>
           </div>
         </div> */}
-      </div>
+      </Box>
       <Modal
         open={open}
         onClose={handleClose}
@@ -112,7 +112,7 @@ const Modal1 = ({ control }) => {
         keepMounted={true}
       >
         <Box sx={style}>
-          <Typography>
+          <Box>
             <Typography
               id="modal-modal-title"
               variant="h6"
@@ -127,15 +127,15 @@ const Modal1 = ({ control }) => {
               sx={{ mt: 1 }}
               className="text-[14px] text-center mb-[20px]"
             >
-              <div className="px-20 text-center font-light text-lightGray">
+              <Box className="px-20 text-center font-light text-lightGray">
                 You’re about to process rollover for Top Cap Digital Asset
                 Strategy
-              </div>
+              </Box>
             </Typography>
             <Typography className="text-[14px] text-center mb-[12px] font-thin text-lightGray">
               Are you sure you want to proceed with this action?
             </Typography>
-            <div className="flex justify-center">
+            <Box className="flex justify-center">
               <Button
                 className="mx-5 text-[18px] py-[10px] px-[53px] w-[134px] bg-primary"
                 onClick={() => {
@@ -153,8 +153,8 @@ const Modal1 = ({ control }) => {
               >
                 No
               </Button>
-            </div>
-          </Typography>
+            </Box>
+          </Box>
         </Box>
       </Modal>
     </>

@@ -39,7 +39,7 @@ import { useApproveToken } from "../hook/useToken";
 import { useStore } from "../context/StoreContext";
 import { waitForTransaction } from '@wagmi/core';
 import { toast } from "react-toastify";
-import { useWeb3Store } from "../context/WebContext";
+import { useWeb3Store } from "../context/Web3Context";
 import { isApproved } from "../contracts";
 import { simplifyAddress } from "../utils/simplifyAddy";
 import { fetchUSDPrice } from "../api/utils";
@@ -130,8 +130,6 @@ const Uniswap = () => {
   const [totalProfitLoss, setTotalProfitLoss] = useState("loss");
   const [totalTraderTokenAmount, setTotalTraderTokenAmount] = useState();
   const [totalUserTokenAmount, setTotalUserTokenAmount] = useState();
-  const [traderWallet, setTraderWallet] = useState("Loading...");
-  const [vaultAddress, setVaultAddress] = useState("Loading...");
   const [open, setOpen] = useState(false);
   const [percentage, setPercentage] = useState(0.5);
   const [checked, setChecked] = useState(false);
@@ -158,7 +156,7 @@ const Uniswap = () => {
   const [poolFee, setPoolFee] = useState(3000);
   const [ratio, setRatio] = useState(0);
   const priceImpact = usePriceImpact(ratio, swapAmount, swapSecondAmount);
-  const { isApproveLoad, setApproveLoad, traderTotalAmount, userTotalAmount } = useStore();
+  const { isApproveLoad, setApproveLoad, traderTotalAmount, userTotalAmount, traderWallet, vaultAddress } = useStore();
   const { chain } = useNetwork();
   const { isInitialized } = useWeb3Store();
 
@@ -307,17 +305,7 @@ const Uniswap = () => {
     setToggle(type);
   };
 
-  const setTraderWalletAddress = async () => {
-    const trader = await publicClient.readContract({ 
-        abi: TraderWalletABI, 
-        address: contractAddress.traderWalletAddress, 
-        functionName: "traderAddress" 
-    });
-    const userVault = await publicClient.readContract({ 
-      abi: TraderWalletABI,
-      address: contractAddress.traderWalletAddress,
-      functionName: 'vaultAddress'
-    })
+  const getTokens = async () => {
     const tradeTokensArrray = await publicClient.readContract({
       abi: TraderWalletABI,
       address: contractAddress.traderWalletAddress,
@@ -330,12 +318,10 @@ const Uniswap = () => {
     })
     setTraderTokens(tradeTokensArrray);
     setUserTokens(userTokensArray);
-    setTraderWallet(trader);
-    setVaultAddress(userVault);
   }
 
   useEffect(() => {
-    setTraderWalletAddress();
+    getTokens();
   }, [])
 
   const fetchBalances = async (shortName, tokenAddress, setBalance) => {
@@ -410,8 +396,6 @@ const Uniswap = () => {
         address: contractAddress.traderWalletAddress, 
         functionName: "underlyingTokenAddress" 
       });
-      console.log("underlyingToken: ", underlyingToken);
-      console.log("trader: ", trader);
       const protocolId = 2;
       const replicate = true;
       const tokenADecimal = await publicClient.readContract({ abi: erc20ABI, address: tokenData.address, functionName: "decimals" });
@@ -908,7 +892,7 @@ const Uniswap = () => {
                 <div>
                   <p className="text-[14px]">1 {tokenData.shortName} = {ratio}({tokenDataNext.shortName}) </p>
                   <span className="text-lightbluetext text-[14px]">
-                    (${usdValue1})
+                    (${usdValue1.toFixed(2)})
                   </span>
                 </div>
               </div>
